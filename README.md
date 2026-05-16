@@ -27,7 +27,7 @@ Optional live realtime credentials:
 OPENAI_API_KEY=<real-key> npm run dev:api
 ~~~
 
-The browser does not receive the API key. `apps/api` mints a realtime client secret at `POST /realtime/session`. See `.env.example` for the full environment reference; scripts read process environment variables from the shell or deployment host.
+The browser does not receive the API key. `apps/api` mints a realtime client secret at `POST /realtime/session`. Scripts read process environment variables from the shell or deployment host.
 
 ## Demo Script
 
