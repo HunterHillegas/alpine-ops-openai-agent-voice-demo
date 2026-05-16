@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildAlpineRealtimeAgent, extractClientSecret } from "./realtimeConsole";
+import { approvalForModel, buildAlpineRealtimeAgent, extractClientSecret } from "./realtimeConsole";
 
 describe("realtime console integration", () => {
   it("builds the triage agent with specialist handoffs and core tools", () => {
@@ -41,6 +41,28 @@ describe("realtime console integration", () => {
     expect(extractClientSecret({ mode: "mock", data: { client_secret: "nope" } })).toBeNull();
     expect(extractClientSecret({ mode: "live", data: { client_secret: { value: "eph_123" } } })).toBe("eph_123");
     expect(extractClientSecret({ mode: "live", data: { value: "eph_456" } })).toBe("eph_456");
+  });
+
+  it("does not expose approval tokens to the realtime model", () => {
+    const visibleApproval = approvalForModel({
+      approvalId: "apr_123",
+      token: "tok_secret",
+      action: "createWorkOrder",
+      summary: "Schedule Marco Diaz.",
+      payload: { ticketId: "TCK-1044" },
+      status: "pending",
+      createdAt: "2026-05-16T12:00:00-07:00"
+    });
+
+    expect(visibleApproval).toEqual({
+      approvalId: "apr_123",
+      action: "createWorkOrder",
+      summary: "Schedule Marco Diaz.",
+      status: "pending",
+      message: "Approval card created in the UI. Do not call the write tool or claim completion until the dispatcher approves it."
+    });
+    expect(JSON.stringify(visibleApproval)).not.toContain("tok_secret");
+    expect(JSON.stringify(visibleApproval)).not.toContain("ticketId");
   });
 });
 

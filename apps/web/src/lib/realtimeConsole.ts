@@ -2,6 +2,7 @@ import { tool } from "@openai/agents";
 import { RealtimeAgent, RealtimeSession, type RealtimeItem } from "@openai/agents/realtime";
 import { realtimeInstructions, realtimeModel } from "@alpine/agents";
 import { z } from "zod";
+import type { Approval } from "@alpine/mock-data";
 import { companyClient, type RealtimeSessionResponse } from "./companyClient";
 
 export type VoiceConnection = "disconnected" | "connecting" | "live" | "mock";
@@ -329,10 +330,20 @@ export function buildAlpineRealtimeAgent() {
           summary: z.string(),
           payload: z.unknown()
         }),
-        execute: async (params) => companyClient.requestHumanApproval(params)
+        execute: async (params) => approvalForModel(await companyClient.requestHumanApproval(params))
       })
     ]
   });
+}
+
+export function approvalForModel(approval: Approval) {
+  return {
+    approvalId: approval.approvalId,
+    action: approval.action,
+    summary: approval.summary,
+    status: approval.status,
+    message: "Approval card created in the UI. Do not call the write tool or claim completion until the dispatcher approves it."
+  };
 }
 
 export function extractClientSecret(response: RealtimeSessionResponse): string | null {
