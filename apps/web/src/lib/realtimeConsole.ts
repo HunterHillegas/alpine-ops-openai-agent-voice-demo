@@ -66,6 +66,10 @@ export class AlpineRealtimeConsole {
     }
     this.session.sendMessage(message);
   }
+
+  setMuted(muted: boolean) {
+    this.session?.mute(muted);
+  }
 }
 
 export function buildAlpineRealtimeAgent() {

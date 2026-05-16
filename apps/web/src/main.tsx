@@ -40,6 +40,7 @@ function App() {
   const [theme, setTheme] = useState<ThemeId>(initialTheme);
   const [connection, setConnection] = useState<VoiceConnection>("disconnected");
   const [userText, setUserText] = useState("");
+  const [liveUserTranscript, setLiveUserTranscript] = useState("No live speech captured yet.");
   const [assistantText, setAssistantText] = useState("Ready for a dispatch request. Load a scenario or connect voice.");
   const [transcriptTurns, setTranscriptTurns] = useState<TranscriptTurn[]>([]);
   const [micMode, setMicMode] = useState<"push-to-talk" | "open-mic">("push-to-talk");
@@ -97,6 +98,9 @@ function App() {
       }
       const realtime = await getRealtimeConsole();
       await realtime.connect();
+      realtime.setMuted(micMode === "push-to-talk");
+      setLiveUserTranscript("Listening for live dispatcher audio.");
+      setBargeInStatus(micMode === "open-mic" ? "Open mic listening." : "Microphone muted. Switch to open mic before speaking.");
     } catch (err) {
       setConnection("disconnected");
       setError(err instanceof Error ? err.message : "Unable to connect realtime session.");
@@ -107,6 +111,7 @@ function App() {
     const next = await companyClient.reset(scenarioId);
     setState(next);
     setTranscriptTurns([]);
+    setLiveUserTranscript("No live speech captured yet.");
     setBargeInStatus("Idle");
     setAssistantText("Demo data reset. Scenario seed restored.");
   }
@@ -116,6 +121,7 @@ function App() {
     const replayTranscript = scenarioTranscripts[scenarioId] ?? [];
     setState(next);
     setTranscriptTurns(replayTranscript);
+    setLiveUserTranscript("No live speech captured yet.");
     setBargeInStatus("No interruption during replay.");
     setAssistantText(replayTranscript.findLast((turn) => turn.speaker === "assistant")?.text ?? next.events[0]?.label ?? "Scenario replay loaded.");
   }
@@ -141,6 +147,14 @@ function App() {
     setAssistantText(replayTranscript.findLast((turn) => turn.speaker === "assistant")?.text ?? next.events[0]?.label ?? "Text fallback replay loaded.");
   }
 
+  function changeMicMode(nextMode: "push-to-talk" | "open-mic") {
+    setMicMode(nextMode);
+    if (connection !== "live") return;
+
+    realtimeRef.current?.setMuted(nextMode === "push-to-talk");
+    setBargeInStatus(nextMode === "open-mic" ? "Open mic listening." : "Microphone muted. Switch to open mic before speaking.");
+  }
+
   async function getRealtimeConsole() {
     if (realtimeRef.current) return realtimeRef.current;
 
@@ -148,7 +162,7 @@ function App() {
     realtimeRef.current = new AlpineRealtimeConsole({
       onConnectionChange: setConnection,
       onAssistantText: setAssistantText,
-      onUserText: setUserText,
+      onUserText: setLiveUserTranscript,
       onError: setError,
       onInterruption: setBargeInStatus,
       onRefreshState: refresh
@@ -247,12 +261,12 @@ function App() {
           connection={connection}
           userText={userText}
           setUserText={setUserText}
+          userTranscript={connection === "live" ? liveUserTranscript : selectedScenario?.openingPrompt ?? "No scenario loaded."}
           assistantText={assistantText}
           transcriptTurns={transcriptTurns}
           micMode={micMode}
-          setMicMode={setMicMode}
+          setMicMode={changeMicMode}
           bargeInStatus={bargeInStatus}
-          selectedScenario={selectedScenario}
           onSubmitTextFallback={submitTextFallback}
         />
         <CaseWorkspace customer={customer} asset={asset} ticket={ticket} telemetry={telemetry} state={state} scenario={selectedScenario} />
@@ -272,12 +286,12 @@ function VoicePanel(props: {
   connection: string;
   userText: string;
   setUserText: (value: string) => void;
+  userTranscript: string;
   assistantText: string;
   transcriptTurns: TranscriptTurn[];
   micMode: "push-to-talk" | "open-mic";
   setMicMode: (mode: "push-to-talk" | "open-mic") => void;
   bargeInStatus: string;
-  selectedScenario: DemoScenario | undefined;
   onSubmitTextFallback: (event: React.FormEvent) => void;
 }) {
   return (
@@ -291,18 +305,18 @@ function VoicePanel(props: {
         <b>48A</b>
       </div>
       <div className="mic-row">
-        <button className={`control-button ${props.micMode === "push-to-talk" ? "active" : ""}`} aria-pressed={props.micMode === "push-to-talk"} onClick={() => props.setMicMode("push-to-talk")}>Push to talk</button>
+        <button className={`control-button ${props.micMode === "push-to-talk" ? "active" : ""}`} aria-pressed={props.micMode === "push-to-talk"} onClick={() => props.setMicMode("push-to-talk")}>Mute mic</button>
         <button className={`control-button secondary ${props.micMode === "open-mic" ? "active" : ""}`} aria-pressed={props.micMode === "open-mic"} onClick={() => props.setMicMode("open-mic")}>Open mic</button>
       </div>
       <div className="barge-indicator">
         <label>Mic mode</label>
-        <p>{props.micMode === "open-mic" ? "Open mic standby" : "Push-to-talk armed"}</p>
+        <p>{props.micMode === "open-mic" ? "Open mic listening" : "Mic muted"}</p>
         <label>Barge-in</label>
         <p>{props.bargeInStatus}</p>
       </div>
       <div className="transcript">
         <label>User transcript</label>
-        <p>{props.selectedScenario?.openingPrompt ?? "No scenario loaded."}</p>
+        <p>{props.userTranscript}</p>
       </div>
       {props.transcriptTurns.length > 0 && (
         <div className="transcript transcript-feed">

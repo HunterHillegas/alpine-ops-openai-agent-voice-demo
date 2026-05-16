@@ -33,13 +33,14 @@ The live smoke starts isolated API/web servers, grants microphone permission to 
 2. Browser asks for microphone permission.
 3. Status changes to `live`.
 4. Assistant transcript says the live voice session connected.
-5. Speak: "Customer Amelia Brooks says charger C H G dash 8821 died after a power outage."
-6. Agent asks to confirm exact ID if needed before lookup.
-7. Activity rail shows customer, asset, telemetry, warranty, inventory, dispatch, and approval events.
-8. Approval drawer receives a pending write action before any work order, cancellation, refund, reservation, save, or send mutates mock state.
-9. Approving the card updates the mock state and event rail.
-10. Disconnect returns status to `disconnected`.
-11. After the smoke test and spoken checklist both pass, record the local marker and run strict audit:
+5. Click **Open mic**.
+6. Speak: "Customer Amelia Brooks says charger C H G dash 8821 died after a power outage."
+7. Agent asks to confirm exact ID if needed before lookup.
+8. Activity rail shows customer, asset, telemetry, warranty, inventory, dispatch, and approval events.
+9. Approval drawer receives a pending write action before any work order, cancellation, refund, reservation, save, or send mutates mock state.
+10. Approving the card updates the mock state and event rail.
+11. Disconnect returns status to `disconnected`.
+12. After the smoke test and spoken checklist both pass, record the local marker and run strict audit:
 
 ~~~bash
 LIVE_VOICE_VERIFIED=1 npm run verify:live-audio

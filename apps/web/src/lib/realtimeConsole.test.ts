@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { approvalForModel, bindRealtimeSessionEvents, buildAlpineRealtimeAgent, extractClientSecret, type RealtimeConsoleCallbacks } from "./realtimeConsole";
+import { AlpineRealtimeConsole, approvalForModel, bindRealtimeSessionEvents, buildAlpineRealtimeAgent, extractClientSecret, type RealtimeConsoleCallbacks } from "./realtimeConsole";
 
 describe("realtime console integration", () => {
   it("builds the triage agent with specialist handoffs and core tools", () => {
@@ -81,6 +81,19 @@ describe("realtime console integration", () => {
 
     expect(callbacks.assistantText).toContain("Please confirm the normalized asset ID is CHG-8821.");
     expect(callbacks.userText).toContain("Confirmed CHG-8821.");
+  });
+
+  it("bridges UI mic mode into the realtime session mute control", () => {
+    const console = new AlpineRealtimeConsole(callbackRecorder());
+    const muted: boolean[] = [];
+    (console as unknown as { session: { mute: (value: boolean) => void } }).session = {
+      mute: (value) => muted.push(value)
+    };
+
+    console.setMuted(true);
+    console.setMuted(false);
+
+    expect(muted).toEqual([true, false]);
   });
 
   it("refreshes state and surfaces approval, interruption, and error events", async () => {

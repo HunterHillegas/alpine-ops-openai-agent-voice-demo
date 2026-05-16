@@ -37,7 +37,7 @@ Open the dashboard. Point out Alpine FieldOps, connection state, model indicator
 
 ### 0:20 Start Voice Session
 
-Click **Connect voice**. With no API key, the UI enters mock mode. With `OPENAI_API_KEY`, the API returns a realtime session credential for the browser WebRTC wiring. The text fallback input can also run seeded replay flows without a microphone.
+Click **Connect voice**. With no API key, the UI enters mock mode. With `OPENAI_API_KEY`, the API returns a realtime session credential for the browser WebRTC wiring. The default live mode starts muted; click **Open mic** before speaking. The text fallback input can also run seeded replay flows without a microphone.
 
 ### 0:40 Main Request
 
@@ -97,7 +97,7 @@ npm run docs:list
 
 The repo has the server-side realtime session endpoint, a lazy-loaded browser `RealtimeAgent` / `RealtimeSession` wrapper, specialist handoffs, and function tools that call the mock API. Without an API key, **Connect voice** enters mock mode. With `OPENAI_API_KEY` on the API server, the browser uses the ephemeral client secret to connect over WebRTC.
 
-Automated live WebRTC smoke has passed in this workspace with a real server-side key loaded from ignored local environment. Local tests also cover realtime session credential minting, mock voice fallback, transcript event handling, approval refresh events, and interruption/error surfacing. Strict completion still requires the spoken microphone/audio checklist in `docs/live-voice-verification.md`; after that passes, run `LIVE_VOICE_VERIFIED=1 npm run audit:strict` with the same server-side key loaded.
+Automated live WebRTC smoke has passed in this workspace with a real server-side key loaded from ignored local environment. Local tests also cover realtime session credential minting, mock voice fallback, transcript event handling, approval refresh events, mic mute control, and interruption/error surfacing. Strict completion still requires the spoken microphone/audio checklist in `docs/live-voice-verification.md`; after that passes, run `LIVE_VOICE_VERIFIED=1 npm run verify:live-audio` and `npm run audit:strict` with the same server-side key loaded.
 
 See `docs/scenarios.md` for replay/eval scenario coverage, `docs/live-voice-verification.md` for the manual live-key checklist, `docs/demo-capture.md` for screenshot/GIF capture steps, and `docs/deployment.md` for optional Vercel/Render notes.
 

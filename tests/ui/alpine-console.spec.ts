@@ -15,7 +15,7 @@ test("renders seeded operations cockpit", async ({ page }) => {
   await expect(page.getByText("Control board, AlpineCharge Pro 48A R3")).toBeVisible();
   await expect(page.getByText("Policy notes")).toBeVisible();
   await expect(page.getByText("Technician schedule")).toBeVisible();
-  await expect(page.getByText("Push-to-talk armed")).toBeVisible();
+  await expect(page.getByText("Mic muted")).toBeVisible();
   await expect(page.getByLabel("Theme")).toHaveValue("nextstep");
   await expect(page.locator(".app-shell")).toHaveAttribute("data-theme", "nextstep");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "nextstep");
@@ -23,7 +23,7 @@ test("renders seeded operations cockpit", async ({ page }) => {
   await expect(page.locator(".app-shell")).toHaveAttribute("data-theme", "platinum");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "platinum");
   await page.getByRole("button", { name: "Open mic" }).click();
-  await expect(page.getByText("Open mic standby")).toBeVisible();
+  await expect(page.getByText("Open mic listening")).toBeVisible();
   await expect(page.getByText("No pending side effects")).toBeVisible();
 });
 
