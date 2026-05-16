@@ -20,6 +20,7 @@ export function runCompletionAudit(env: NodeJS.ProcessEnv = process.env): Comple
     passed("trace-redaction", "Trace formatter tests redact phone numbers, emails, tokens, and client secrets while preserving operational IDs."),
     passed("mock-company-api", "Company API exposes resettable customers, assets, telemetry, warranty, policy, inventory, technicians, tickets, work orders, credit memos, messages, notes, event log, shared typed client contracts, and route-level tests for read/write flows."),
     passed("realtime-session-route", "API route tests cover mock mode without a key and live client-secret minting with the server API key kept out of browser responses."),
+    passed("realtime-ui-events", "Realtime console tests cover history transcript mapping, approval refresh events, audio interruption messages, and session error surfacing."),
     passed("specialist-tools", "Realtime agent handoffs expose Customer Context, Diagnostics, Dispatch, Policy/Billing, and Message Composer tools."),
     passed("approval-gates", "Eval tests cover approval-token enforcement for work orders, tickets, cancellations, credit memos, notes, and customer messages; realtime approval tool responses do not expose tokens to the model."),
     passed("exact-entity-capture", "Eval tests cover exact asset ID, ticket ID, appointment window, phone, and email normalization with partial-value rejection."),

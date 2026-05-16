@@ -41,7 +41,7 @@ export class AlpineRealtimeConsole {
       traceMetadata: { app: "alpine-fieldops-voice-agent" }
     });
 
-    wireSessionEvents(session, this.callbacks);
+    bindRealtimeSessionEvents(session, this.callbacks);
     await session.connect({ apiKey: secret, model: realtimeModel.model });
     this.session = session;
     this.mode = "live";
@@ -361,9 +361,13 @@ export function extractClientSecret(response: RealtimeSessionResponse): string |
   return null;
 }
 
-function wireSessionEvents(session: RealtimeSession, callbacks: RealtimeConsoleCallbacks) {
+export interface RealtimeEventSource {
+  on(event: string, handler: (...args: unknown[]) => void | Promise<void>): void;
+}
+
+export function bindRealtimeSessionEvents(session: RealtimeEventSource, callbacks: RealtimeConsoleCallbacks) {
   session.on("history_updated", (history) => {
-    const latest = [...history].reverse().find((item) => item.type === "message");
+    const latest = [...(history as RealtimeItem[])].reverse().find((item) => item.type === "message");
     const text = latest ? messageText(latest) : "";
     if (!text) return;
     if (latest?.role === "assistant") callbacks.onAssistantText(text);
@@ -382,7 +386,7 @@ function wireSessionEvents(session: RealtimeSession, callbacks: RealtimeConsoleC
     callbacks.onAssistantText(message);
   });
   session.on("error", (error) => {
-    callbacks.onError(errorMessage(error.error));
+    callbacks.onError(errorMessage((error as { error?: unknown }).error));
   });
 }
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { approvalForModel, buildAlpineRealtimeAgent, extractClientSecret } from "./realtimeConsole";
+import { approvalForModel, bindRealtimeSessionEvents, buildAlpineRealtimeAgent, extractClientSecret, type RealtimeConsoleCallbacks } from "./realtimeConsole";
 
 describe("realtime console integration", () => {
   it("builds the triage agent with specialist handoffs and core tools", () => {
@@ -64,8 +64,89 @@ describe("realtime console integration", () => {
     expect(JSON.stringify(visibleApproval)).not.toContain("tok_secret");
     expect(JSON.stringify(visibleApproval)).not.toContain("ticketId");
   });
+
+  it("maps realtime history events into visible user and assistant transcripts", () => {
+    const source = new FakeRealtimeSource();
+    const callbacks = callbackRecorder();
+    bindRealtimeSessionEvents(source, callbacks);
+
+    source.emit("history_updated", [
+      messageItem("user", "Customer says charger C H G dash 8821 died."),
+      messageItem("assistant", "Please confirm the normalized asset ID is CHG-8821.")
+    ]);
+    source.emit("history_updated", [
+      messageItem("assistant", "Please confirm the normalized asset ID is CHG-8821."),
+      messageItem("user", "Confirmed CHG-8821.")
+    ]);
+
+    expect(callbacks.assistantText).toContain("Please confirm the normalized asset ID is CHG-8821.");
+    expect(callbacks.userText).toContain("Confirmed CHG-8821.");
+  });
+
+  it("refreshes state and surfaces approval, interruption, and error events", async () => {
+    const source = new FakeRealtimeSource();
+    const callbacks = callbackRecorder();
+    bindRealtimeSessionEvents(source, callbacks);
+
+    await source.emit("agent_tool_end");
+    await source.emit("tool_approval_requested");
+    await source.emit("audio_interrupted");
+    await source.emit("error", { error: new Error("session failed") });
+
+    expect(callbacks.refreshCount).toBe(2);
+    expect(callbacks.assistantText).toContain("Approval requested. Review the drawer before any side effect runs.");
+    expect(callbacks.interruptions).toContain("Interrupted. Listening for the next dispatcher instruction.");
+    expect(callbacks.errors).toContain("session failed");
+  });
 });
 
 function toolNames(agent: unknown) {
   return ((agent as { tools?: Array<{ name: string }> } | undefined)?.tools ?? []).map((tool) => tool.name);
+}
+
+function messageItem(role: "assistant" | "user", text: string) {
+  return {
+    type: "message",
+    role,
+    content: [{ type: "text", text }]
+  };
+}
+
+function callbackRecorder() {
+  const callbacks = {
+    assistantText: [] as string[],
+    userText: [] as string[],
+    interruptions: [] as string[],
+    errors: [] as string[],
+    refreshCount: 0,
+    onConnectionChange: () => undefined,
+    onAssistantText: (text: string) => callbacks.assistantText.push(text),
+    onUserText: (text: string) => callbacks.userText.push(text),
+    onError: (message: string) => callbacks.errors.push(message),
+    onInterruption: (message: string) => callbacks.interruptions.push(message),
+    onRefreshState: () => {
+      callbacks.refreshCount += 1;
+    }
+  };
+  return callbacks satisfies RealtimeConsoleCallbacks & {
+    assistantText: string[];
+    userText: string[];
+    interruptions: string[];
+    errors: string[];
+    refreshCount: number;
+  };
+}
+
+class FakeRealtimeSource {
+  private handlers = new Map<string, Array<(...args: unknown[]) => void | Promise<void>>>();
+
+  on(event: string, handler: (...args: unknown[]) => void | Promise<void>) {
+    this.handlers.set(event, [...(this.handlers.get(event) ?? []), handler]);
+  }
+
+  async emit(event: string, ...args: unknown[]) {
+    for (const handler of this.handlers.get(event) ?? []) {
+      await handler(...args);
+    }
+  }
 }
