@@ -74,7 +74,7 @@ packages/agents       Agent roster, realtime instructions, tool schemas, exact-I
 packages/company-api  In-memory fake company API with approval-gated writes
 packages/mock-data    Seed fixtures and shared domain types
 packages/evals        Eval fixtures and behavior tests
-docs                  Architecture and troubleshooting
+docs                  Architecture, evals, demo capture, live verification, troubleshooting
 ~~~
 
 ## Gates
@@ -94,6 +94,8 @@ npm run docs:list
 The repo has the server-side realtime session endpoint, a lazy-loaded browser `RealtimeAgent` / `RealtimeSession` wrapper, specialist handoffs, and function tools that call the mock API. Without an API key, **Connect voice** enters mock mode. With `OPENAI_API_KEY` on the API server, the browser uses the ephemeral client secret to connect over WebRTC.
 
 Remaining live-voice hardening: exercise the full microphone/audio path with a real key, expand SDK approval-resume handling for write tools, and add browser automation around live transcript events.
+
+See `docs/live-voice-verification.md` for the manual live-key checklist and `docs/demo-capture.md` for screenshot/GIF capture steps.
 
 ## Mocking Boundary
 

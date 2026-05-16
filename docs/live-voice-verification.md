@@ -1,0 +1,32 @@
+# Live Voice Verification
+
+Use this checklist when an OpenAI API key is available. The current automated suite verifies the mock voice fallback, scenario replay, approval drawer, exact-ID guardrails, and browser UI. Live microphone/audio still needs a real key and browser microphone permission.
+
+## Setup
+
+~~~bash
+OPENAI_API_KEY=sk-... npm run dev:api
+VITE_API_URL=http://localhost:8787 npm run dev:web
+~~~
+
+Open `http://localhost:5173`.
+
+## Expected Checks
+
+1. Click **Connect voice**.
+2. Browser asks for microphone permission.
+3. Status changes to `live`.
+4. Assistant transcript says the live voice session connected.
+5. Speak: "Customer Amelia Brooks says charger C H G dash 8821 died after a power outage."
+6. Agent asks to confirm exact ID if needed before lookup.
+7. Activity rail shows customer, asset, telemetry, warranty, inventory, dispatch, and approval events.
+8. Approval drawer receives a pending write action before any work order, cancellation, refund, reservation, save, or send mutates mock state.
+9. Approving the card updates the mock state and event rail.
+10. Disconnect returns status to `disconnected`.
+
+## Failure Notes
+
+- If the endpoint returns mock mode, the API server does not have `OPENAI_API_KEY`.
+- If the browser never prompts for a microphone, check browser permissions for `localhost:5173`.
+- If the agent claims a write completed before the event rail shows a successful tool result, treat it as a bug.
+- If an exact ID is partial or corrected mid-utterance and a lookup still runs, treat it as a bug.
