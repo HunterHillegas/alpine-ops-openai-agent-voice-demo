@@ -27,6 +27,21 @@ test("renders seeded operations cockpit", async ({ page }) => {
   await expect(page.getByText("No pending side effects")).toBeVisible();
 });
 
+test("loads Platinum desktop furniture from theme deep link", async ({ page }) => {
+  await page.goto("/?theme=platinum");
+
+  await expect(page.getByLabel("Theme")).toHaveValue("platinum");
+  await expect(page.locator(".app-shell")).toHaveAttribute("data-theme", "platinum");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "platinum");
+  await expect(page.locator("body")).toHaveCSS("background-color", "rgb(154, 152, 204)");
+  await expect(page.locator(".platinum-menu-bar")).toBeVisible();
+  await expect(page.locator(".platinum-menu-bar")).toContainText("File");
+  await expect(page.locator(".platinum-menu-bar")).toContainText("Special");
+  await expect(page.locator(".platinum-wallpaper span")).toHaveCount(54);
+  await expect(page.locator(".platinum-desktop-icons span")).toHaveCount(4);
+  await expect(page.locator(".topbar")).toHaveCSS("background-color", "rgb(216, 216, 216)");
+});
+
 test("replays main scenario and executes approved work order", async ({ page }) => {
   await page.getByRole("button", { name: "Run replay" }).click();
 

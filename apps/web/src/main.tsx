@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { scenarioTranscripts, type Approval, type CompanyState, type DemoScenario, type TranscriptTurn } from "@alpine/mock-data";
 import { ActivityRail } from "./components/ActivityRail";
 import { NextStepFurniture } from "./components/NextStepFurniture";
+import { PlatinumFurniture } from "./components/PlatinumFurniture";
 import { TopBar, type ThemeId } from "./components/TopBar";
 import { companyClient } from "./lib/companyClient";
 import { dispatchSummaryText, ticketIdForCustomerMessage } from "./lib/dispatchSummary";
@@ -22,12 +23,20 @@ import type {
 import "./styles.css";
 import "./cockpit.css";
 import "./themes.css";
+import "./platinum.css";
+
+function initialTheme(): ThemeId {
+  if (typeof window === "undefined") return "nextstep";
+
+  const theme = new URLSearchParams(window.location.search).get("theme");
+  return theme === "platinum" || theme === "nextstep" ? theme : "nextstep";
+}
 
 function App() {
   const [state, setState] = useState<CompanyState | null>(null);
   const [scenarios, setScenarios] = useState<DemoScenario[]>([]);
   const [scenarioId, setScenarioId] = useState("dead-charger-outage");
-  const [theme, setTheme] = useState<ThemeId>("nextstep");
+  const [theme, setTheme] = useState<ThemeId>(initialTheme);
   const [connection, setConnection] = useState<VoiceConnection>("disconnected");
   const [userText, setUserText] = useState("");
   const [assistantText, setAssistantText] = useState("Ready for a dispatch request. Load a scenario or connect voice.");
@@ -217,6 +226,7 @@ function App() {
   return (
     <main className="app-shell" data-theme={theme}>
       <NextStepFurniture />
+      <PlatinumFurniture />
       <TopBar
         connection={connection}
         scenarioId={scenarioId}

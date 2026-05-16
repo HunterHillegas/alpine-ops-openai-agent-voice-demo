@@ -1,0 +1,487 @@
+html[data-theme="platinum"] {
+  color-scheme: light;
+  --bg: #9a98cc;
+  --bg-2: #b4b2dc;
+  --panel: #d8d8d8;
+  --panel-strong: #ececec;
+  --line: #5f5f5f;
+  --text: #111;
+  --muted: #3f3f3f;
+  --accent: #263fbd;
+  --accent-2: #d63a9a;
+  --danger: #b82018;
+  --cyan: #0a6b86;
+  --shadow: 2px 2px 0 rgba(0, 0, 0, 0.34);
+  --page-bg: #9a98cc;
+  --chrome-bg: #d8d8d8;
+  --control-bg: #dcdcdc;
+  --control-hover-border: #263fbd;
+  --primary-text: #fff;
+  --field-bg: #fff;
+  --raised-bg: #e6e6e6;
+  --inset-bg: #cfcfcf;
+  --copy-strong: #1d1d1d;
+  --brand-bg: #fff;
+  --brand-border: #777;
+  --radius: 0;
+  --radius-lg: 0;
+  font-family: Charcoal, Chicago, Geneva, "Avenir Next", sans-serif;
+}
+
+html[data-theme="platinum"] body {
+  background: #9a98cc;
+  background-size: 1px 1px;
+}
+
+.platinum-furniture {
+  display: none;
+}
+
+html[data-theme="platinum"] .platinum-furniture {
+  display: block;
+}
+
+html[data-theme="platinum"] .app-shell {
+  position: relative;
+  padding: 34px 82px 18px 18px;
+}
+
+html[data-theme="platinum"] .topbar,
+html[data-theme="platinum"] .console-grid,
+html[data-theme="platinum"] .approval-drawer,
+html[data-theme="platinum"] .error-banner {
+  position: relative;
+  z-index: 1;
+}
+
+html[data-theme="platinum"] .platinum-menu-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 6;
+  height: 20px;
+  border-bottom: 1px solid #4a4a4a;
+  background: #f8f8f8;
+  color: #060606;
+  box-shadow: 0 1px #bdbdbd;
+  font-size: 12px;
+  line-height: 20px;
+  padding: 0 8px;
+}
+
+html[data-theme="platinum"] .platinum-menu-bar b {
+  font-weight: 700;
+}
+
+html[data-theme="platinum"] .platinum-menu-bar time {
+  margin-left: auto;
+  font-weight: 700;
+}
+
+html[data-theme="platinum"] .platinum-apple {
+  position: relative;
+  width: 12px;
+  height: 14px;
+  margin-right: 2px;
+}
+
+html[data-theme="platinum"] .platinum-apple::before,
+html[data-theme="platinum"] .platinum-apple::after {
+  position: absolute;
+  content: "";
+  background: #070707;
+}
+
+html[data-theme="platinum"] .platinum-apple::before {
+  left: 2px;
+  bottom: 0;
+  width: 9px;
+  height: 10px;
+  border-radius: 5px 5px 4px 4px;
+}
+
+html[data-theme="platinum"] .platinum-apple::after {
+  top: 0;
+  left: 7px;
+  width: 5px;
+  height: 3px;
+  transform: rotate(-24deg);
+}
+
+html[data-theme="platinum"] .platinum-wallpaper {
+  display: grid;
+  grid-template-columns: repeat(9, 86px);
+  gap: 20px 34px;
+  position: fixed;
+  inset: 22px 86px 0 16px;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  color: rgba(61, 67, 166, 0.22);
+  font-family: Chicago, Charcoal, Geneva, sans-serif;
+  font-size: 20px;
+  line-height: 1;
+}
+
+html[data-theme="platinum"] .platinum-wallpaper span {
+  display: grid;
+  width: 82px;
+  height: 44px;
+  align-content: end;
+  text-shadow: 1px 1px rgba(255, 255, 255, 0.22);
+}
+
+html[data-theme="platinum"] .platinum-wallpaper span::before {
+  width: 22px;
+  height: 20px;
+  margin: 0 auto 2px;
+  border: 1px solid rgba(61, 67, 166, 0.24);
+  border-radius: 2px 2px 0 0;
+  background:
+    linear-gradient(90deg, transparent 45%, rgba(61, 67, 166, 0.18) 45% 55%, transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(61, 67, 166, 0.08));
+  content: "";
+}
+
+html[data-theme="platinum"] .platinum-desktop-icons {
+  display: grid;
+  gap: 18px;
+  position: fixed;
+  top: 38px;
+  right: 10px;
+  z-index: 2;
+  width: 62px;
+  color: #111;
+  font-family: Chicago, Charcoal, Geneva, sans-serif;
+  font-size: 10px;
+  line-height: 1.08;
+  text-align: center;
+}
+
+html[data-theme="platinum"] .platinum-desktop-icons span {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+}
+
+html[data-theme="platinum"] .platinum-desktop-icons i {
+  display: block;
+  width: 30px;
+  height: 26px;
+  border: 1px solid #565656;
+  border-radius: 2px 2px 1px 1px;
+  background:
+    linear-gradient(180deg, #fff 0 20%, #d8d8d8 21% 100%);
+  box-shadow:
+    inset 1px 1px #fff,
+    inset -1px -1px #787878,
+    1px 1px #555;
+}
+
+html[data-theme="platinum"] .platinum-desktop-icons .trash i {
+  width: 25px;
+  height: 29px;
+  border-radius: 0 0 4px 4px;
+  background:
+    linear-gradient(90deg, transparent 0 20%, #bdbdbd 20% 28%, transparent 28% 45%, #bdbdbd 45% 53%, transparent 53% 70%, #bdbdbd 70% 78%, transparent 78%),
+    #eeeeee;
+}
+
+html[data-theme="platinum"] .topbar,
+html[data-theme="platinum"] .panel,
+html[data-theme="platinum"] .workspace,
+html[data-theme="platinum"] .approval-drawer,
+html[data-theme="platinum"] .info-panel,
+html[data-theme="platinum"] .chart-panel,
+html[data-theme="platinum"] .timeline-panel,
+html[data-theme="platinum"] .policy-panel,
+html[data-theme="platinum"] .schedule-panel,
+html[data-theme="platinum"] .plan-panel,
+html[data-theme="platinum"] .event-card,
+html[data-theme="platinum"] .transcript,
+html[data-theme="platinum"] .barge-indicator {
+  box-shadow:
+    inset 1px 1px #fff,
+    inset -1px -1px #777,
+    var(--shadow);
+}
+
+html[data-theme="platinum"] .topbar,
+html[data-theme="platinum"] .panel,
+html[data-theme="platinum"] .workspace,
+html[data-theme="platinum"] .approval-drawer {
+  border: 1px solid #565656;
+  background: #d8d8d8;
+}
+
+html[data-theme="platinum"] .topbar {
+  position: relative;
+  align-items: flex-start;
+  padding-top: 24px;
+}
+
+html[data-theme="platinum"] .topbar::before,
+html[data-theme="platinum"] .panel-heading,
+html[data-theme="platinum"] .workspace-header,
+html[data-theme="platinum"] .agent-group-heading {
+  border: 1px solid #8d8d8d;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
+  background:
+    repeating-linear-gradient(180deg, #f8f8f8 0 1px, #b8b8b8 1px 2px, #e8e8e8 2px 3px);
+  color: #111;
+}
+
+html[data-theme="platinum"] .topbar::before {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  left: 18px;
+  height: 15px;
+  content: "Alpine FieldOps Voice Console";
+  font-family: Chicago, Charcoal, Geneva, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 15px;
+  text-align: center;
+}
+
+html[data-theme="platinum"] .topbar::after {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 10px;
+  height: 10px;
+  border: 1px solid #676767;
+  background:
+    linear-gradient(135deg, #fff 0 50%, #b4b4b4 51%);
+  box-shadow:
+    inset 1px 1px #fff,
+    inset -1px -1px #777;
+  content: "";
+}
+
+html[data-theme="platinum"] .panel-heading,
+html[data-theme="platinum"] .workspace-header {
+  min-height: 18px;
+  margin: -14px -14px 12px;
+  padding: 2px 8px;
+}
+
+html[data-theme="platinum"] .workspace-header {
+  margin: -16px -16px 12px;
+}
+
+html[data-theme="platinum"] .panel-heading span,
+html[data-theme="platinum"] .panel-heading strong,
+html[data-theme="platinum"] .workspace-header h2,
+html[data-theme="platinum"] .workspace-header p,
+html[data-theme="platinum"] .agent-group-heading h3,
+html[data-theme="platinum"] .agent-group-heading span {
+  color: #111;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+html[data-theme="platinum"] .workspace-header h2 {
+  font-size: 1.08rem;
+  line-height: 1.1;
+}
+
+html[data-theme="platinum"] .workspace-header p {
+  margin-top: 1px;
+  font-size: 0.72rem;
+}
+
+html[data-theme="platinum"] button,
+html[data-theme="platinum"] select,
+html[data-theme="platinum"] input {
+  border: 1px solid #565656;
+  border-top-color: #fff;
+  border-left-color: #fff;
+  border-radius: 0;
+  background: #dcdcdc;
+  color: #111;
+  box-shadow:
+    inset 1px 1px #fff,
+    inset -1px -1px #6d6d6d;
+  font-family: Chicago, Charcoal, Geneva, sans-serif;
+  font-size: 11px;
+  padding: 0.42rem 0.62rem;
+}
+
+html[data-theme="platinum"] .primary-action {
+  background: #263fbd;
+  color: #fff;
+}
+
+html[data-theme="platinum"] button:hover {
+  transform: none;
+  border-color: #263fbd;
+}
+
+html[data-theme="platinum"] .brand {
+  min-width: 220px;
+}
+
+html[data-theme="platinum"] .brand-mark {
+  position: relative;
+  width: 45px;
+  height: 38px;
+  border-color: #777;
+  border-radius: 1px;
+  background:
+    linear-gradient(180deg, #fff 0 18%, #111 18% 19%, #ececec 19% 100%);
+  color: transparent;
+  box-shadow:
+    inset 1px 1px #fff,
+    inset -1px -1px #777;
+}
+
+html[data-theme="platinum"] .brand-mark::after {
+  position: absolute;
+  top: 14px;
+  left: 7px;
+  color: #111;
+  content: "Mac";
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+html[data-theme="platinum"] .brand h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.08rem;
+  letter-spacing: 0;
+}
+
+html[data-theme="platinum"] .brand p,
+html[data-theme="platinum"] .theme-picker span,
+html[data-theme="platinum"] .status-pill,
+html[data-theme="platinum"] .model-pill,
+html[data-theme="platinum"] .priority,
+html[data-theme="platinum"] .info-panel span,
+html[data-theme="platinum"] .transcript label,
+html[data-theme="platinum"] .approval-drawer span {
+  color: #222;
+  font-family: Chicago, Charcoal, Geneva, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+html[data-theme="platinum"] .status-pill,
+html[data-theme="platinum"] .model-pill,
+html[data-theme="platinum"] .priority {
+  border: 1px solid #777;
+  border-radius: 0;
+  background: #eeeeee;
+  padding: 0.38rem 0.55rem;
+  box-shadow:
+    inset 1px 1px #fff,
+    inset -1px -1px #777;
+}
+
+html[data-theme="platinum"] .console-grid {
+  grid-template-columns: minmax(220px, 0.78fr) minmax(430px, 1.6fr) minmax(230px, 0.78fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+
+html[data-theme="platinum"] .info-panel,
+html[data-theme="platinum"] .chart-panel,
+html[data-theme="platinum"] .timeline-panel,
+html[data-theme="platinum"] .policy-panel,
+html[data-theme="platinum"] .schedule-panel,
+html[data-theme="platinum"] .plan-panel,
+html[data-theme="platinum"] .event-card,
+html[data-theme="platinum"] .transcript,
+html[data-theme="platinum"] .barge-indicator,
+html[data-theme="platinum"] .approval-list article {
+  border: 1px solid #777;
+  border-top-color: #fff;
+  border-left-color: #fff;
+  border-radius: 0;
+  background: #e8e8e8;
+}
+
+html[data-theme="platinum"] .info-panel h3,
+html[data-theme="platinum"] .event-card small,
+html[data-theme="platinum"] .follow-up span,
+html[data-theme="platinum"] .message-ledger span,
+html[data-theme="platinum"] .transcript-feed b,
+html[data-theme="platinum"] .timeline-panel li span,
+html[data-theme="platinum"] .schedule-panel b {
+  color: #263fbd;
+}
+
+html[data-theme="platinum"] .info-panel h3 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.05rem;
+  letter-spacing: 0;
+}
+
+html[data-theme="platinum"] .voice-orb {
+  border: 1px solid #777;
+  border-radius: 0;
+  background:
+    linear-gradient(135deg, #111 0 47%, #fff 47% 50%, #647ac8 50% 66%, #d63a9a 66% 100%);
+  box-shadow:
+    inset 2px 2px #fff,
+    inset -2px -2px #747474,
+    var(--shadow);
+}
+
+html[data-theme="platinum"] .voice-orb span {
+  border-radius: 0;
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+html[data-theme="platinum"] .voice-orb b {
+  color: #fff;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+html[data-theme="platinum"] .bar {
+  border: 1px solid #777;
+  border-radius: 0;
+  background: repeating-linear-gradient(180deg, #263fbd 0 4px, #5f73d3 4px 7px);
+}
+
+html[data-theme="platinum"] .assistant {
+  border-color: #1e4fbf;
+}
+
+html[data-theme="platinum"] .policy-panel li {
+  border-left-color: #263fbd;
+}
+
+html[data-theme="platinum"] .approval-list article {
+  background: #fff;
+}
+
+html[data-theme="platinum"] .event-args {
+  border-color: #777;
+  border-radius: 0;
+  background: #fff;
+  color: #111;
+}
+
+html[data-theme="platinum"] .approval-drawer {
+  backdrop-filter: none;
+}
+
+@media (max-width: 1180px) {
+  html[data-theme="platinum"] .app-shell {
+    padding: 30px 12px 12px;
+  }
+
+  html[data-theme="platinum"] .platinum-desktop-icons,
+  html[data-theme="platinum"] .platinum-wallpaper {
+    display: none;
+  }
+}
