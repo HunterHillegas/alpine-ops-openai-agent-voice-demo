@@ -1,0 +1,337 @@
+.workspace {
+  padding: 16px;
+}
+
+.workspace-header {
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.workspace-header h2 {
+  font-size: clamp(1.4rem, 2vw, 2.1rem);
+}
+
+.workspace-header p {
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.priority {
+  color: var(--accent-2);
+  text-transform: uppercase;
+}
+
+.workspace-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.info-panel,
+.chart-panel,
+.timeline-panel,
+.policy-panel,
+.schedule-panel,
+.plan-panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.045);
+  padding: 13px;
+}
+
+.info-panel h3 {
+  margin-top: 8px;
+  color: var(--accent);
+  font-size: 1.28rem;
+}
+
+.info-panel p,
+.plain-note,
+.chart-caption,
+.event-card p,
+.policy-panel p,
+.schedule-panel span,
+.approval-list p {
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+dl {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 0;
+}
+
+dl div {
+  display: grid;
+  grid-template-columns: minmax(64px, 0.34fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+dt {
+  color: var(--muted);
+}
+
+dd {
+  margin: 0;
+  color: var(--text);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.lower-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.plan-panel {
+  grid-column: 1 / -1;
+}
+
+.telemetry-chart {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  height: 180px;
+  border-bottom: 1px solid var(--line);
+  padding: 16px 8px 0;
+}
+
+.bar {
+  position: relative;
+  flex: 1;
+  min-height: 24px;
+  border-radius: 7px 7px 0 0;
+  background: linear-gradient(180deg, var(--accent-2), rgba(126, 231, 135, 0.42));
+}
+
+.bar span {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--text);
+  font-size: 0.78rem;
+}
+
+.timeline-panel ol {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline-panel li,
+.schedule-panel li {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 10px;
+  color: #dbece0;
+}
+
+.timeline-panel li span {
+  color: var(--accent-2);
+  font-weight: 800;
+}
+
+.policy-panel ul,
+.schedule-panel ul {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.policy-panel li {
+  border-left: 2px solid rgba(126, 231, 135, 0.5);
+  color: #dbece0;
+  padding-left: 9px;
+}
+
+.schedule-panel li {
+  grid-template-columns: 86px 1fr;
+}
+
+.schedule-panel b {
+  color: var(--accent-2);
+}
+
+.follow-up,
+.message-ledger {
+  margin-top: 12px;
+  border-left: 3px solid var(--accent);
+  padding-left: 12px;
+}
+
+.message-ledger {
+  border-left-color: var(--cyan);
+}
+
+.follow-up span,
+.message-ledger span {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.message-ledger span {
+  color: var(--cyan);
+}
+
+.message-ledger b {
+  color: var(--accent-2);
+}
+
+.activity-rail {
+  overflow: hidden;
+}
+
+.event-list {
+  display: grid;
+  max-height: 584px;
+  gap: 9px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.event-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.18);
+  padding: 11px;
+}
+
+.event-card > div {
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.event-card h4 {
+  margin-top: 8px;
+  font-size: 0.95rem;
+}
+
+.event-card small {
+  display: block;
+  margin-top: 8px;
+  color: var(--accent);
+}
+
+.event-args {
+  display: block;
+  max-height: 128px;
+  margin-top: 8px;
+  overflow: auto;
+  border: 1px solid rgba(177, 224, 194, 0.14);
+  border-radius: 7px;
+  background: rgba(5, 13, 11, 0.58);
+  color: #cfe3d6;
+  font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  padding: 8px;
+  white-space: pre-wrap;
+}
+
+.event-card.approval {
+  border-color: rgba(246, 198, 91, 0.4);
+}
+
+.event-card.failure,
+.event-error {
+  color: var(--danger);
+}
+
+.approval-drawer {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  left: 18px;
+  z-index: 3;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 14px;
+  backdrop-filter: blur(18px);
+}
+
+.approval-drawer > div:first-child {
+  min-width: 210px;
+}
+
+.approval-drawer strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--text);
+}
+
+.approval-list {
+  display: flex;
+  flex: 1;
+  gap: 10px;
+  overflow-x: auto;
+}
+
+.approval-list article {
+  min-width: min(460px, 80vw);
+  border: 1px solid rgba(246, 198, 91, 0.35);
+  border-radius: 8px;
+  background: rgba(246, 198, 91, 0.08);
+  padding: 10px;
+}
+
+.approval-list article button {
+  margin: 8px 8px 0 0;
+}
+
+@media (max-width: 1180px) {
+  .console-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .panel,
+  .workspace {
+    min-height: auto;
+  }
+
+  .workspace-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .app-shell {
+    padding: 10px;
+  }
+
+  .topbar,
+  .approval-drawer,
+  .lower-grid,
+  .fallback-form {
+    display: block;
+  }
+
+  .topbar-controls {
+    justify-content: flex-start;
+    margin-top: 12px;
+  }
+
+  .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .approval-drawer {
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+  }
+
+  .approval-list {
+    margin-top: 10px;
+  }
+}

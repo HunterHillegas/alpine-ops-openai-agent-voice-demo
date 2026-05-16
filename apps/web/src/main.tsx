@@ -5,6 +5,7 @@ import type { Approval, CompanyState, DemoScenario, EventLogEntry } from "@alpin
 import { companyClient } from "./lib/companyClient";
 import type { AlpineRealtimeConsole, VoiceConnection } from "./lib/realtimeConsole";
 import "./styles.css";
+import "./cockpit.css";
 
 function App() {
   const [state, setState] = useState<CompanyState | null>(null);
