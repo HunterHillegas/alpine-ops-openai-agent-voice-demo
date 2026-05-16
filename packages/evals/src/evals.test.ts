@@ -31,6 +31,15 @@ describe("eval fixtures", () => {
     ]));
   });
 
+  it("defines final mock state expectations for every fixture", () => {
+    for (const fixture of evalFixtures) {
+      expect(fixture.expectedState, fixture.id).toMatchObject({
+        workOrderCount: expect.any(Number),
+        pendingApprovalActions: expect.any(Array)
+      });
+    }
+  });
+
   it("marks write tools as approval-gated", () => {
     const writeTools = toolDefinitions.filter((tool) => tool.kind === "write");
     expect(writeTools.map((tool) => tool.name)).toEqual([
@@ -145,6 +154,7 @@ describe("eval fixtures", () => {
 
     expect(results).toHaveLength(evalFixtures.length);
     expect(results.every((result) => result.passed)).toBe(true);
+    expect(results.flatMap((result) => result.stateErrors)).toEqual([]);
   });
 
   it("completion audit reports live voice as blocked without an API key", () => {

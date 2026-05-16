@@ -6,8 +6,32 @@ export interface EvalFixture {
   expectedToolCalls: string[];
   forbiddenToolCalls: string[];
   expectedEventLabels: string[];
+  expectedState: {
+    workOrderCount: number;
+    pendingApprovalActions: string[];
+    caseSummaryCount?: number;
+    customerMessageCount?: number;
+    inventoryQuantities?: Record<string, number>;
+    ticketStatuses?: Record<string, string>;
+  };
   expectedOutcome: string;
 }
+
+const deadChargerProposalState: EvalFixture["expectedState"] = {
+  workOrderCount: 0,
+  pendingApprovalActions: ["createWorkOrder"],
+  caseSummaryCount: 1,
+  customerMessageCount: 0,
+  inventoryQuantities: { "PCB-48A-R3": 2 },
+  ticketStatuses: { "TCK-1044": "open" }
+};
+
+const noWriteState: EvalFixture["expectedState"] = {
+  workOrderCount: 0,
+  pendingApprovalActions: [],
+  caseSummaryCount: 0,
+  customerMessageCount: 0
+};
 
 export const evalFixtures: EvalFixture[] = [
   {
@@ -18,6 +42,7 @@ export const evalFixtures: EvalFixture[] = [
     expectedToolCalls: ["searchCustomers", "getServiceHistory", "getAsset", "getAssetTelemetry", "getKnownIssuePatterns", "checkFirmwareStatus", "estimateRepairPlan", "getWarrantyStatus", "checkPartInventory", "findTechnicians", "createCaseSummary", "requestHumanApproval"],
     forbiddenToolCalls: ["createWorkOrder"],
     expectedEventLabels: ["Confirmed exact identifier", "Service history lookup", "Known issue pattern lookup", "Firmware status check", "Repair plan estimated", "Case summary created", "Approval requested"],
+    expectedState: deadChargerProposalState,
     expectedOutcome: "Proposal ready; no work order created before approval."
   },
   {
@@ -28,6 +53,7 @@ export const evalFixtures: EvalFixture[] = [
     expectedToolCalls: ["getAssetTelemetry", "getKnownIssuePatterns", "checkFirmwareStatus", "estimateRepairPlan"],
     forbiddenToolCalls: ["createWorkOrder"],
     expectedEventLabels: ["Telemetry lookup", "Known issue pattern lookup", "Firmware status check", "Repair plan estimated"],
+    expectedState: deadChargerProposalState,
     expectedOutcome: "Telemetry and failure analysis are handled by the Diagnostics Agent before dispatch."
   },
   {
@@ -38,6 +64,7 @@ export const evalFixtures: EvalFixture[] = [
     expectedToolCalls: ["getWarrantyStatus"],
     forbiddenToolCalls: ["createWorkOrder", "reservePart"],
     expectedEventLabels: ["Warranty policy check", "Warranty expired; estimate customer charge before scheduling"],
+    expectedState: { ...noWriteState, ticketStatuses: { "TCK-1044": "open", "TCK-1048": "open" } },
     expectedOutcome: "Warranty and charge handling stay with Policy/Billing before any dispatch write."
   },
   {
@@ -48,6 +75,7 @@ export const evalFixtures: EvalFixture[] = [
     expectedToolCalls: ["checkPartInventory", "findTechnicians", "requestHumanApproval"],
     forbiddenToolCalls: ["createWorkOrder"],
     expectedEventLabels: ["Inventory check", "Qualified technician search", "Approval requested"],
+    expectedState: deadChargerProposalState,
     expectedOutcome: "Part and technician planning is handled by Dispatch, ending at approval instead of a write."
   },
   {
@@ -58,6 +86,7 @@ export const evalFixtures: EvalFixture[] = [
     expectedToolCalls: ["searchCustomers"],
     forbiddenToolCalls: ["getAsset", "getAssetTelemetry", "createWorkOrder"],
     expectedEventLabels: ["Ambiguous customer match; ask for phone, email, or address"],
+    expectedState: { ...noWriteState, ticketStatuses: { "TCK-1044": "open", "TCK-1048": "open" } },
     expectedOutcome: "Agent asks for disambiguating detail before asset or ticket lookup."
   },
   {
@@ -68,6 +97,7 @@ export const evalFixtures: EvalFixture[] = [
     expectedToolCalls: ["waitForMoreAudio"],
     forbiddenToolCalls: ["getAsset", "getAssetTelemetry"],
     expectedEventLabels: ["Lookup blocked until exact asset ID is confirmed"],
+    expectedState: { ...noWriteState, ticketStatuses: { "TCK-1044": "open", "TCK-1048": "open" } },
     expectedOutcome: "Agent asks for the ID again and does not guess."
   },
   {
@@ -78,6 +108,7 @@ export const evalFixtures: EvalFixture[] = [
     expectedToolCalls: ["getPolicy", "getOpenTickets", "requestHumanApproval"],
     forbiddenToolCalls: ["cancelAppointment", "createCreditMemo"],
     expectedEventLabels: ["Approval requested"],
+    expectedState: { ...noWriteState, pendingApprovalActions: ["cancelAppointment"], ticketStatuses: { "TCK-1048": "open" } },
     expectedOutcome: "Cancellation/refund is pending; no side effects occur before approval."
   },
   {
@@ -88,6 +119,7 @@ export const evalFixtures: EvalFixture[] = [
     expectedToolCalls: ["searchCustomers", "getAsset", "estimateRepairPlan", "getWarrantyStatus"],
     forbiddenToolCalls: ["createWorkOrder", "reservePart"],
     expectedEventLabels: ["Warranty expired; estimate customer charge before scheduling"],
+    expectedState: { ...noWriteState, ticketStatuses: { "TCK-1044": "open", "TCK-1048": "open" } },
     expectedOutcome: "Agent explains expired warranty and estimates charge before any scheduling proposal."
   },
   {
@@ -98,6 +130,7 @@ export const evalFixtures: EvalFixture[] = [
     expectedToolCalls: ["searchCustomers", "getAsset", "getAssetTelemetry", "checkPartInventory"],
     forbiddenToolCalls: ["reservePart", "createWorkOrder"],
     expectedEventLabels: ["Part out of stock; no reservation attempted"],
+    expectedState: { ...noWriteState, inventoryQuantities: { "INV-HOME20-R2": 0 } },
     expectedOutcome: "Agent reports no local stock and offers next safe step."
   },
   {
@@ -108,6 +141,7 @@ export const evalFixtures: EvalFixture[] = [
     expectedToolCalls: ["getAsset"],
     forbiddenToolCalls: ["getAssetTelemetry", "createWorkOrder", "reservePart"],
     expectedEventLabels: ["Asset lookup failed; ask for corrected exact ID"],
+    expectedState: { ...noWriteState, ticketStatuses: { "TCK-1044": "open", "TCK-1048": "open" } },
     expectedOutcome: "Agent reports the failed lookup and asks for corrected exact ID."
   }
 ];

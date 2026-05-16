@@ -1,4 +1,5 @@
 import { createCompanyApi } from "@alpine/company-api";
+import type { CompanyState } from "@alpine/mock-data";
 import { evalFixtures, type EvalFixture } from "./index";
 
 export interface EvalResult {
@@ -7,6 +8,7 @@ export interface EvalResult {
   missingTools: string[];
   forbiddenToolsSeen: string[];
   missingLabels: string[];
+  stateErrors: string[];
   outcome: string;
 }
 
@@ -21,16 +23,51 @@ export function runEvalFixtures(fixtures: EvalFixture[] = evalFixtures): EvalRes
     const missingTools = fixture.expectedToolCalls.filter((toolName) => !tools.includes(toolName));
     const forbiddenToolsSeen = fixture.forbiddenToolCalls.filter((toolName) => tools.includes(toolName));
     const missingLabels = fixture.expectedEventLabels.filter((label) => !labels.includes(label));
+    const stateErrors = stateExpectationErrors(fixture, replay.data);
 
     return {
       id: fixture.id,
-      passed: !missingTools.length && !forbiddenToolsSeen.length && !missingLabels.length,
+      passed: !missingTools.length && !forbiddenToolsSeen.length && !missingLabels.length && !stateErrors.length,
       missingTools,
       forbiddenToolsSeen,
       missingLabels,
+      stateErrors,
       outcome: fixture.expectedOutcome
     };
   });
+}
+
+function stateExpectationErrors(fixture: EvalFixture, state: CompanyState): string[] {
+  const errors: string[] = [];
+  const expected = fixture.expectedState;
+  if (state.workOrders.length !== expected.workOrderCount) {
+    errors.push(`expected ${expected.workOrderCount} work order(s), saw ${state.workOrders.length}`);
+  }
+
+  const pendingApprovalActions = state.approvals.filter((approval) => approval.status === "pending").map((approval) => approval.action);
+  if (JSON.stringify(pendingApprovalActions) !== JSON.stringify(expected.pendingApprovalActions)) {
+    errors.push(`expected pending approvals ${expected.pendingApprovalActions.join(",") || "none"}, saw ${pendingApprovalActions.join(",") || "none"}`);
+  }
+
+  if (expected.caseSummaryCount !== undefined && state.caseSummaries.length !== expected.caseSummaryCount) {
+    errors.push(`expected ${expected.caseSummaryCount} case summary record(s), saw ${state.caseSummaries.length}`);
+  }
+
+  if (expected.customerMessageCount !== undefined && state.customerMessages.length !== expected.customerMessageCount) {
+    errors.push(`expected ${expected.customerMessageCount} customer message record(s), saw ${state.customerMessages.length}`);
+  }
+
+  for (const [ticketId, status] of Object.entries(expected.ticketStatuses ?? {})) {
+    const ticket = state.tickets.find((item) => item.ticketId === ticketId);
+    if (ticket?.status !== status) errors.push(`expected ${ticketId} status ${status}, saw ${ticket?.status ?? "missing"}`);
+  }
+
+  for (const [partId, quantity] of Object.entries(expected.inventoryQuantities ?? {})) {
+    const part = state.inventory.find((item) => item.partId === partId);
+    if (part?.quantity !== quantity) errors.push(`expected ${partId} quantity ${quantity}, saw ${part?.quantity ?? "missing"}`);
+  }
+
+  return errors;
 }
 
 function failedFixture(fixture: EvalFixture, errors: string[]): EvalResult {
@@ -40,6 +77,7 @@ function failedFixture(fixture: EvalFixture, errors: string[]): EvalResult {
     missingTools: errors,
     forbiddenToolsSeen: [],
     missingLabels: [],
+    stateErrors: [],
     outcome: fixture.expectedOutcome
   };
 }
