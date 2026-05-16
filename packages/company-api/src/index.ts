@@ -37,6 +37,8 @@ export interface CompanyApi {
   cancelAppointment(params: { ticketId: string; approvalToken: string }): ApiResult<Ticket>;
   createCreditMemo(params: { customerId: string; amountCents: number; reason: string; approvalToken: string }): ApiResult<{ creditMemoId: string; customerId: string; amountCents: number }>;
   draftCustomerMessage(params: { customerId: string; workOrderId?: string; channel: "sms" | "email"; topic: string }): ApiResult<{ draftId: string; body: string }>;
+  saveCustomerMessage(params: { customerId: string; channel: "sms" | "email"; body: string; approvalToken: string }): ApiResult<{ messageId: string; status: "saved" }>;
+  sendCustomerMessage(params: { messageId: string; approvalToken: string }): ApiResult<{ messageId: string; status: "sent" }>;
   replayScenario(scenarioId: string): ApiResult<CompanyState>;
   addEvent(entry: EventLogEntry): EventLogEntry;
 }
@@ -257,6 +259,43 @@ export function createCompanyApi(initialState: CompanyState = createSeedState())
         : `Hi ${customer.name.split(" ")[0]}, Alpine FieldOps reviewed your ${topic}. Reply here if you want us to make any changes before we save it.`;
       addEvent(event("Message Composer Agent", "tool_result", "Customer message drafted", { toolName: "draftCustomerMessage", args: { customerId, workOrderId, channel, topic }, resultSummary: body }));
       return success({ draftId: `msg_${Math.random().toString(36).slice(2, 9)}`, body });
+    },
+
+    saveCustomerMessage: ({ customerId, channel, body, approvalToken }) => {
+      const approval = requireApprovedToken(approvalToken, "saveCustomerMessage");
+      if (!approval.ok) return approval;
+      const customer = state.customers.find((item) => item.id === customerId);
+      if (!customer) return failure("customer_not_found", `No customer found for ${customerId}.`);
+      const message = {
+        messageId: `MSG-${Math.floor(1000 + Math.random() * 9000)}`,
+        customerId,
+        channel,
+        body,
+        status: "saved" as const,
+        createdAt: new Date().toISOString()
+      };
+      state.customerMessages.unshift(message);
+      addEvent(event("Message Composer Agent", "state_change", "Customer message saved", {
+        toolName: "saveCustomerMessage",
+        args: { customerId, channel },
+        resultSummary: message.messageId
+      }));
+      return success({ messageId: message.messageId, status: message.status });
+    },
+
+    sendCustomerMessage: ({ messageId, approvalToken }) => {
+      const approval = requireApprovedToken(approvalToken, "sendCustomerMessage");
+      if (!approval.ok) return approval;
+      const message = state.customerMessages.find((item) => item.messageId === messageId);
+      if (!message) return failure("message_not_found", `No message found for ${messageId}.`);
+      message.status = "sent";
+      message.sentAt = new Date().toISOString();
+      addEvent(event("Message Composer Agent", "state_change", "Customer message sent", {
+        toolName: "sendCustomerMessage",
+        args: { messageId },
+        resultSummary: "Mock send complete"
+      }));
+      return success({ messageId, status: message.status });
     },
 
     replayScenario: (scenarioId) => {

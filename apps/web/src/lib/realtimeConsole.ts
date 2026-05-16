@@ -188,6 +188,26 @@ export function buildAlpineRealtimeAgent() {
           topic: params.topic,
           ...(params.workOrderId ? { workOrderId: params.workOrderId } : {})
         })
+      }),
+      tool({
+        name: "saveCustomerMessage",
+        description: "Save a mocked customer message only after the dispatcher approves the UI card and provides its approval token.",
+        parameters: z.object({
+          customerId: z.string(),
+          channel: z.enum(["sms", "email"]),
+          body: z.string(),
+          approvalToken: z.string()
+        }),
+        execute: async (params) => companyClient.saveCustomerMessage(params)
+      }),
+      tool({
+        name: "sendCustomerMessage",
+        description: "Mark a saved customer message as sent in the mock system only after explicit UI approval.",
+        parameters: z.object({
+          messageId: z.string(),
+          approvalToken: z.string()
+        }),
+        execute: async (params) => companyClient.sendCustomerMessage(params)
       })
     ]
   });

@@ -18,7 +18,14 @@ describe("eval fixtures", () => {
 
   it("marks write tools as approval-gated", () => {
     const writeTools = toolDefinitions.filter((tool) => tool.kind === "write");
-    expect(writeTools.map((tool) => tool.name)).toEqual(["createWorkOrder", "reservePart", "cancelAppointment", "createCreditMemo"]);
+    expect(writeTools.map((tool) => tool.name)).toEqual([
+      "createWorkOrder",
+      "reservePart",
+      "cancelAppointment",
+      "createCreditMemo",
+      "saveCustomerMessage",
+      "sendCustomerMessage"
+    ]);
     expect(writeTools.every((tool) => tool.requiresApproval)).toBe(true);
   });
 
@@ -76,5 +83,18 @@ describe("eval fixtures", () => {
 
     expect(denied.ok).toBe(false);
     expect(api.getState().workOrders).toHaveLength(0);
+  });
+
+  it("requires approval before saving mocked customer messages", () => {
+    const api = createCompanyApi();
+    const deniedSave = api.saveCustomerMessage({
+      customerId: "cus_amelia_brooks",
+      channel: "sms",
+      body: "Draft",
+      approvalToken: "missing"
+    });
+
+    expect(deniedSave.ok).toBe(false);
+    expect(api.getState().customerMessages).toHaveLength(0);
   });
 });

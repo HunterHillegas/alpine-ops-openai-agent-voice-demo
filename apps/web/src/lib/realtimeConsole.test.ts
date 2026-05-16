@@ -25,6 +25,9 @@ describe("realtime console integration", () => {
     expect(toolNames(dispatch)).toContain("reservePart");
     expect(toolNames(policy)).toContain("cancelAppointment");
     expect(toolNames(policy)).toContain("createCreditMemo");
+    const composer = agent.handoffs.find((handoff) => ("agentName" in handoff ? handoff.agentName : handoff.name) === "Message Composer Agent");
+    expect(toolNames(composer)).toContain("saveCustomerMessage");
+    expect(toolNames(composer)).toContain("sendCustomerMessage");
   });
 
   it("extracts ephemeral client secrets without exposing server keys", () => {

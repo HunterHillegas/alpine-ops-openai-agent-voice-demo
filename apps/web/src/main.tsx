@@ -93,6 +93,18 @@ function App() {
     if (approved.action === "cancelAppointment") {
       await companyClient.cancelAppointment({ ...(approved.payload as object), approvalToken: approved.token });
     }
+    if (approved.action === "createCreditMemo") {
+      await companyClient.createCreditMemo({ ...(approved.payload as object), approvalToken: approved.token });
+    }
+    if (approved.action === "reservePart") {
+      await companyClient.reservePart({ ...(approved.payload as object), approvalToken: approved.token });
+    }
+    if (approved.action === "saveCustomerMessage") {
+      await companyClient.saveCustomerMessage({ ...(approved.payload as object), approvalToken: approved.token });
+    }
+    if (approved.action === "sendCustomerMessage") {
+      await companyClient.sendCustomerMessage({ ...(approved.payload as object), approvalToken: approved.token });
+    }
     await refresh();
   }
 

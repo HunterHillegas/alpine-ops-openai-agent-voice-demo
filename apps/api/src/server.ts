@@ -73,6 +73,8 @@ app.post<{ Body: { partId: string; quantity: number; approvalToken: string } }>(
 app.post<{ Body: { ticketId: string; approvalToken: string } }>("/appointments/cancel", async (request) => company.cancelAppointment(request.body));
 app.post<{ Body: { customerId: string; amountCents: number; reason: string; approvalToken: string } }>("/billing/credits", async (request) => company.createCreditMemo(request.body));
 app.post<{ Body: { customerId: string; workOrderId?: string; channel: "sms" | "email"; topic: string } }>("/messages/draft", async (request) => company.draftCustomerMessage(request.body));
+app.post<{ Body: { customerId: string; channel: "sms" | "email"; body: string; approvalToken: string } }>("/messages/save", async (request) => company.saveCustomerMessage(request.body));
+app.post<{ Body: { messageId: string; approvalToken: string } }>("/messages/send", async (request) => company.sendCustomerMessage(request.body));
 
 app.post("/realtime/session", async (_request, reply) => {
   if (!process.env.OPENAI_API_KEY) {

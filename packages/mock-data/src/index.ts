@@ -90,6 +90,16 @@ export interface WorkOrder {
   status: WorkOrderStatus;
 }
 
+export interface CustomerMessage {
+  messageId: string;
+  customerId: string;
+  channel: ContactChannel;
+  body: string;
+  status: "draft" | "saved" | "sent";
+  createdAt: string;
+  sentAt?: string;
+}
+
 export interface Approval {
   approvalId: string;
   token: string;
@@ -133,6 +143,7 @@ export interface CompanyState {
   inventory: InventoryItem[];
   policies: Policy[];
   workOrders: WorkOrder[];
+  customerMessages: CustomerMessage[];
   approvals: Approval[];
   events: EventLogEntry[];
 }
@@ -387,6 +398,7 @@ export function createSeedState(): CompanyState {
       }
     ],
     workOrders: [],
+    customerMessages: [],
     approvals: [],
     events: []
   };

@@ -20,6 +20,8 @@ export const companyClient = {
   reservePart: (payload: unknown) => post("/inventory/reservations", payload),
   cancelAppointment: (payload: unknown) => post("/appointments/cancel", payload),
   createCreditMemo: (payload: unknown) => post("/billing/credits", payload),
+  saveCustomerMessage: (payload: unknown) => post("/messages/save", payload),
+  sendCustomerMessage: (payload: unknown) => post("/messages/send", payload),
   realtimeSession: () => postRaw<RealtimeSessionResponse>("/realtime/session", {}),
   searchCustomers: (query: string) => request<unknown>(`/customers/search?q=${encodeURIComponent(query)}`),
   getAsset: (assetId: string) => request<unknown>(`/assets/${encodeURIComponent(assetId)}`),

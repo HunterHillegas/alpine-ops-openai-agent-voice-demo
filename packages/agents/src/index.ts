@@ -50,6 +50,8 @@ export const toolDefinitions = [
   writeTool("reservePart", "Reserve inventory after UI approval succeeds.", z.object({ partId: z.string(), quantity: z.number().int().positive(), approvalToken: z.string() })),
   writeTool("cancelAppointment", "Cancel an appointment only after explicit confirmation and UI approval.", z.object({ ticketId: z.string(), approvalToken: z.string() })),
   writeTool("createCreditMemo", "Create a mocked credit memo only after explicit confirmation and UI approval.", z.object({ customerId: z.string(), amountCents: z.number().int().positive(), reason: z.string(), approvalToken: z.string() })),
+  writeTool("saveCustomerMessage", "Save a mocked customer message only after explicit confirmation and UI approval.", z.object({ customerId: z.string(), channel: z.enum(["sms", "email"]), body: z.string(), approvalToken: z.string() })),
+  writeTool("sendCustomerMessage", "Mark a saved mock customer message as sent only after explicit confirmation and UI approval.", z.object({ messageId: z.string(), approvalToken: z.string() })),
   {
     name: "waitForMoreAudio",
     kind: "utility",
