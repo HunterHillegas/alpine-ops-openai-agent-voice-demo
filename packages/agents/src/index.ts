@@ -36,6 +36,8 @@ export const agentRoster = [
 export const exactAssetIdSchema = z.string().regex(/^[A-Z]{3}-\d{4}$/, "Use exact normalized asset ID like CHG-8821.");
 export const exactEmailSchema = z.string().email().regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Use a complete email address.");
 export const exactPhoneSchema = z.string().regex(/^\+1-\d{3}-\d{3}-\d{4}$/, "Use normalized US phone like +1-805-555-0147.");
+export const exactTicketIdSchema = z.string().regex(/^TCK-\d{4}$/, "Use exact normalized ticket ID like TCK-1044.");
+export const exactWindowIdSchema = z.string().regex(/^win_[a-z]+_\d{4}$/, "Use exact appointment window ID like win_marco_1012.");
 
 export const toolDefinitions = [
   readTool("searchCustomers", "Search customers by exact or partial name once the spoken name is clear.", z.object({ query: z.string().min(2) })),
@@ -53,13 +55,13 @@ export const toolDefinitions = [
   readTool("checkPartInventory", "Check available stock for a specific part ID.", z.object({ partId: z.string().min(3) })),
   readTool("findTechnicians", "Find qualified technicians by certification, region, and optional van part.", z.object({ certification: z.string(), region: z.string(), partId: z.string().optional() })),
   writeTool("createTicket", "Create a service ticket only after explicit confirmation and UI approval.", z.object({ customerId: z.string(), assetId: exactAssetIdSchema, priority: z.enum(["low", "normal", "high", "urgent"]), summary: z.string(), notes: z.array(z.string()).optional(), approvalToken: z.string() })),
-  writeTool("updateTicket", "Update a service ticket only after explicit confirmation and UI approval.", z.object({ ticketId: z.string(), status: z.enum(["open", "triaged", "scheduled", "cancelled", "resolved"]).optional(), priority: z.enum(["low", "normal", "high", "urgent"]).optional(), summary: z.string().optional(), note: z.string().optional(), approvalToken: z.string() })),
-  writeTool("createWorkOrder", "Schedule a work order after UI approval succeeds.", z.object({ ticketId: z.string(), technicianId: z.string(), windowId: z.string(), reservedParts: z.array(z.string()), customerChargeCents: z.number().int().nonnegative(), approvalToken: z.string() })),
+  writeTool("updateTicket", "Update a service ticket only after explicit confirmation and UI approval.", z.object({ ticketId: exactTicketIdSchema, status: z.enum(["open", "triaged", "scheduled", "cancelled", "resolved"]).optional(), priority: z.enum(["low", "normal", "high", "urgent"]).optional(), summary: z.string().optional(), note: z.string().optional(), approvalToken: z.string() })),
+  writeTool("createWorkOrder", "Schedule a work order after UI approval succeeds.", z.object({ ticketId: exactTicketIdSchema, technicianId: z.string(), windowId: exactWindowIdSchema, reservedParts: z.array(z.string()), customerChargeCents: z.number().int().nonnegative(), approvalToken: z.string() })),
   writeTool("reservePart", "Reserve inventory after UI approval succeeds.", z.object({ partId: z.string(), quantity: z.number().int().positive(), approvalToken: z.string() })),
-  writeTool("cancelAppointment", "Cancel an appointment only after explicit confirmation and UI approval.", z.object({ ticketId: z.string(), approvalToken: z.string() })),
+  writeTool("cancelAppointment", "Cancel an appointment only after explicit confirmation and UI approval.", z.object({ ticketId: exactTicketIdSchema, approvalToken: z.string() })),
   writeTool("createCreditMemo", "Create a mocked credit memo only after explicit confirmation and UI approval.", z.object({ customerId: z.string(), amountCents: z.number().int().positive(), reason: z.string(), approvalToken: z.string() })),
-  writeTool("saveInternalNote", "Save mocked internal dispatch notes only after UI approval.", z.object({ ticketId: z.string(), body: z.string(), approvalToken: z.string() })),
-  readTool("createCaseSummary", "Create a grounded case summary from current mock case data.", z.object({ ticketId: z.string() })),
+  writeTool("saveInternalNote", "Save mocked internal dispatch notes only after UI approval.", z.object({ ticketId: exactTicketIdSchema, body: z.string(), approvalToken: z.string() })),
+  readTool("createCaseSummary", "Create a grounded case summary from current mock case data.", z.object({ ticketId: exactTicketIdSchema })),
   writeTool("saveCustomerMessage", "Save a mocked customer message only after explicit confirmation and UI approval.", z.object({ customerId: z.string(), channel: z.enum(["sms", "email"]), body: z.string(), approvalToken: z.string() })),
   writeTool("sendCustomerMessage", "Mark a saved mock customer message as sent only after explicit confirmation and UI approval.", z.object({ messageId: z.string(), approvalToken: z.string() })),
   {
@@ -117,6 +119,25 @@ export function normalizeSpokenEmail(input: string): { status: "complete"; email
     .replace(/,/g, ".");
   const parsed = exactEmailSchema.safeParse(email);
   return parsed.success ? { status: "complete", email } : { status: "partial", reason: "Need a complete email address with mailbox, domain, and top-level domain." };
+}
+
+export function normalizeSpokenTicketId(input: string): { status: "complete"; ticketId: string } | { status: "partial"; reason: string } {
+  const upper = input.toUpperCase().replace(/TICKET/g, "TCK").replace(/DASH|HYPHEN/g, "-").replace(/\s+/g, "");
+  const digits = upper.match(/\d{4}/)?.[0];
+  if (!upper.includes("TCK") || !digits) return { status: "partial", reason: "Need TCK prefix and four ticket digits." };
+  const ticketId = `TCK-${digits}`;
+  const parsed = exactTicketIdSchema.safeParse(ticketId);
+  return parsed.success ? { status: "complete", ticketId } : { status: "partial", reason: parsed.error.issues[0]?.message ?? "Invalid ticket ID." };
+}
+
+export function normalizeSpokenWindowId(input: string): { status: "complete"; windowId: string } | { status: "partial"; reason: string } {
+  const normalized = input.toLowerCase().replace(/window|dash|hyphen/g, " ").replace(/[^a-z0-9]+/g, " ").trim();
+  const tech = normalized.match(/marco|iris/)?.[0];
+  const digits = normalized.match(/\d{4}/)?.[0];
+  if (!tech || !digits) return { status: "partial", reason: "Need technician name and four window digits." };
+  const windowId = `win_${tech}_${digits}`;
+  const parsed = exactWindowIdSchema.safeParse(windowId);
+  return parsed.success ? { status: "complete", windowId } : { status: "partial", reason: parsed.error.issues[0]?.message ?? "Invalid appointment window." };
 }
 
 function readTool(name: string, description: string, schema: z.ZodType) {

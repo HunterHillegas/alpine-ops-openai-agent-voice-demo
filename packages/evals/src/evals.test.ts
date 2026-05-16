@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalizeSpokenAssetId, normalizeSpokenEmail, normalizeSpokenPhone, toolDefinitions } from "@alpine/agents";
+import { normalizeSpokenAssetId, normalizeSpokenEmail, normalizeSpokenPhone, normalizeSpokenTicketId, normalizeSpokenWindowId, toolDefinitions } from "@alpine/agents";
 import { createCompanyApi } from "@alpine/company-api";
 import { runCompletionAudit } from "./audit";
 import { evalFixtures } from "./index";
@@ -67,6 +67,13 @@ describe("eval fixtures", () => {
     expect(normalizeSpokenPhone("805 555").status).toBe("partial");
     expect(normalizeSpokenEmail("amelia dot brooks at example dot test")).toEqual({ status: "complete", email: "amelia.brooks@example.test" });
     expect(normalizeSpokenEmail("amelia at example").status).toBe("partial");
+  });
+
+  it("normalizes ticket and appointment window identifiers conservatively", () => {
+    expect(normalizeSpokenTicketId("ticket T C K dash 1044")).toEqual({ status: "complete", ticketId: "TCK-1044" });
+    expect(normalizeSpokenTicketId("ticket ten forty four").status).toBe("partial");
+    expect(normalizeSpokenWindowId("window Marco 1012")).toEqual({ status: "complete", windowId: "win_marco_1012" });
+    expect(normalizeSpokenWindowId("tomorrow morning").status).toBe("partial");
   });
 
   it("does not create a work order during the replay before approval", () => {

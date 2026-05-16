@@ -1,6 +1,6 @@
 import { tool } from "@openai/agents";
 import { RealtimeAgent, RealtimeSession, type RealtimeItem } from "@openai/agents/realtime";
-import { realtimeInstructions, realtimeModel } from "@alpine/agents";
+import { exactTicketIdSchema, exactWindowIdSchema, realtimeInstructions, realtimeModel } from "@alpine/agents";
 import { z } from "zod";
 import type { Approval } from "@alpine/mock-data";
 import { companyClient, type RealtimeSessionResponse } from "./companyClient";
@@ -120,7 +120,7 @@ export function buildAlpineRealtimeAgent() {
         name: "updateTicket",
         description: "Update a mocked service ticket only after explicit confirmation, UI approval, and approval token.",
         parameters: z.object({
-          ticketId: z.string(),
+          ticketId: exactTicketIdSchema,
           status: z.enum(["open", "triaged", "scheduled", "cancelled", "resolved"]).optional(),
           priority: z.enum(["low", "normal", "high", "urgent"]).optional(),
           summary: z.string().optional(),
@@ -187,9 +187,9 @@ export function buildAlpineRealtimeAgent() {
         name: "createWorkOrder",
         description: "Create a mocked work order only after the dispatcher approves the UI card and provides its approval token.",
         parameters: z.object({
-          ticketId: z.string(),
+          ticketId: exactTicketIdSchema,
           technicianId: z.string(),
-          windowId: z.string(),
+          windowId: exactWindowIdSchema,
           reservedParts: z.array(z.string()),
           customerChargeCents: z.number().int().nonnegative(),
           approvalToken: z.string()
@@ -228,7 +228,7 @@ export function buildAlpineRealtimeAgent() {
       tool({
         name: "cancelAppointment",
         description: "Cancel a mocked appointment only after explicit confirmation, UI approval, and approval token.",
-        parameters: z.object({ ticketId: z.string(), approvalToken: z.string() }),
+        parameters: z.object({ ticketId: exactTicketIdSchema, approvalToken: z.string() }),
         execute: async (params) => companyClient.cancelAppointment(params)
       }),
       tool({
@@ -269,7 +269,7 @@ export function buildAlpineRealtimeAgent() {
         name: "saveInternalNote",
         description: "Save a mocked internal dispatch note only after UI approval and approval token.",
         parameters: z.object({
-          ticketId: z.string(),
+          ticketId: exactTicketIdSchema,
           body: z.string(),
           approvalToken: z.string()
         }),
@@ -278,7 +278,7 @@ export function buildAlpineRealtimeAgent() {
       tool({
         name: "createCaseSummary",
         description: "Create a grounded summary from the current mock case state.",
-        parameters: z.object({ ticketId: z.string() }),
+        parameters: z.object({ ticketId: exactTicketIdSchema }),
         execute: async (params) => companyClient.createCaseSummary(params)
       }),
       tool({
