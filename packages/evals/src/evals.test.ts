@@ -188,6 +188,7 @@ describe("eval fixtures", () => {
       status: "passed",
       evidence: expect.stringContaining("menu chrome")
     });
+    expect(audit.checks.find((check) => check.id === "operations-cockpit")?.evidence).toContain("approval execution/rejection");
     expect(audit.checks.find((check) => check.id === "docs")?.evidence).toContain("docs/scenarios.md");
     expect(audit.checks.find((check) => check.id === "live-webrtc-key")?.status).toBe("blocked");
     expect(audit.checks.find((check) => check.id === "live-webrtc-verified")?.status).toBe("blocked");

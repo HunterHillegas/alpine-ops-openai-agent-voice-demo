@@ -88,6 +88,21 @@ test("replays main scenario and executes approved work order", async ({ page }) 
   await expect(page.getByText("No pending side effects")).toBeVisible();
 });
 
+test("rejecting a proposed work order leaves write state unchanged", async ({ page }) => {
+  await page.getByRole("button", { name: "Run replay" }).click();
+
+  await expect(page.getByText("createWorkOrder", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Reject" }).click();
+
+  await expect(page.getByRole("heading", { name: "Approval rejected" })).toBeVisible();
+  await expect(page.getByText("No pending side effects")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "2 local" })).toBeVisible();
+  await expect(page.getByText("No saved notes, summaries, credits, or customer messages.")).not.toBeVisible();
+  await expect(page.getByText("saveCustomerMessage", { exact: true })).not.toBeVisible();
+  await expect(page.getByText("sendCustomerMessage", { exact: true })).not.toBeVisible();
+  await expect(page.getByText(/WO-\d{4}/)).not.toBeVisible();
+});
+
 test("mock voice connection and text fallback run seeded replay without an API key", async ({ page }) => {
   await page.getByRole("button", { name: "Connect voice" }).click();
 
