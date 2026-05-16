@@ -1,6 +1,6 @@
 # Live Voice Verification
 
-Use this checklist when an OpenAI API key is available. The current automated suite verifies the mock voice fallback, scenario replay, approval drawer, exact-ID guardrails, and browser UI. Live microphone/audio still needs a real key and browser microphone permission.
+Use this checklist when an OpenAI API key is available. The current automated suite verifies the mock voice fallback, scenario replay, approval drawer, exact-ID guardrails, and browser UI. Live microphone/audio is intentionally deferred for the current handoff and still needs a real key plus browser microphone permission before strict completion.
 
 ## Setup
 

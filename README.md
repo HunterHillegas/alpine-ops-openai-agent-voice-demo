@@ -97,7 +97,7 @@ npm run docs:list
 
 The repo has the server-side realtime session endpoint, a lazy-loaded browser `RealtimeAgent` / `RealtimeSession` wrapper, specialist handoffs, and function tools that call the mock API. Without an API key, **Connect voice** enters mock mode. With `OPENAI_API_KEY` on the API server, the browser uses the ephemeral client secret to connect over WebRTC.
 
-Remaining live-voice verification: run `OPENAI_API_KEY=<real-key> npm run test:live`, exercise the full microphone/audio checklist in `docs/live-voice-verification.md`, then run `LIVE_VOICE_VERIFIED=1 npm run audit:strict`. Local tests cover realtime session credential minting, mock voice fallback, transcript event handling, approval refresh events, and interruption/error surfacing.
+Live-voice verification is intentionally deferred for this handoff. Local tests cover realtime session credential minting, mock voice fallback, transcript event handling, approval refresh events, and interruption/error surfacing. To finish the strict live gate later, run `OPENAI_API_KEY=<real-key> npm run test:live`, exercise the full microphone/audio checklist in `docs/live-voice-verification.md`, then run `LIVE_VOICE_VERIFIED=1 npm run audit:strict`.
 
 See `docs/live-voice-verification.md` for the manual live-key checklist, `docs/demo-capture.md` for screenshot/GIF capture steps, and `docs/deployment.md` for optional Vercel/Render notes.
 
