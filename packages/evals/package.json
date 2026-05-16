@@ -1,0 +1,13 @@
+{
+  "name": "@alpine/evals",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@alpine/agents": "0.1.0",
+    "@alpine/company-api": "0.1.0"
+  }
+}

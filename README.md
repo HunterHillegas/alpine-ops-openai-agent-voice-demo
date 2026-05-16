@@ -1,0 +1,95 @@
+# Alpine FieldOps Voice Console
+
+Alpine FieldOps Voice Console is an OSS TypeScript demo for a fictional EV-charger and solar-battery field-service company. It shows the shape of a realtime browser voice agent with a credible operations cockpit, resettable company data, specialist-agent boundaries, approval gates, and a visible tool/activity trace.
+
+No real CRM, SMS, calendar, billing, inventory, refund, or dispatch systems are connected. All data and side effects are mocked and resettable.
+
+## What It Demonstrates
+
+- React/Vite operations cockpit with voice controls, transcript, customer/asset cards, telemetry, service timeline, work-order plan, approval drawer, and agent activity rail.
+- Fastify mock company API with deterministic fixtures, read endpoints, write endpoints, approval-token enforcement, event log, scenario replay, and reset.
+- TypeScript packages for mock data, typed company API, agent/tool definitions, and eval fixtures.
+- Realtime session endpoint that keeps \`OPENAI_API_KEY\` server-side. Without a key it returns mock mode so the visual demo still runs.
+- Guardrail examples for exact asset IDs and approval-gated write actions.
+
+## Quick Start
+
+~~~bash
+npm install
+npm run dev
+~~~
+
+Open the web app at \`http://localhost:5173\`. The API runs at \`http://localhost:8787\`.
+
+Optional live realtime credentials:
+
+~~~bash
+OPENAI_API_KEY=sk-... npm run dev:api
+~~~
+
+The browser does not receive the API key. \`apps/api\` mints a realtime client secret at \`POST /realtime/session\`.
+
+## Demo Script
+
+### 0:00 Launch
+
+Open the dashboard. Point out Alpine FieldOps, connection state, model indicator, seeded scenario picker, reset button, and replay button.
+
+### 0:20 Start Voice Session
+
+Click **Connect voice**. With no API key, the UI enters mock mode. With \`OPENAI_API_KEY\`, the API returns a realtime session credential for the browser WebRTC wiring.
+
+### 0:40 Main Request
+
+Load **Dead charger after outage**. The scenario prompt is:
+
+> Customer Amelia Brooks says charger C H G dash 8821 died after a power outage. Check warranty, recent telemetry, likely fix, and earliest certified tech with the right part.
+
+### 1:10 Tools And Agents
+
+Click **Run replay**. The activity rail shows exact-ID confirmation, customer lookup, asset lookup, telemetry lookup, warranty check, inventory check, technician search, approval request, and summary.
+
+### 1:40 Approval
+
+Use the bottom approval drawer to approve the proposed work order. The mock API then creates the work order and updates the ticket.
+
+### 2:00 Customer Message
+
+The workspace includes a grounded draft customer follow-up message. Message send remains mocked and approval-gated in the agent/tool contract.
+
+### 2:25 Summary
+
+Review the final dispatch summary and event trace. The UI displays tool names, normalized arguments, approval status, result summaries, and failures; it does not display private reasoning.
+
+### 2:45 Safety Demo
+
+Load **Refund and cancellation guardrail** and run replay. The agent requests approval before cancellation/refund work and does not claim completion before a write succeeds.
+
+## Monorepo Layout
+
+~~~text
+apps/web              React/Vite operations cockpit
+apps/api              Fastify mock API and realtime session endpoint
+packages/agents       Agent roster, realtime instructions, tool schemas, exact-ID helpers
+packages/company-api  In-memory fake company API with approval-gated writes
+packages/mock-data    Seed fixtures and shared domain types
+packages/evals        Eval fixtures and behavior tests
+docs                  Architecture and troubleshooting
+~~~
+
+## Gates
+
+~~~bash
+npm run typecheck
+npm test
+npm run build
+npm run docs:list
+~~~
+
+## Current Voice Status
+
+The repo has the server-side realtime session endpoint and UI lifecycle state. Full browser WebRTC microphone/audio streaming is the next implementation slice: connect \`RealtimeAgent\` and \`RealtimeSession\` in \`apps/web\`, wire function tools to \`apps/api\`, and stream transcript/audio events into the existing UI state and event rail.
+
+## Mocking Boundary
+
+All company data, telemetry, ticket updates, work orders, part reservations, customer messages, cancellations, and credit memos are fake. Reset restores seeded data. Approval tokens are local mock tokens only.
