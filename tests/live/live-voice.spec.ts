@@ -13,6 +13,10 @@ test("connects the browser console to a live realtime session", async ({ page })
   await expect(page.getByText("Live voice session connected.")).toBeVisible();
   await expect(page.getByRole("button", { name: "Disconnect" })).toBeVisible();
 
+  await page.getByPlaceholder("Text fallback for no-mic testing").fill("Live smoke text turn for CHG-8821.");
+  await page.getByRole("button", { name: "Send" }).click();
+  await expect(page.getByPlaceholder("Text fallback for no-mic testing")).toHaveValue("Live smoke text turn for CHG-8821.");
+
   await page.getByRole("button", { name: "Disconnect" }).click();
   await expect(page.getByText("disconnected").first()).toBeVisible();
 });
