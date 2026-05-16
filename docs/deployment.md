@@ -4,6 +4,8 @@ This repo is local-first. Deploy only the mock demo; do not connect real CRM, SM
 
 ## Environment
 
+See `.env.example` for the local/deployed environment reference. Do not commit real secrets.
+
 - Node 22+
 - `OPENAI_API_KEY` set only on the API/server environment when live voice is needed
 - `ALLOWED_ORIGIN` set to the deployed web origin

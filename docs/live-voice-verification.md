@@ -4,6 +4,8 @@ Use this checklist when an OpenAI API key is available. The current automated su
 
 ## Setup
 
+Use `.env.example` as the reference, but pass the live key through the shell or your process manager. The API key must stay server-side.
+
 ~~~bash
 OPENAI_API_KEY=<real-key> npm run dev:api
 VITE_API_URL=http://localhost:8787 npm run dev:web
