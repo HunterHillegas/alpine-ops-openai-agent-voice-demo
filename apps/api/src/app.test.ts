@@ -74,6 +74,104 @@ describe("api routes", () => {
     expect(createdBody.data.workOrderId).toMatch(/^WO-/);
   });
 
+  it("approval-gates ticket, inventory, billing, note, and message writes through HTTP", async () => {
+    app = buildApiApp({ logger: false });
+
+    const deniedReservation = await app.inject({
+      method: "POST",
+      url: "/inventory/reservations",
+      payload: { partId: "PCB-48A-R3", quantity: 1, approvalToken: "missing" }
+    });
+    expect(deniedReservation.json<Envelope<unknown>>().ok).toBe(false);
+
+    const reserve = await approve("reservePart", { partId: "PCB-48A-R3", quantity: 1 });
+    const reserved = await app.inject({
+      method: "POST",
+      url: "/inventory/reservations",
+      payload: { partId: "PCB-48A-R3", quantity: 1, approvalToken: reserve.token }
+    });
+    const reservedBody = expectOk(reserved.json<Envelope<{ quantity: number }>>());
+    expect(reservedBody.quantity).toBe(1);
+
+    const createTicket = await approve("createTicket", {
+      customerId: "cus_amelia_brooks",
+      assetId: "CHG-8821",
+      priority: "high",
+      summary: "Customer called back with outage details"
+    });
+    const createdTicket = await app.inject({
+      method: "POST",
+      url: "/tickets",
+      payload: {
+        customerId: "cus_amelia_brooks",
+        assetId: "CHG-8821",
+        priority: "high",
+        summary: "Customer called back with outage details",
+        approvalToken: createTicket.token
+      }
+    });
+    const ticketBody = createdTicket.json<Envelope<{ ticketId: string; status: string }>>();
+    expect(ticketBody.ok).toBe(true);
+    if (!ticketBody.ok) return;
+
+    const updateTicket = await approve("updateTicket", { ticketId: ticketBody.data.ticketId, status: "triaged", note: "Exact ID confirmed." });
+    const updatedTicket = await app.inject({
+      method: "POST",
+      url: "/tickets/update",
+      payload: { ticketId: ticketBody.data.ticketId, status: "triaged", note: "Exact ID confirmed.", approvalToken: updateTicket.token }
+    });
+    expect(expectOk(updatedTicket.json<Envelope<{ status: string }>>()).status).toBe("triaged");
+
+    const cancel = await approve("cancelAppointment", { ticketId: "TCK-1048" });
+    const cancelled = await app.inject({
+      method: "POST",
+      url: "/appointments/cancel",
+      payload: { ticketId: "TCK-1048", approvalToken: cancel.token }
+    });
+    expect(expectOk(cancelled.json<Envelope<{ status: string }>>()).status).toBe("cancelled");
+
+    const credit = await approve("createCreditMemo", { customerId: "cus_noah_reed", amountCents: 25000, reason: "Customer cancelled install." });
+    const credited = await app.inject({
+      method: "POST",
+      url: "/billing/credits",
+      payload: { customerId: "cus_noah_reed", amountCents: 25000, reason: "Customer cancelled install.", approvalToken: credit.token }
+    });
+    expect(expectOk(credited.json<Envelope<{ creditMemoId: string }>>()).creditMemoId).toMatch(/^CRM-/);
+
+    const note = await approve("saveInternalNote", { ticketId: "TCK-1044", body: "Validated outage diagnostic path." });
+    const savedNote = await app.inject({
+      method: "POST",
+      url: "/notes/internal",
+      payload: { ticketId: "TCK-1044", body: "Validated outage diagnostic path.", approvalToken: note.token }
+    });
+    expect(expectOk(savedNote.json<Envelope<{ noteId: string }>>()).noteId).toMatch(/^NOTE-/);
+
+    const draft = await app.inject({
+      method: "POST",
+      url: "/messages/draft",
+      payload: { customerId: "cus_amelia_brooks", channel: "sms", topic: "warranty repair" }
+    });
+    expect(expectOk(draft.json<Envelope<{ body: string }>>()).body).toContain("Amelia");
+
+    const saveMessage = await approve("saveCustomerMessage", { customerId: "cus_amelia_brooks", channel: "sms", body: "Repair scheduled." });
+    const savedMessage = await app.inject({
+      method: "POST",
+      url: "/messages/save",
+      payload: { customerId: "cus_amelia_brooks", channel: "sms", body: "Repair scheduled.", approvalToken: saveMessage.token }
+    });
+    const messageBody = savedMessage.json<Envelope<{ messageId: string; status: string }>>();
+    const message = expectOk(messageBody);
+    expect(message.status).toBe("saved");
+
+    const sendMessage = await approve("sendCustomerMessage", { messageId: message.messageId });
+    const sentMessage = await app.inject({
+      method: "POST",
+      url: "/messages/send",
+      payload: { messageId: message.messageId, approvalToken: sendMessage.token }
+    });
+    expect(expectOk(sentMessage.json<Envelope<{ status: string }>>()).status).toBe("sent");
+  });
+
   it("returns mock realtime mode without exposing server keys", async () => {
     const previousKey = process.env.OPENAI_API_KEY;
     delete process.env.OPENAI_API_KEY;
@@ -132,6 +230,24 @@ describe("api routes", () => {
     else process.env.OPENAI_API_KEY = previousKey;
   });
 });
+
+async function approve(action: string, payload: unknown) {
+  if (!app) throw new Error("API test app is not initialized.");
+  const approvalResponse = await app.inject({
+    method: "POST",
+    url: "/approvals",
+    payload: { action, summary: `Approve ${action}.`, payload }
+  });
+  const approval = approvalResponse.json<{ ok: true; data: { approvalId: string; token: string } }>().data;
+  await app.inject({ method: "POST", url: `/approvals/${approval.approvalId}/approve` });
+  return approval;
+}
+
+function expectOk<T>(envelope: Envelope<T>): T {
+  expect(envelope.ok).toBe(true);
+  if (!envelope.ok) throw new Error(envelope.message);
+  return envelope.data;
+}
 
 function workOrderPayload(approvalToken: string) {
   return {
