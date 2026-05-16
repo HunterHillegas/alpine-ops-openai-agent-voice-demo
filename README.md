@@ -86,18 +86,19 @@ npm run evals
 npm run audit
 npm run test:ui
 npm run test:live
+npm run test:live-audio
 npm run test:all
 npm run build
 npm run docs:list
 ~~~
 
-`npm run evals` prints a JSON report for the scripted fixtures and writes `packages/evals/results/latest.json` for local inspection. `npm run audit` prints a completion-audit report and marks live checks as blocked until an API key, automated live-smoke evidence, and spoken checklist marker are present; use `npm run audit:strict` after the live checklist passes. `npm run test:ui` starts fresh smoke servers on API port `8788` and web port `5174`, then verifies the dashboard render, main scenario replay, approval execution, mock voice fallback, text fallback replay, unclear-ID guardrail, and Platinum desktop chrome in Chromium. `npm run test:all` runs the local non-live gate set. `npm run test:live` requires `OPENAI_API_KEY`, verifies that the browser reaches a live WebRTC session, and writes ignored live-smoke evidence. After manually completing the spoken checklist, run `LIVE_VOICE_VERIFIED=1 npm run verify:live-audio` to persist the ignored spoken-checklist marker for strict audits.
+`npm run evals` prints a JSON report for the scripted fixtures and writes `packages/evals/results/latest.json` for local inspection. `npm run audit` prints a completion-audit report and marks live checks as blocked until an API key, automated live-smoke evidence, and live-audio evidence are present; use `npm run audit:strict` after the live checks pass. `npm run test:ui` starts fresh smoke servers on API port `8788` and web port `5174`, then verifies the dashboard render, main scenario replay, approval execution, mock voice fallback, text fallback replay, unclear-ID guardrail, and Platinum desktop chrome in Chromium. `npm run test:all` runs the local non-live gate set. `npm run test:live` requires `OPENAI_API_KEY`, verifies that the browser reaches a live WebRTC session, and writes ignored live-smoke evidence. `npm run test:live-audio` generates a temporary TTS prompt, feeds it through Chromium's fake microphone into the live WebRTC session, verifies transcription, and writes ignored live-audio evidence.
 
 ## Current Voice Status
 
 The repo has the server-side realtime session endpoint, a lazy-loaded browser `RealtimeAgent` / `RealtimeSession` wrapper, specialist handoffs, and function tools that call the mock API. Without an API key, **Connect voice** enters mock mode. With `OPENAI_API_KEY` on the API server, the browser uses the ephemeral client secret to connect over WebRTC.
 
-Automated live WebRTC smoke has passed in this workspace with a real server-side key loaded from ignored local environment. Local tests also cover realtime session credential minting, mock voice fallback, transcript event handling, approval refresh events, mic mute control, and interruption/error surfacing. Strict completion still requires the spoken microphone/audio checklist in `docs/live-voice-verification.md`; after that passes, run `LIVE_VOICE_VERIFIED=1 npm run verify:live-audio` and `npm run audit:strict` with the same server-side key loaded.
+Automated live WebRTC smoke and generated-speech browser microphone verification have passed in this workspace with a real server-side key loaded from ignored local environment. Local tests also cover realtime session credential minting, mock voice fallback, transcript event handling, approval refresh events, mic mute control, and interruption/error surfacing. For a manual physical-mic check, use `docs/live-voice-verification.md`; strict completion accepts either `npm run test:live-audio` evidence or `LIVE_VOICE_VERIFIED=1 npm run verify:live-audio` with the same server-side key loaded.
 
 See `docs/scenarios.md` for replay/eval scenario coverage, `docs/live-voice-verification.md` for the manual live-key checklist, `docs/demo-capture.md` for screenshot/GIF capture steps, and `docs/deployment.md` for optional Vercel/Render notes.
 

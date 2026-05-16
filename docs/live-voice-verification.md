@@ -17,15 +17,18 @@ Both servers bind localhost by default. For a LAN-visible demo, run the API with
 
 ## Automated Live Smoke
 
-Run this when a real API key is available:
+Run these when a real API key is available:
 
 ~~~bash
 OPENAI_API_KEY=<real-key> npm run test:live
+OPENAI_API_KEY=<real-key> npm run test:live-audio
 ~~~
 
 Use a real server-side OpenAI API key. The preflight blocks missing, test, or placeholder values before launching Chromium.
 
-The live smoke starts isolated API/web servers, grants microphone permission to Chromium, clicks **Connect voice**, verifies that the console reaches `live` / `WebRTC` status with the live connection transcript, sends one dispatcher text turn through the connected realtime session, and writes ignored evidence to `packages/evals/results/live-smoke.json`. This automated smoke has passed in the current workspace. It does not replace the spoken-audio checklist below.
+The live smoke starts isolated API/web servers, grants microphone permission to Chromium, clicks **Connect voice**, verifies that the console reaches `live` / `WebRTC` status with the live connection transcript, sends one dispatcher text turn through the connected realtime session, and writes ignored evidence to `packages/evals/results/live-smoke.json`.
+
+The live-audio check generates a temporary spoken dispatcher prompt with OpenAI TTS, feeds it through Chromium's fake microphone device, verifies that the live Realtime session transcribes the spoken request, and writes ignored evidence to `packages/evals/results/live-audio-checklist.json`. This covers the repeatable browser audio-input path. Use the manual checklist below when you also want physical microphone proof.
 
 ## Expected Checks
 
@@ -46,6 +49,8 @@ The live smoke starts isolated API/web servers, grants microphone permission to 
 LIVE_VOICE_VERIFIED=1 npm run verify:live-audio
 LIVE_VOICE_VERIFIED=1 npm run audit:strict
 ~~~
+
+If `npm run test:live-audio` already passed, it records the local audio marker automatically and only `npm run audit:strict` is needed.
 
 ## Failure Notes
 

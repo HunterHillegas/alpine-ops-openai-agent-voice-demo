@@ -221,7 +221,7 @@ describe("eval fixtures", () => {
     expect(audit.checks.find((check) => check.id === "live-audio-checklist")?.status).toBe("blocked");
   });
 
-  it("completion audit still blocks after live smoke until spoken audio checklist is verified", () => {
+  it("completion audit still blocks after live smoke until live audio is verified", () => {
     const audit = runCompletionAudit({ ...noLiveAudioEnv, OPENAI_API_KEY: "sk-proj-examplelivekey123", LIVE_WEBRTC_SMOKE_VERIFIED: "1" });
 
     expect(audit.status).toBe("blocked");
@@ -229,11 +229,11 @@ describe("eval fixtures", () => {
     expect(audit.checks.find((check) => check.id === "live-audio-checklist")?.status).toBe("blocked");
   });
 
-  it("does not record spoken audio checklist evidence without explicit verification", () => {
+  it("does not record live audio checklist evidence without manual or automated verification", () => {
     const path = join(mkdtempSync(join(tmpdir(), "alpine-live-audio-")), "marker.json");
 
     try {
-      expect(() => writeLiveAudioChecklistEvidence({}, path)).toThrow("Set LIVE_VOICE_VERIFIED=1");
+      expect(() => writeLiveAudioChecklistEvidence({}, path)).toThrow("test:live-audio");
       expect(readLiveAudioChecklistEvidence({}, path)).toMatchObject({ ok: false });
     } finally {
       rmSync(dirname(path), { force: true, recursive: true });
@@ -255,6 +255,27 @@ describe("eval fixtures", () => {
       expect(audit.checks.find((check) => check.id === "live-audio-checklist")).toMatchObject({
         status: "passed",
         evidence: expect.stringContaining("Spoken microphone/audio checklist marker recorded")
+      });
+    } finally {
+      rmSync(dirname(path), { force: true, recursive: true });
+    }
+  });
+
+  it("completion audit passes with persisted generated-speech browser mic evidence", () => {
+    const path = join(mkdtempSync(join(tmpdir(), "alpine-live-audio-")), "marker.json");
+
+    try {
+      writeLiveAudioChecklistEvidence({}, path, "automated-generated-speech");
+      const audit = runCompletionAudit({
+        OPENAI_API_KEY: "sk-proj-examplelivekey123",
+        LIVE_WEBRTC_SMOKE_VERIFIED: "1",
+        LIVE_AUDIO_CHECKLIST_RESULT_PATH: path
+      });
+
+      expect(audit.status).toBe("passed");
+      expect(audit.checks.find((check) => check.id === "live-audio-checklist")).toMatchObject({
+        status: "passed",
+        evidence: expect.stringContaining("Generated-speech browser microphone check marker recorded")
       });
     } finally {
       rmSync(dirname(path), { force: true, recursive: true });
