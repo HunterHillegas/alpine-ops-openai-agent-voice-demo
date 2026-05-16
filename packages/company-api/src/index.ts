@@ -191,7 +191,12 @@ export function createCompanyApi(initialState: CompanyState = createSeedState())
         createdAt: new Date().toISOString()
       };
       state.approvals.unshift(approval);
-      addEvent(event("Safety / Approval Layer", "approval", "Approval requested", { args: { action, payload }, resultSummary: summary, approvalStatus: "pending" }));
+      addEvent(event("Safety / Approval Layer", "approval", "Approval requested", {
+        toolName: "requestHumanApproval",
+        args: { action, payload },
+        resultSummary: summary,
+        approvalStatus: "pending"
+      }));
       return clone(approval);
     },
 
@@ -390,6 +395,7 @@ export function createCompanyApi(initialState: CompanyState = createSeedState())
         });
       } else if (scenarioId === "unclear-asset-id") {
         addEvent(event("Realtime Triage Agent", "heard_entity", "Heard partial asset ID: CHG-8...", { args: { candidate: "CHG-8" } }));
+        addEvent(event("Realtime Triage Agent", "tool_call", "Waiting for complete asset ID", { toolName: "waitForMoreAudio", args: { reason: "partial spoken asset ID" } }));
         addEvent(event("Safety / Approval Layer", "guardrail", "Lookup blocked until exact asset ID is confirmed", { error: "Partial spoken ID" }));
       } else if (scenarioId === "ambiguous-customer") {
         const result = api.searchCustomers("Amelia");

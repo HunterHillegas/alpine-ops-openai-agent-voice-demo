@@ -61,6 +61,24 @@ describe("eval fixtures", () => {
     }
   });
 
+  it("replay scenarios honor expected and forbidden tool calls", () => {
+    for (const fixture of evalFixtures) {
+      const api = createCompanyApi();
+      const replay = api.replayScenario(fixture.initialScenario);
+
+      expect(replay.ok, fixture.id).toBe(true);
+      if (!replay.ok) continue;
+
+      const toolCalls = replay.data.events.flatMap((event) => event.toolName ? [event.toolName] : []);
+      for (const expectedTool of fixture.expectedToolCalls) {
+        expect(toolCalls, fixture.id).toContain(expectedTool);
+      }
+      for (const forbiddenTool of fixture.forbiddenToolCalls) {
+        expect(toolCalls, fixture.id).not.toContain(forbiddenTool);
+      }
+    }
+  });
+
   it("surfaces ambiguous customer matches without continuing to writes", () => {
     const api = createCompanyApi();
     const result = api.searchCustomers("Amelia");
