@@ -1,11 +1,12 @@
-const missing: string[] = [];
+import { validateLiveVoiceEnv } from "./live-voice-env";
 
-if (!process.env.OPENAI_API_KEY) missing.push("OPENAI_API_KEY");
+const result = validateLiveVoiceEnv(process.env);
 
-if (missing.length) {
-  console.error(`Live voice verification requires ${missing.join(", ")}.`);
+if (!result.ok) {
+  console.error("Live voice verification cannot start:");
+  for (const error of result.errors) console.error(`- ${error}`);
   console.error("Run with a real key: OPENAI_API_KEY=sk-... npm run test:live");
   process.exit(1);
 }
 
-console.log("Live voice preflight passed: OPENAI_API_KEY is present.");
+console.log("Live voice preflight passed: OPENAI_API_KEY looks usable.");
