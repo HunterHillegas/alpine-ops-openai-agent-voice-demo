@@ -39,6 +39,11 @@ test("loads Platinum desktop furniture from theme deep link", async ({ page }) =
   await expect(page.locator(".platinum-menu-bar")).toContainText("Special");
   await expect(page.locator(".platinum-wallpaper span")).toHaveCount(54);
   await expect(page.locator(".platinum-desktop-icons span")).toHaveCount(4);
+  await expect(page.locator(".platinum-desktop-window")).toHaveCount(3);
+  await expect(page.locator(".platinum-desktop-window.about")).toContainText("About This Computer");
+  await expect(page.locator(".platinum-desktop-window.controls")).toContainText("Control Panels");
+  await expect(page.locator(".platinum-launch-strip")).toBeVisible();
+  await expect(page.locator(".platinum-launch-strip span")).toHaveCount(6);
   await expect(page.locator(".topbar")).toHaveCSS("background-color", "rgb(216, 216, 216)");
 });
 

@@ -24,6 +24,7 @@ import "./styles.css";
 import "./cockpit.css";
 import "./themes.css";
 import "./platinum.css";
+import "./platinum-furniture.css";
 
 function initialTheme(): ThemeId {
   if (typeof window === "undefined") return "nextstep";

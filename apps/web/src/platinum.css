@@ -33,17 +33,9 @@ html[data-theme="platinum"] body {
   background-size: 1px 1px;
 }
 
-.platinum-furniture {
-  display: none;
-}
-
-html[data-theme="platinum"] .platinum-furniture {
-  display: block;
-}
-
 html[data-theme="platinum"] .app-shell {
   position: relative;
-  padding: 34px 82px 18px 18px;
+  padding: 34px 82px 30px 18px;
 }
 
 html[data-theme="platinum"] .topbar,
@@ -52,143 +44,6 @@ html[data-theme="platinum"] .approval-drawer,
 html[data-theme="platinum"] .error-banner {
   position: relative;
   z-index: 1;
-}
-
-html[data-theme="platinum"] .platinum-menu-bar {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
-  z-index: 6;
-  height: 20px;
-  border-bottom: 1px solid #4a4a4a;
-  background: #f8f8f8;
-  color: #060606;
-  box-shadow: 0 1px #bdbdbd;
-  font-size: 12px;
-  line-height: 20px;
-  padding: 0 8px;
-}
-
-html[data-theme="platinum"] .platinum-menu-bar b {
-  font-weight: 700;
-}
-
-html[data-theme="platinum"] .platinum-menu-bar time {
-  margin-left: auto;
-  font-weight: 700;
-}
-
-html[data-theme="platinum"] .platinum-apple {
-  position: relative;
-  width: 12px;
-  height: 14px;
-  margin-right: 2px;
-}
-
-html[data-theme="platinum"] .platinum-apple::before,
-html[data-theme="platinum"] .platinum-apple::after {
-  position: absolute;
-  content: "";
-  background: #070707;
-}
-
-html[data-theme="platinum"] .platinum-apple::before {
-  left: 2px;
-  bottom: 0;
-  width: 9px;
-  height: 10px;
-  border-radius: 5px 5px 4px 4px;
-}
-
-html[data-theme="platinum"] .platinum-apple::after {
-  top: 0;
-  left: 7px;
-  width: 5px;
-  height: 3px;
-  transform: rotate(-24deg);
-}
-
-html[data-theme="platinum"] .platinum-wallpaper {
-  display: grid;
-  grid-template-columns: repeat(9, 86px);
-  gap: 20px 34px;
-  position: fixed;
-  inset: 22px 86px 0 16px;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
-  color: rgba(61, 67, 166, 0.22);
-  font-family: Chicago, Charcoal, Geneva, sans-serif;
-  font-size: 20px;
-  line-height: 1;
-}
-
-html[data-theme="platinum"] .platinum-wallpaper span {
-  display: grid;
-  width: 82px;
-  height: 44px;
-  align-content: end;
-  text-shadow: 1px 1px rgba(255, 255, 255, 0.22);
-}
-
-html[data-theme="platinum"] .platinum-wallpaper span::before {
-  width: 22px;
-  height: 20px;
-  margin: 0 auto 2px;
-  border: 1px solid rgba(61, 67, 166, 0.24);
-  border-radius: 2px 2px 0 0;
-  background:
-    linear-gradient(90deg, transparent 45%, rgba(61, 67, 166, 0.18) 45% 55%, transparent 55%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(61, 67, 166, 0.08));
-  content: "";
-}
-
-html[data-theme="platinum"] .platinum-desktop-icons {
-  display: grid;
-  gap: 18px;
-  position: fixed;
-  top: 38px;
-  right: 10px;
-  z-index: 2;
-  width: 62px;
-  color: #111;
-  font-family: Chicago, Charcoal, Geneva, sans-serif;
-  font-size: 10px;
-  line-height: 1.08;
-  text-align: center;
-}
-
-html[data-theme="platinum"] .platinum-desktop-icons span {
-  display: grid;
-  justify-items: center;
-  gap: 3px;
-}
-
-html[data-theme="platinum"] .platinum-desktop-icons i {
-  display: block;
-  width: 30px;
-  height: 26px;
-  border: 1px solid #565656;
-  border-radius: 2px 2px 1px 1px;
-  background:
-    linear-gradient(180deg, #fff 0 20%, #d8d8d8 21% 100%);
-  box-shadow:
-    inset 1px 1px #fff,
-    inset -1px -1px #787878,
-    1px 1px #555;
-}
-
-html[data-theme="platinum"] .platinum-desktop-icons .trash i {
-  width: 25px;
-  height: 29px;
-  border-radius: 0 0 4px 4px;
-  background:
-    linear-gradient(90deg, transparent 0 20%, #bdbdbd 20% 28%, transparent 28% 45%, #bdbdbd 45% 53%, transparent 53% 70%, #bdbdbd 70% 78%, transparent 78%),
-    #eeeeee;
 }
 
 html[data-theme="platinum"] .topbar,
@@ -477,7 +332,7 @@ html[data-theme="platinum"] .approval-drawer {
 
 @media (max-width: 1180px) {
   html[data-theme="platinum"] .app-shell {
-    padding: 30px 12px 12px;
+    padding: 30px 12px 24px;
   }
 
   html[data-theme="platinum"] .platinum-desktop-icons,
