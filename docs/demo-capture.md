@@ -14,7 +14,7 @@ npm run dev:web
 2. Open `http://localhost:5173`.
 3. Select **Dead charger after outage**.
 4. Click **Run replay** and show the seeded transcript playback.
-5. Approve the work order in the drawer.
+5. Approve the work order in the drawer and show the part inventory drop.
 6. Capture the full page with browser tooling.
 
 Recommended filename: `docs/media/alpine-fieldops-console.png`.

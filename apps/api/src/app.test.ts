@@ -61,17 +61,28 @@ describe("api routes", () => {
     const approval = approvalResponse.json<{ ok: true; data: { approvalId: string; token: string } }>().data;
     await app.inject({ method: "POST", url: `/approvals/${approval.approvalId}/approve` });
 
+    const outOfStock = await app.inject({
+      method: "POST",
+      url: "/work-orders",
+      payload: { ...workOrderPayload(approval.token), reservedParts: ["INV-HOME20-R2"] }
+    });
+    expect(outOfStock.json<Envelope<unknown>>().ok).toBe(false);
+
     const created = await app.inject({
       method: "POST",
       url: "/work-orders",
       payload: workOrderPayload(approval.token)
     });
     const createdBody = created.json<Envelope<{ status: string; workOrderId: string }>>();
+    const state = await app.inject({ method: "GET", url: "/state" });
+    const stateBody = state.json<Envelope<{ inventory: Array<{ partId: string; quantity: number }>; events: Array<{ label: string }> }>>();
 
     expect(createdBody.ok).toBe(true);
     if (!createdBody.ok) return;
     expect(createdBody.data.status).toBe("scheduled");
     expect(createdBody.data.workOrderId).toMatch(/^WO-/);
+    expect(expectOk(stateBody).inventory.find((part) => part.partId === "PCB-48A-R3")?.quantity).toBe(1);
+    expect(expectOk(stateBody).events.map((event) => event.label)).toContain("Part reserved");
   });
 
   it("approval-gates ticket, inventory, billing, note, and message writes through HTTP", async () => {

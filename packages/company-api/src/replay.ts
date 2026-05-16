@@ -62,14 +62,6 @@ function replayApprovedDeadCharger(api: CompanyApi, addEvent: (entry: EventLogEn
     approvalToken: workOrderApproval.token
   });
 
-  const partApproval = api.requestHumanApproval({
-    action: "reservePart",
-    summary: "Reserve one PCB-48A-R3 control board for Amelia Brooks's CHG-8821 warranty repair.",
-    payload: { partId: "PCB-48A-R3", quantity: 1 }
-  });
-  api.approve(partApproval.approvalId);
-  api.reservePart({ partId: "PCB-48A-R3", quantity: 1, approvalToken: partApproval.token });
-
   const workOrderId = workOrder.ok ? workOrder.data.workOrderId : "WO-pending";
   const draft = api.draftCustomerMessage({
     customerId: "cus_amelia_brooks",

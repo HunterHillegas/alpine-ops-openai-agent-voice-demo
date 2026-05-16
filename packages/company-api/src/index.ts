@@ -306,6 +306,12 @@ export function createCompanyApi(initialState: CompanyState = createSeedState())
       const appointmentWindow = technician?.schedule.find((window) => window.windowId === windowId);
       if (!ticket) return failure("ticket_not_found", `No ticket found for ${ticketId}.`);
       if (!technician || !appointmentWindow || !appointmentWindow.available) return failure("window_unavailable", "Technician window is no longer available.");
+      const partCounts = countParts(reservedParts);
+      for (const [partId, quantity] of Object.entries(partCounts)) {
+        const part = state.inventory.find((item) => item.partId === partId);
+        if (!part) return failure("part_not_found", `No part found for ${partId}.`);
+        if (part.quantity < quantity) return failure("part_out_of_stock", `${partId} has only ${part.quantity} available.`);
+      }
       const workOrder: WorkOrder = {
         workOrderId: `WO-${Math.floor(2000 + Math.random() * 7000)}`,
         ticketId,
@@ -318,12 +324,23 @@ export function createCompanyApi(initialState: CompanyState = createSeedState())
       appointmentWindow.available = false;
       ticket.status = "scheduled";
       ticket.linkedWorkOrderId = workOrder.workOrderId;
+      for (const [partId, quantity] of Object.entries(partCounts)) {
+        const part = state.inventory.find((item) => item.partId === partId);
+        if (part) part.quantity -= quantity;
+      }
       state.workOrders.unshift(workOrder);
       addEvent(event("Dispatch Agent", "state_change", "Work order created", {
         toolName: "createWorkOrder",
         args: { ticketId, technicianId, windowId, reservedParts, customerChargeCents },
         resultSummary: `${workOrder.workOrderId} scheduled with ${technician.name}`
       }));
+      if (reservedParts.length) {
+        addEvent(event("Dispatch Agent", "state_change", "Part reserved", {
+          toolName: "createWorkOrder",
+          args: { reservedParts },
+          resultSummary: reservedParts.join(", ")
+        }));
+      }
       return success(clone(workOrder));
     },
 
@@ -450,6 +467,13 @@ function failure(code: string, message: string): ApiResult<never> {
 
 function clone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T;
+}
+
+function countParts(partIds: string[]): Record<string, number> {
+  return partIds.reduce<Record<string, number>>((counts, partId) => {
+    counts[partId] = (counts[partId] ?? 0) + 1;
+    return counts;
+  }, {});
 }
 
 export async function fetchJson<T>(baseUrl: string, path: string, init?: RequestInit): Promise<T> {

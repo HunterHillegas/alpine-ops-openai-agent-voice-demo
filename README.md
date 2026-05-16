@@ -51,7 +51,7 @@ Click **Run replay**. The transcript panel plays the seeded dispatcher/assistant
 
 ### 1:40 Approval
 
-Use the bottom approval drawer to approve the proposed work order. The mock API then creates the work order and updates the ticket.
+Use the bottom approval drawer to approve the proposed work order. The mock API then creates the work order, reserves the listed part, and updates the ticket.
 
 ### 2:00 Customer Message
 
