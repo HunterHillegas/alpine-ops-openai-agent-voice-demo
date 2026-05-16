@@ -6,6 +6,7 @@ describe("realtime console integration", () => {
     const agent = buildAlpineRealtimeAgent();
 
     expect(agent.name).toBe("Realtime Triage Agent");
+    expect(agent.instructions).toContain("Never call a tool with empty or partial arguments");
     expect(agent.handoffs.map((handoff) => ("agentName" in handoff ? handoff.agentName : handoff.name))).toEqual([
       "Customer Context Agent",
       "Diagnostics Agent",
@@ -13,6 +14,14 @@ describe("realtime console integration", () => {
       "Policy and Billing Agent",
       "Message Composer Agent"
     ]);
+    expect(agent.handoffs.map((handoff) => ("toolName" in handoff ? handoff.toolName : handoff.name))).toEqual([
+      "transfer_to_Customer_Context_Agent",
+      "transfer_to_Diagnostics_Agent",
+      "transfer_to_Dispatch_Agent",
+      "transfer_to_Policy_and_Billing_Agent",
+      "transfer_to_Message_Composer_Agent"
+    ]);
+    expect(agent.handoffs.every((handoff) => "inputJsonSchema" in handoff && Object.keys(handoff.inputJsonSchema.properties ?? {}).length === 0)).toBe(true);
     expect(agent.tools.map((tool) => tool.name)).toEqual(["waitForMoreAudio", "getAsset", "requestHumanApproval"]);
   });
 
@@ -35,6 +44,7 @@ describe("realtime console integration", () => {
     expect(toolNames(composer)).toContain("createCaseSummary");
     expect(toolNames(composer)).toContain("saveCustomerMessage");
     expect(toolNames(composer)).toContain("sendCustomerMessage");
+    expect((policy as { agent?: { handoffs?: Array<{ toolName: string }> } }).agent?.handoffs?.map((handoff) => handoff.toolName)).toContain("transfer_to_Dispatch_Agent");
   });
 
   it("extracts ephemeral client secrets without exposing server keys", () => {
@@ -111,10 +121,22 @@ describe("realtime console integration", () => {
     expect(callbacks.interruptions).toContain("Interrupted. Listening for the next dispatcher instruction.");
     expect(callbacks.errors).toContain("session failed");
   });
+
+  it("keeps non-fatal realtime handoff parser noise out of the UI error banner", async () => {
+    const source = new FakeRealtimeSource();
+    const callbacks = callbackRecorder();
+    bindRealtimeSessionEvents(source, callbacks);
+
+    await source.emit("error", { error: new Error("Handoff function expected non empty input") });
+    await source.emit("error", { error: new SyntaxError("Unexpected end of JSON input") });
+
+    expect(callbacks.errors).toEqual([]);
+  });
 });
 
 function toolNames(agent: unknown) {
-  return ((agent as { tools?: Array<{ name: string }> } | undefined)?.tools ?? []).map((tool) => tool.name);
+  const target = (agent as { agent?: unknown } | undefined)?.agent ?? agent;
+  return ((target as { tools?: Array<{ name: string }> } | undefined)?.tools ?? []).map((tool) => tool.name);
 }
 
 function messageItem(role: "assistant" | "user", text: string) {

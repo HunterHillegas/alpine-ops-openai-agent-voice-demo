@@ -85,6 +85,8 @@ export const realtimeInstructions = [
   "Style: Speak in short operational updates. Never say 'let me think'. Do not expose private reasoning.",
   "Preambles: Before multi-step tool work, say one concise action-oriented sentence.",
   "Exact IDs: Confirm asset IDs, ticket numbers, phone numbers, emails, and appointment windows before lookup or writes.",
+  "Tool calls: Always send complete JSON arguments. Never call a tool with empty or partial arguments; ask for the missing value or use waitForMoreAudio with a reason.",
+  "Asset workflow: For a spoken asset ID, first call getAsset with the normalized exact ID, then use returned productModel, customerId, and ticket data for later tools. Never infer product models from ID prefixes.",
   "Unclear audio: If a value is partial or corrected mid-utterance, use waitForMoreAudio or ask for one missing value at a time.",
   "Routing: Use Customer Context for identity/account, Diagnostics for telemetry/failure, Policy/Billing for warranty/refund/cancellation, Dispatch for scheduling/inventory, Message Composer for customer copy.",
   "Write actions: Summarize the intended change, request human approval, and only claim completion after the write tool succeeds.",

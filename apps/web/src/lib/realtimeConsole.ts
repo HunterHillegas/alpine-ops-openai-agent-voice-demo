@@ -1,4 +1,4 @@
-import { tool } from "@openai/agents";
+import { handoff, tool } from "@openai/agents";
 import { RealtimeAgent, RealtimeSession, type RealtimeItem } from "@openai/agents/realtime";
 import { exactTicketIdSchema, exactWindowIdSchema, realtimeInstructions, realtimeModel } from "@alpine/agents";
 import { z } from "zod";
@@ -148,7 +148,7 @@ export function buildAlpineRealtimeAgent() {
       }),
       tool({
         name: "getKnownIssuePatterns",
-        description: "Fetch known issue patterns for a product model.",
+        description: "Fetch known issue patterns for the exact productModel returned by getAsset. Do not pass an asset prefix such as CHG.",
         parameters: z.object({ productModel: z.string().min(3) }),
         execute: async ({ productModel }) => companyClient.getKnownIssuePatterns(productModel)
       }),
@@ -308,11 +308,25 @@ export function buildAlpineRealtimeAgent() {
     ]
   });
 
+  const handoffs = [
+    handoff(customerContextAgent, { toolNameOverride: "transfer_to_Customer_Context_Agent", inputType: z.object({}), onHandoff: () => undefined }),
+    handoff(diagnosticsAgent, { toolNameOverride: "transfer_to_Diagnostics_Agent", inputType: z.object({}), onHandoff: () => undefined }),
+    handoff(dispatchAgent, { toolNameOverride: "transfer_to_Dispatch_Agent", inputType: z.object({}), onHandoff: () => undefined }),
+    handoff(policyAgent, { toolNameOverride: "transfer_to_Policy_and_Billing_Agent", inputType: z.object({}), onHandoff: () => undefined }),
+    handoff(messageAgent, { toolNameOverride: "transfer_to_Message_Composer_Agent", inputType: z.object({}), onHandoff: () => undefined })
+  ];
+
+  customerContextAgent.handoffs = handoffs.filter((item) => item.agentName !== customerContextAgent.name);
+  diagnosticsAgent.handoffs = handoffs.filter((item) => item.agentName !== diagnosticsAgent.name);
+  dispatchAgent.handoffs = handoffs.filter((item) => item.agentName !== dispatchAgent.name);
+  policyAgent.handoffs = handoffs.filter((item) => item.agentName !== policyAgent.name);
+  messageAgent.handoffs = handoffs.filter((item) => item.agentName !== messageAgent.name);
+
   return new RealtimeAgent({
     name: "Realtime Triage Agent",
     voice: realtimeModel.voice,
     instructions: realtimeInstructions,
-    handoffs: [customerContextAgent, diagnosticsAgent, dispatchAgent, policyAgent, messageAgent],
+    handoffs,
     tools: [
       tool({
         name: "waitForMoreAudio",
@@ -390,7 +404,8 @@ export function bindRealtimeSessionEvents(session: RealtimeEventSource, callback
     callbacks.onAssistantText(message);
   });
   session.on("error", (error) => {
-    callbacks.onError(errorMessage((error as { error?: unknown }).error));
+    const message = errorMessage((error as { error?: unknown }).error);
+    if (!isNonFatalRealtimeRoutingError(message)) callbacks.onError(message);
   });
 }
 
@@ -407,6 +422,10 @@ function messageText(item: Extract<RealtimeItem, { type: "message" }>) {
 
 function errorMessage(error: unknown) {
   return error instanceof Error ? error.message : String(error);
+}
+
+function isNonFatalRealtimeRoutingError(message: string) {
+  return message.includes("Handoff function expected non empty input") || message.includes("Unexpected end of JSON input");
 }
 
 const assetIdSchema = z.string().regex(/^[A-Z]{3}-\d{4}$/, "Confirm the exact normalized asset ID before lookup.");
