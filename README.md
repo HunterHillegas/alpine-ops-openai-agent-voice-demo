@@ -96,7 +96,7 @@ The repo has the server-side realtime session endpoint, a lazy-loaded browser `R
 
 Remaining live-voice hardening: exercise the full microphone/audio path with a real key, expand SDK approval-resume handling for write tools, and add browser automation around live transcript events.
 
-See `docs/live-voice-verification.md` for the manual live-key checklist and `docs/demo-capture.md` for screenshot/GIF capture steps.
+See `docs/live-voice-verification.md` for the manual live-key checklist, `docs/demo-capture.md` for screenshot/GIF capture steps, and `docs/deployment.md` for optional Vercel/Render notes.
 
 ## Mocking Boundary
 
