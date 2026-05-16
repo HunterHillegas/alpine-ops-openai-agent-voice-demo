@@ -184,6 +184,10 @@ describe("eval fixtures", () => {
     const audit = runCompletionAudit({});
 
     expect(audit.status).toBe("blocked");
+    expect(audit.checks.find((check) => check.id === "platinum-desktop-fidelity")).toMatchObject({
+      status: "passed",
+      evidence: expect.stringContaining("menu chrome")
+    });
     expect(audit.checks.find((check) => check.id === "live-webrtc-key")?.status).toBe("blocked");
     expect(audit.checks.find((check) => check.id === "live-webrtc-verified")?.status).toBe("blocked");
   });

@@ -20,6 +20,10 @@ npm run dev:web
 
 Recommended filename: `docs/media/alpine-fieldops-console.png`.
 
+For the MacOS 8 reference theme, open `http://localhost:5173/?theme=platinum` before capture. The first viewport should show the Finder-style menu bar, patterned desktop wallpaper, right-side desktop icons, striped window title bars, and bottom launcher strip around the same operations cockpit.
+
+Recommended filename: `docs/media/alpine-fieldops-console-platinum.png`.
+
 ## GIF Walkthrough
 
 Suggested sequence:
@@ -42,4 +46,4 @@ For automated UI proof, run:
 npm run test:ui
 ~~~
 
-The test suite covers initial render, replay transcript playback, approval execution, mock voice fallback, text fallback replay, unclear-ID guardrail, and scenario-focused workspace.
+The test suite covers initial render, replay transcript playback, approval execution, mock voice fallback, text fallback replay, unclear-ID guardrail, scenario-focused workspace, and Platinum theme desktop chrome from the `?theme=platinum` deep link.
