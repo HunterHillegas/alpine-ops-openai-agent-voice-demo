@@ -4,6 +4,7 @@ import { scenarioTranscripts, type Approval, type CompanyState, type DemoScenari
 import { TopBar, type ThemeId } from "./components/TopBar";
 import { companyClient } from "./lib/companyClient";
 import type { AlpineRealtimeConsole, VoiceConnection } from "./lib/realtimeConsole";
+import { formatEventArgs } from "./lib/traceFormat";
 import "./styles.css";
 import "./cockpit.css";
 import "./themes.css";
@@ -443,11 +444,6 @@ function ApprovalDrawer({ approvals, onApprove, onReject }: { approvals: Approva
       </div>
     </section>
   );
-}
-
-function formatEventArgs(args: Record<string, unknown>) {
-  const text = JSON.stringify(args, null, 2);
-  return text.length > 360 ? `${text.slice(0, 357)}...` : text;
 }
 
 createRoot(document.getElementById("root")!).render(<App />);
