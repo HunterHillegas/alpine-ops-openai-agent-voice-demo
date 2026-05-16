@@ -9,6 +9,9 @@ describe("eval fixtures", () => {
   it("cover the required demo categories", () => {
     expect(evalFixtures.map((fixture) => fixture.id)).toEqual([
       "dead-charger-success",
+      "routing-diagnostics",
+      "routing-policy-billing",
+      "routing-dispatch",
       "ambiguous-customer",
       "unclear-asset-id",
       "refund-requires-approval",
@@ -16,6 +19,16 @@ describe("eval fixtures", () => {
       "part-out-of-stock",
       "tool-failure-retry-once"
     ]);
+  });
+
+  it("covers every required eval category", () => {
+    expect(new Set(evalFixtures.map((fixture) => fixture.category))).toEqual(new Set([
+      "routing",
+      "tool_use",
+      "approvals",
+      "exact_entity_capture",
+      "failure_handling"
+    ]));
   });
 
   it("marks write tools as approval-gated", () => {
@@ -87,6 +100,24 @@ describe("eval fixtures", () => {
         expect(toolCalls, fixture.id).not.toContain(forbiddenTool);
       }
     }
+  });
+
+  it("orders the main read-only investigation before approval requests", () => {
+    const api = createCompanyApi();
+    const replay = api.replayScenario("dead-charger-outage");
+
+    expect(replay.ok).toBe(true);
+    if (!replay.ok) return;
+
+    const chronologicalTools = replay.data.events
+      .slice()
+      .reverse()
+      .flatMap((event) => event.toolName ? [event.toolName] : []);
+
+    expect(chronologicalTools.indexOf("searchCustomers")).toBeLessThan(chronologicalTools.indexOf("getAsset"));
+    expect(chronologicalTools.indexOf("getAssetTelemetry")).toBeLessThan(chronologicalTools.indexOf("estimateRepairPlan"));
+    expect(chronologicalTools.indexOf("checkPartInventory")).toBeLessThan(chronologicalTools.indexOf("requestHumanApproval"));
+    expect(chronologicalTools).not.toContain("createWorkOrder");
   });
 
   it("scripted eval runner reports every fixture passing", () => {
@@ -271,5 +302,52 @@ describe("eval fixtures", () => {
 
     expect(sent.ok).toBe(true);
     expect(api.getState().customerMessages[0]?.status).toBe("sent");
+  });
+
+  it("keeps rejected write approvals from mutating dispatch or billing state", () => {
+    const api = createCompanyApi();
+    const reserveApproval = api.requestHumanApproval({
+      action: "reservePart",
+      summary: "Reserve one control board.",
+      payload: { partId: "PCB-48A-R3", quantity: 1 }
+    });
+    api.reject(reserveApproval.approvalId);
+
+    const deniedReservation = api.reservePart({
+      partId: "PCB-48A-R3",
+      quantity: 1,
+      approvalToken: reserveApproval.token
+    });
+
+    expect(deniedReservation.ok).toBe(false);
+    expect(api.getState().inventory.find((part) => part.partId === "PCB-48A-R3")?.quantity).toBe(2);
+
+    const cancelApproval = api.requestHumanApproval({
+      action: "cancelAppointment",
+      summary: "Cancel install after dispatcher confirmation.",
+      payload: { ticketId: "TCK-1048" }
+    });
+    api.approve(cancelApproval.approvalId);
+    const cancelled = api.cancelAppointment({ ticketId: "TCK-1048", approvalToken: cancelApproval.token });
+
+    expect(cancelled.ok).toBe(true);
+    expect(api.getState().tickets.find((ticket) => ticket.ticketId === "TCK-1048")?.status).toBe("cancelled");
+
+    const creditApproval = api.requestHumanApproval({
+      action: "createCreditMemo",
+      summary: "Refund deposit after cancellation approval.",
+      payload: { customerId: "cus_noah_reed", amountCents: 25000, reason: "Customer cancelled install before cutoff." }
+    });
+    api.approve(creditApproval.approvalId);
+    const credit = api.createCreditMemo({
+      customerId: "cus_noah_reed",
+      amountCents: 25000,
+      reason: "Customer cancelled install before cutoff.",
+      approvalToken: creditApproval.token
+    });
+
+    expect(credit.ok).toBe(true);
+    if (!credit.ok) return;
+    expect(credit.data.creditMemoId).toMatch(/^CRM-/);
   });
 });

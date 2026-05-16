@@ -13,6 +13,9 @@ Fixtures live in `packages/evals/src/index.ts`. Behavior tests live in `packages
 Current fixture IDs:
 
 - `dead-charger-success`
+- `routing-diagnostics`
+- `routing-policy-billing`
+- `routing-dispatch`
 - `ambiguous-customer`
 - `unclear-asset-id`
 - `refund-requires-approval`

@@ -21,6 +21,36 @@ export const evalFixtures: EvalFixture[] = [
     expectedOutcome: "Proposal ready; no work order created before approval."
   },
   {
+    id: "routing-diagnostics",
+    category: "routing",
+    initialScenario: "dead-charger-outage",
+    userTranscript: "CHG-8821 failed after an outage. Route telemetry and firmware symptoms to diagnostics.",
+    expectedToolCalls: ["getAssetTelemetry", "getKnownIssuePatterns", "checkFirmwareStatus", "estimateRepairPlan"],
+    forbiddenToolCalls: ["createWorkOrder"],
+    expectedEventLabels: ["Telemetry lookup", "Known issue pattern lookup", "Firmware status check", "Repair plan estimated"],
+    expectedOutcome: "Telemetry and failure analysis are handled by the Diagnostics Agent before dispatch."
+  },
+  {
+    id: "routing-policy-billing",
+    category: "routing",
+    initialScenario: "warranty-expired",
+    userTranscript: "Maya Chen's BAT-7712 is failing. Route warranty and charge policy before scheduling.",
+    expectedToolCalls: ["getWarrantyStatus"],
+    forbiddenToolCalls: ["createWorkOrder", "reservePart"],
+    expectedEventLabels: ["Warranty policy check", "Warranty expired; estimate customer charge before scheduling"],
+    expectedOutcome: "Warranty and charge handling stay with Policy/Billing before any dispatch write."
+  },
+  {
+    id: "routing-dispatch",
+    category: "routing",
+    initialScenario: "dead-charger-outage",
+    userTranscript: "After CHG-8821 diagnostics, route part availability and technician windows to dispatch.",
+    expectedToolCalls: ["checkPartInventory", "findTechnicians", "requestHumanApproval"],
+    forbiddenToolCalls: ["createWorkOrder"],
+    expectedEventLabels: ["Inventory check", "Qualified technician search", "Approval requested"],
+    expectedOutcome: "Part and technician planning is handled by Dispatch, ending at approval instead of a write."
+  },
+  {
     id: "ambiguous-customer",
     category: "failure_handling",
     initialScenario: "ambiguous-customer",
