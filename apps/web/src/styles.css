@@ -345,6 +345,8 @@ button:hover {
 .info-panel,
 .chart-panel,
 .timeline-panel,
+.policy-panel,
+.schedule-panel,
 .plan-panel {
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -362,6 +364,8 @@ button:hover {
 .plain-note,
 .chart-caption,
 .event-card p,
+.policy-panel p,
+.schedule-panel span,
 .approval-list p {
   color: var(--muted);
   line-height: 1.4;
@@ -435,7 +439,8 @@ dd {
   list-style: none;
 }
 
-.timeline-panel li {
+.timeline-panel li,
+.schedule-panel li {
   display: grid;
   grid-template-columns: 52px 1fr;
   gap: 10px;
@@ -445,6 +450,29 @@ dd {
 .timeline-panel li span {
   color: var(--accent-2);
   font-weight: 800;
+}
+
+.policy-panel ul,
+.schedule-panel ul {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.policy-panel li {
+  border-left: 2px solid rgba(126, 231, 135, 0.5);
+  color: #dbece0;
+  padding-left: 9px;
+}
+
+.schedule-panel li {
+  grid-template-columns: 86px 1fr;
+}
+
+.schedule-panel b {
+  color: var(--accent-2);
 }
 
 .follow-up,
@@ -507,6 +535,22 @@ dd {
   display: block;
   margin-top: 8px;
   color: var(--accent);
+}
+
+.event-args {
+  display: block;
+  max-height: 128px;
+  margin-top: 8px;
+  overflow: auto;
+  border: 1px solid rgba(177, 224, 194, 0.14);
+  border-radius: 7px;
+  background: rgba(5, 13, 11, 0.58);
+  color: #cfe3d6;
+  font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  padding: 8px;
+  white-space: pre-wrap;
 }
 
 .event-card.approval {

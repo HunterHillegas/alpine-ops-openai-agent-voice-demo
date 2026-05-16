@@ -13,6 +13,8 @@ test("renders seeded operations cockpit", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Amelia Brooks" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "CHG-8821" })).toBeVisible();
   await expect(page.getByText("Control board, AlpineCharge Pro 48A R3")).toBeVisible();
+  await expect(page.getByText("Policy notes")).toBeVisible();
+  await expect(page.getByText("Technician schedule")).toBeVisible();
   await expect(page.getByText("No pending side effects")).toBeVisible();
 });
 
@@ -21,7 +23,9 @@ test("replays main scenario and executes approved work order", async ({ page }) 
 
   await expect(page.getByRole("heading", { name: "Approval requested" })).toBeVisible();
   await expect(page.getByText("1 pending")).toBeVisible();
-  await expect(page.getByText("createWorkOrder")).toBeVisible();
+  await expect(page.getByText("createWorkOrder", { exact: true })).toBeVisible();
+  await expect(page.getByText('"assetId"').first()).toBeVisible();
+  await expect(page.getByText('"CHG-8821"').first()).toBeVisible();
 
   await page.getByRole("button", { name: "Approve and run" }).click();
 

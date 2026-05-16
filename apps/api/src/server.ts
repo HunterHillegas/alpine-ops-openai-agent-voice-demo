@@ -61,6 +61,26 @@ app.post<{ Params: { approvalId: string } }>("/approvals/:approvalId/reject", as
 
 app.post<{
   Body: {
+    customerId: string;
+    assetId: string;
+    priority: "low" | "normal" | "high" | "urgent";
+    summary: string;
+    notes?: string[];
+    approvalToken: string;
+  };
+}>("/tickets", async (request) => company.createTicket(request.body));
+app.post<{
+  Body: {
+    ticketId: string;
+    status?: "open" | "triaged" | "scheduled" | "cancelled" | "resolved";
+    priority?: "low" | "normal" | "high" | "urgent";
+    summary?: string;
+    note?: string;
+    approvalToken: string;
+  };
+}>("/tickets/update", async (request) => company.updateTicket(request.body));
+app.post<{
+  Body: {
     ticketId: string;
     technicianId: string;
     windowId: string;

@@ -19,6 +19,8 @@ describe("eval fixtures", () => {
   it("marks write tools as approval-gated", () => {
     const writeTools = toolDefinitions.filter((tool) => tool.kind === "write");
     expect(writeTools.map((tool) => tool.name)).toEqual([
+      "createTicket",
+      "updateTicket",
       "createWorkOrder",
       "reservePart",
       "cancelAppointment",
@@ -96,6 +98,63 @@ describe("eval fixtures", () => {
 
     expect(deniedSave.ok).toBe(false);
     expect(api.getState().customerMessages).toHaveLength(0);
+  });
+
+  it("creates and updates tickets only after approval", () => {
+    const api = createCompanyApi();
+    const denied = api.createTicket({
+      customerId: "cus_amelia_brooks",
+      assetId: "CHG-8821",
+      priority: "high",
+      summary: "Customer called back with outage details",
+      approvalToken: "missing"
+    });
+
+    expect(denied.ok).toBe(false);
+    expect(api.getState().tickets).toHaveLength(2);
+
+    const createApproval = api.requestHumanApproval({
+      action: "createTicket",
+      summary: "Create follow-up charger outage ticket.",
+      payload: {
+        customerId: "cus_amelia_brooks",
+        assetId: "CHG-8821",
+        priority: "high",
+        summary: "Customer called back with outage details"
+      }
+    });
+    api.approve(createApproval.approvalId);
+
+    const created = api.createTicket({
+      customerId: "cus_amelia_brooks",
+      assetId: "CHG-8821",
+      priority: "high",
+      summary: "Customer called back with outage details",
+      approvalToken: createApproval.token
+    });
+
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+    expect(api.getState().tickets[0]?.ticketId).toBe(created.data.ticketId);
+
+    const updateApproval = api.requestHumanApproval({
+      action: "updateTicket",
+      summary: "Mark new ticket triaged.",
+      payload: { ticketId: created.data.ticketId, status: "triaged", note: "Exact ID confirmed." }
+    });
+    api.approve(updateApproval.approvalId);
+
+    const updated = api.updateTicket({
+      ticketId: created.data.ticketId,
+      status: "triaged",
+      note: "Exact ID confirmed.",
+      approvalToken: updateApproval.token
+    });
+
+    expect(updated.ok).toBe(true);
+    if (!updated.ok) return;
+    expect(updated.data.status).toBe("triaged");
+    expect(updated.data.notes).toContain("Exact ID confirmed.");
   });
 
   it("saves and sends mocked customer messages only after approval", () => {

@@ -32,6 +32,8 @@ export interface CompanyApi {
   requestHumanApproval(params: { action: string; summary: string; payload: unknown }): Approval;
   approve(approvalId: string): ApiResult<Approval>;
   reject(approvalId: string): ApiResult<Approval>;
+  createTicket(params: CreateTicketInput): ApiResult<Ticket>;
+  updateTicket(params: UpdateTicketInput): ApiResult<Ticket>;
   createWorkOrder(params: CreateWorkOrderInput): ApiResult<WorkOrder>;
   reservePart(params: { partId: string; quantity: number; approvalToken: string }): ApiResult<InventoryItem>;
   cancelAppointment(params: { ticketId: string; approvalToken: string }): ApiResult<Ticket>;
@@ -49,6 +51,24 @@ export interface CreateWorkOrderInput {
   windowId: string;
   reservedParts: string[];
   customerChargeCents: number;
+  approvalToken: string;
+}
+
+export interface CreateTicketInput {
+  customerId: string;
+  assetId: string;
+  priority: Ticket["priority"];
+  summary: string;
+  notes?: string[];
+  approvalToken: string;
+}
+
+export interface UpdateTicketInput {
+  ticketId: string;
+  status?: Ticket["status"];
+  priority?: Ticket["priority"];
+  summary?: string;
+  note?: string;
   approvalToken: string;
 }
 
@@ -189,6 +209,51 @@ export function createCompanyApi(initialState: CompanyState = createSeedState())
       approval.status = "rejected";
       addEvent(event("Dispatcher", "approval", "Approval rejected", { args: { approvalId, action: approval.action }, approvalStatus: "rejected" }));
       return success(clone(approval));
+    },
+
+    createTicket: ({ customerId, assetId, priority, summary, notes = [], approvalToken }) => {
+      const approval = requireApprovedToken(approvalToken, "createTicket");
+      if (!approval.ok) return approval;
+      const customer = state.customers.find((item) => item.id === customerId);
+      const asset = state.assets.find((item) => item.assetId === assetId && item.customerId === customerId);
+      if (!customer) return failure("customer_not_found", `No customer found for ${customerId}.`);
+      if (!asset) return failure("asset_not_found", `No asset ${assetId} found for ${customerId}.`);
+
+      const ticket: Ticket = {
+        ticketId: `TCK-${Math.floor(2000 + Math.random() * 7000)}`,
+        customerId,
+        assetId,
+        status: "open",
+        priority,
+        summary,
+        notes
+      };
+      state.tickets.unshift(ticket);
+      addEvent(event("Customer Context Agent", "state_change", "Ticket created", {
+        toolName: "createTicket",
+        args: { customerId, assetId, priority, summary },
+        resultSummary: ticket.ticketId
+      }));
+      return success(clone(ticket));
+    },
+
+    updateTicket: ({ ticketId, status, priority, summary, note, approvalToken }) => {
+      const approval = requireApprovedToken(approvalToken, "updateTicket");
+      if (!approval.ok) return approval;
+      const ticket = state.tickets.find((item) => item.ticketId === ticketId);
+      if (!ticket) return failure("ticket_not_found", `No ticket found for ${ticketId}.`);
+
+      if (status) ticket.status = status;
+      if (priority) ticket.priority = priority;
+      if (summary) ticket.summary = summary;
+      if (note) ticket.notes.push(note);
+
+      addEvent(event("Customer Context Agent", "state_change", "Ticket updated", {
+        toolName: "updateTicket",
+        args: { ticketId, status, priority, summary, note },
+        resultSummary: `${ticket.ticketId} is ${ticket.status}`
+      }));
+      return success(clone(ticket));
     },
 
     createWorkOrder: ({ ticketId, technicianId, windowId, reservedParts, customerChargeCents, approvalToken }) => {

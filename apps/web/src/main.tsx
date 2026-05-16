@@ -102,6 +102,12 @@ function App() {
 
   async function approveAndRun(approval: Approval) {
     const approved = await companyClient.approve(approval.approvalId);
+    if (approved.action === "createTicket") {
+      await companyClient.createTicket({ ...(approved.payload as object), approvalToken: approved.token });
+    }
+    if (approved.action === "updateTicket") {
+      await companyClient.updateTicket({ ...(approved.payload as object), approvalToken: approved.token });
+    }
     if (approved.action === "createWorkOrder") {
       await companyClient.createWorkOrder({ ...(approved.payload as object), approvalToken: approved.token });
     }
@@ -250,6 +256,9 @@ function CaseWorkspace({ customer, asset, ticket, telemetry, state }: {
   const tech = state.technicians.find((item) => item.vanInventory.includes(likelyPartId)) ?? state.technicians.find((item) => item.region === "Santa Barbara");
   const workOrder = state.workOrders.find((item) => item.ticketId === ticket?.ticketId) ?? state.workOrders[0];
   const customerMessages = state.customerMessages.filter((message) => message.customerId === customer?.id);
+  const warrantyPolicy = state.policies.find((policy) => policy.policyId === "warranty-standard");
+  const cancellationPolicy = state.policies.find((policy) => policy.policyId === "cancellation-refund");
+  const schedule = tech?.schedule ?? [];
 
   return (
     <section className="workspace">
@@ -312,6 +321,32 @@ function CaseWorkspace({ customer, asset, ticket, telemetry, state }: {
           </ol>
         </section>
 
+        <section className="policy-panel">
+          <div className="panel-heading">
+            <span>Policy notes</span>
+            <strong>{warrantyActive ? warrantyPolicy?.policyId : cancellationPolicy?.policyId}</strong>
+          </div>
+          <p>{warrantyActive ? warrantyPolicy?.summary : cancellationPolicy?.summary}</p>
+          <ul>
+            {(warrantyActive ? warrantyPolicy?.rules : cancellationPolicy?.rules)?.map((rule) => <li key={rule}>{rule}</li>)}
+          </ul>
+        </section>
+
+        <section className="schedule-panel">
+          <div className="panel-heading">
+            <span>Technician schedule</span>
+            <strong>{tech?.name ?? "Unassigned"}</strong>
+          </div>
+          <ul>
+            {schedule.map((window) => (
+              <li key={window.windowId}>
+                <b>{window.start}-{window.end}</b>
+                <span>{window.available ? "available" : "booked"} · {window.date}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
         <section className="plan-panel">
           <div className="panel-heading">
             <span>Work-order plan</span>
@@ -365,7 +400,9 @@ function ActivityRail({ events }: { events: EventLogEntry[] }) {
             </div>
             <h4>{event.label}</h4>
             <p>{event.toolName ?? event.handoffTarget ?? event.type}</p>
+            {event.args && <code className="event-args">{formatEventArgs(event.args)}</code>}
             {event.resultSummary && <small>{event.resultSummary}</small>}
+            {event.approvalStatus && <small>{event.approvalStatus}</small>}
             {event.error && <small className="event-error">{event.error}</small>}
           </article>
         ))}
@@ -383,7 +420,7 @@ function ApprovalDrawer({ approvals, onApprove, onReject }: { approvals: Approva
       </div>
       <div className="approval-list">
         {approvals.length === 0 ? (
-          <p>Read-only lookups can run automatically. Scheduling, cancellation, refund, part reservation, and message send wait here.</p>
+          <p>Read-only lookups can run automatically. Ticket writes, scheduling, cancellation, refund, part reservation, and message send wait here.</p>
         ) : approvals.map((approval) => (
           <article key={approval.approvalId}>
             <b>{approval.action}</b>
@@ -395,6 +432,11 @@ function ApprovalDrawer({ approvals, onApprove, onReject }: { approvals: Approva
       </div>
     </section>
   );
+}
+
+function formatEventArgs(args: Record<string, unknown>) {
+  const text = JSON.stringify(args, null, 2);
+  return text.length > 360 ? `${text.slice(0, 357)}...` : text;
 }
 
 createRoot(document.getElementById("root")!).render(<App />);

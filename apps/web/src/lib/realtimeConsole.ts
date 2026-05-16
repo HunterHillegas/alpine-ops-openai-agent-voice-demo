@@ -76,6 +76,32 @@ export function buildAlpineRealtimeAgent() {
         description: "Search customers by name after the spoken name is clear.",
         parameters: z.object({ query: z.string().min(2) }),
         execute: async ({ query }) => companyClient.searchCustomers(query)
+      }),
+      tool({
+        name: "createTicket",
+        description: "Create a mocked service ticket only after explicit confirmation, UI approval, and approval token.",
+        parameters: z.object({
+          customerId: z.string(),
+          assetId: assetIdSchema,
+          priority: z.enum(["low", "normal", "high", "urgent"]),
+          summary: z.string(),
+          notes: z.array(z.string()).optional(),
+          approvalToken: z.string()
+        }),
+        execute: async (params) => companyClient.createTicket(params)
+      }),
+      tool({
+        name: "updateTicket",
+        description: "Update a mocked service ticket only after explicit confirmation, UI approval, and approval token.",
+        parameters: z.object({
+          ticketId: z.string(),
+          status: z.enum(["open", "triaged", "scheduled", "cancelled", "resolved"]).optional(),
+          priority: z.enum(["low", "normal", "high", "urgent"]).optional(),
+          summary: z.string().optional(),
+          note: z.string().optional(),
+          approvalToken: z.string()
+        }),
+        execute: async (params) => companyClient.updateTicket(params)
       })
     ]
   });

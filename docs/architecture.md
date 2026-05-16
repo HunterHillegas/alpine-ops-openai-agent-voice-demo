@@ -33,7 +33,7 @@ Read tools run once exact required fields are known. Write tools require:
 4. Approved token passed to the write endpoint.
 5. Successful write response before the assistant claims completion.
 
-Approval-gated writes include work-order creation, part reservation, appointment cancellation, credit memo creation, and customer-message send.
+Approval-gated writes include ticket creation/update, work-order creation, part reservation, appointment cancellation, credit memo creation, and customer-message save/send.
 
 ## Trace Events
 
