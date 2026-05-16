@@ -1,6 +1,6 @@
 # Live Voice Verification
 
-Use this checklist when an OpenAI API key is available. The current automated suite verifies the mock voice fallback, scenario replay, approval drawer, exact-ID guardrails, and browser UI. Live microphone/audio is intentionally deferred for the current handoff and still needs a real key plus browser microphone permission before strict completion.
+Use this checklist when an OpenAI API key is available. The current automated suite verifies the mock voice fallback, scenario replay, approval drawer, exact-ID guardrails, browser UI, and automated live WebRTC connection path. The live smoke has passed in this workspace with a real server-side key loaded from ignored local environment. Strict completion still needs the spoken microphone/audio checklist below.
 
 ## Setup
 
@@ -25,7 +25,7 @@ OPENAI_API_KEY=<real-key> npm run test:live
 
 Use a real server-side OpenAI API key. The preflight blocks missing, test, or placeholder values before launching Chromium.
 
-The live smoke starts isolated API/web servers, grants microphone permission to Chromium, clicks **Connect voice**, and verifies that the console reaches `live` / `WebRTC` status with the live connection transcript. It does not replace the spoken-audio checklist below.
+The live smoke starts isolated API/web servers, grants microphone permission to Chromium, clicks **Connect voice**, and verifies that the console reaches `live` / `WebRTC` status with the live connection transcript. This automated smoke has passed in the current workspace. It does not replace the spoken-audio checklist below.
 
 ## Expected Checks
 
