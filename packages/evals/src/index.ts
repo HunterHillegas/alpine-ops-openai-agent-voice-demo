@@ -9,6 +9,7 @@ export interface EvalFixture {
   expectedState: {
     workOrderCount: number;
     pendingApprovalActions: string[];
+    approvedApprovalActions?: string[];
     caseSummaryCount?: number;
     customerMessageCount?: number;
     inventoryQuantities?: Record<string, number>;
@@ -44,6 +45,25 @@ export const evalFixtures: EvalFixture[] = [
     expectedEventLabels: ["Confirmed exact identifier", "Service history lookup", "Known issue pattern lookup", "Firmware status check", "Repair plan estimated", "Case summary created", "Approval requested"],
     expectedState: deadChargerProposalState,
     expectedOutcome: "Proposal ready; no work order created before approval."
+  },
+  {
+    id: "dead-charger-approved-dispatch",
+    category: "approvals",
+    initialScenario: "dead-charger-approved",
+    userTranscript: "Approve the CHG-8821 warranty dispatch, reserve the PCB-48A-R3 board, and save the customer text.",
+    expectedToolCalls: ["requestHumanApproval", "createWorkOrder", "reservePart", "draftCustomerMessage", "saveCustomerMessage"],
+    forbiddenToolCalls: ["sendCustomerMessage"],
+    expectedEventLabels: ["Approval granted", "Work order created", "Part reserved", "Customer message drafted", "Customer message saved"],
+    expectedState: {
+      workOrderCount: 1,
+      pendingApprovalActions: [],
+      approvedApprovalActions: ["createWorkOrder", "reservePart", "saveCustomerMessage"],
+      caseSummaryCount: 1,
+      customerMessageCount: 1,
+      inventoryQuantities: { "PCB-48A-R3": 1 },
+      ticketStatuses: { "TCK-1044": "scheduled" }
+    },
+    expectedOutcome: "Approved dispatch creates a work order, reserves the part, and saves the customer message."
   },
   {
     id: "routing-diagnostics",

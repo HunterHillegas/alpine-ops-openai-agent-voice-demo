@@ -49,6 +49,13 @@ function stateExpectationErrors(fixture: EvalFixture, state: CompanyState): stri
     errors.push(`expected pending approvals ${expected.pendingApprovalActions.join(",") || "none"}, saw ${pendingApprovalActions.join(",") || "none"}`);
   }
 
+  if (expected.approvedApprovalActions) {
+    const approvedApprovalActions = state.approvals.filter((approval) => approval.status === "approved").map((approval) => approval.action).reverse();
+    if (JSON.stringify(approvedApprovalActions) !== JSON.stringify(expected.approvedApprovalActions)) {
+      errors.push(`expected approved approvals ${expected.approvedApprovalActions.join(",") || "none"}, saw ${approvedApprovalActions.join(",") || "none"}`);
+    }
+  }
+
   if (expected.caseSummaryCount !== undefined && state.caseSummaries.length !== expected.caseSummaryCount) {
     errors.push(`expected ${expected.caseSummaryCount} case summary record(s), saw ${state.caseSummaries.length}`);
   }

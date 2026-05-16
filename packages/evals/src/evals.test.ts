@@ -9,6 +9,7 @@ describe("eval fixtures", () => {
   it("cover the required demo categories", () => {
     expect(evalFixtures.map((fixture) => fixture.id)).toEqual([
       "dead-charger-success",
+      "dead-charger-approved-dispatch",
       "routing-diagnostics",
       "routing-policy-billing",
       "routing-dispatch",

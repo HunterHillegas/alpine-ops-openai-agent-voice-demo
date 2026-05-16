@@ -8,6 +8,7 @@ export function replayDemoScenario(
 ): CompanyState {
   api.reset(scenarioId);
   if (scenarioId === "dead-charger-outage") replayDeadCharger(api, addEvent);
+  else if (scenarioId === "dead-charger-approved") replayApprovedDeadCharger(api, addEvent);
   else if (scenarioId === "refund-cancellation") replayRefundCancellation(api);
   else if (scenarioId === "unclear-asset-id") replayUnclearAssetId(addEvent);
   else if (scenarioId === "ambiguous-customer") replayAmbiguousCustomer(api, addEvent);
@@ -42,6 +43,54 @@ function replayDeadCharger(api: CompanyApi, addEvent: (entry: EventLogEntry) => 
     payload: { ticketId: "TCK-1044", technicianId: "tech_marco_diaz", windowId: "win_marco_1012", reservedParts: ["PCB-48A-R3"], customerChargeCents: 0 }
   });
   addEvent(event("Realtime Triage Agent", "summary", "Ready for dispatcher approval: active warranty, likely control-board fault, Marco Diaz available tomorrow 10:00-12:00."));
+}
+
+function replayApprovedDeadCharger(api: CompanyApi, addEvent: (entry: EventLogEntry) => EventLogEntry) {
+  replayDeadCharger(api, addEvent);
+  const workOrderApproval = api.getState().approvals[0];
+  if (!workOrderApproval) {
+    addEvent(event("Safety / Approval Layer", "failure", "Approved replay missing work-order approval", { error: "approval_not_found" }));
+    return;
+  }
+  api.approve(workOrderApproval.approvalId);
+  const workOrder = api.createWorkOrder({
+    ticketId: "TCK-1044",
+    technicianId: "tech_marco_diaz",
+    windowId: "win_marco_1012",
+    reservedParts: ["PCB-48A-R3"],
+    customerChargeCents: 0,
+    approvalToken: workOrderApproval.token
+  });
+
+  const partApproval = api.requestHumanApproval({
+    action: "reservePart",
+    summary: "Reserve one PCB-48A-R3 control board for Amelia Brooks's CHG-8821 warranty repair.",
+    payload: { partId: "PCB-48A-R3", quantity: 1 }
+  });
+  api.approve(partApproval.approvalId);
+  api.reservePart({ partId: "PCB-48A-R3", quantity: 1, approvalToken: partApproval.token });
+
+  const workOrderId = workOrder.ok ? workOrder.data.workOrderId : "WO-pending";
+  const draft = api.draftCustomerMessage({
+    customerId: "cus_amelia_brooks",
+    workOrderId,
+    channel: "sms",
+    topic: "scheduled warranty repair"
+  });
+  const messageBody = draft.ok ? draft.data.body : "Alpine FieldOps scheduled your warranty repair.";
+  const messageApproval = api.requestHumanApproval({
+    action: "saveCustomerMessage",
+    summary: "Save Amelia Brooks customer SMS draft after dispatcher approval.",
+    payload: { customerId: "cus_amelia_brooks", channel: "sms" }
+  });
+  api.approve(messageApproval.approvalId);
+  api.saveCustomerMessage({
+    customerId: "cus_amelia_brooks",
+    channel: "sms",
+    body: messageBody,
+    approvalToken: messageApproval.token
+  });
+  addEvent(event("Realtime Triage Agent", "summary", "Approved dispatch complete: work order scheduled, part reserved, customer text saved."));
 }
 
 function replayRefundCancellation(api: CompanyApi) {
