@@ -6,6 +6,17 @@ import { TopBar, type ThemeId } from "./components/TopBar";
 import { companyClient } from "./lib/companyClient";
 import { scenarioForTextFallback } from "./lib/mockTextFallback";
 import type { AlpineRealtimeConsole, VoiceConnection } from "./lib/realtimeConsole";
+import type {
+  CancelAppointmentInput,
+  CreateCreditMemoInput,
+  CreateTicketInput,
+  CreateWorkOrderInput,
+  ReservePartInput,
+  SaveCustomerMessageInput,
+  SaveInternalNoteInput,
+  SendCustomerMessageInput,
+  UpdateTicketInput
+} from "@alpine/company-api";
 import "./styles.css";
 import "./cockpit.css";
 import "./themes.css";
@@ -137,13 +148,13 @@ function App() {
   async function approveAndRun(approval: Approval) {
     const approved = await companyClient.approve(approval.approvalId);
     if (approved.action === "createTicket") {
-      await companyClient.createTicket({ ...(approved.payload as object), approvalToken: approved.token });
+      await companyClient.createTicket(withApprovalToken<CreateTicketInput>(approved.payload, approved.token));
     }
     if (approved.action === "updateTicket") {
-      await companyClient.updateTicket({ ...(approved.payload as object), approvalToken: approved.token });
+      await companyClient.updateTicket(withApprovalToken<UpdateTicketInput>(approved.payload, approved.token));
     }
     if (approved.action === "createWorkOrder") {
-      const workOrder = await companyClient.createWorkOrder({ ...(approved.payload as object), approvalToken: approved.token }) as { workOrderId: string };
+      const workOrder = await companyClient.createWorkOrder(withApprovalToken<CreateWorkOrderInput>(approved.payload, approved.token));
       const workOrderPayload = approved.payload as { ticketId?: string };
       const ticketForMessage = state?.tickets.find((item) => item.ticketId === workOrderPayload.ticketId);
       if (ticketForMessage) {
@@ -161,19 +172,19 @@ function App() {
       }
     }
     if (approved.action === "cancelAppointment") {
-      await companyClient.cancelAppointment({ ...(approved.payload as object), approvalToken: approved.token });
+      await companyClient.cancelAppointment(withApprovalToken<CancelAppointmentInput>(approved.payload, approved.token));
     }
     if (approved.action === "createCreditMemo") {
-      await companyClient.createCreditMemo({ ...(approved.payload as object), approvalToken: approved.token });
+      await companyClient.createCreditMemo(withApprovalToken<CreateCreditMemoInput>(approved.payload, approved.token));
     }
     if (approved.action === "saveInternalNote") {
-      await companyClient.saveInternalNote({ ...(approved.payload as object), approvalToken: approved.token });
+      await companyClient.saveInternalNote(withApprovalToken<SaveInternalNoteInput>(approved.payload, approved.token));
     }
     if (approved.action === "reservePart") {
-      await companyClient.reservePart({ ...(approved.payload as object), approvalToken: approved.token });
+      await companyClient.reservePart(withApprovalToken<ReservePartInput>(approved.payload, approved.token));
     }
     if (approved.action === "saveCustomerMessage") {
-      const savedMessage = await companyClient.saveCustomerMessage({ ...(approved.payload as object), approvalToken: approved.token }) as { messageId: string };
+      const savedMessage = await companyClient.saveCustomerMessage(withApprovalToken<SaveCustomerMessageInput>(approved.payload, approved.token));
       await companyClient.requestHumanApproval({
         action: "sendCustomerMessage",
         summary: "Mock-send the saved customer SMS.",
@@ -181,7 +192,7 @@ function App() {
       });
     }
     if (approved.action === "sendCustomerMessage") {
-      await companyClient.sendCustomerMessage({ ...(approved.payload as object), approvalToken: approved.token });
+      await companyClient.sendCustomerMessage(withApprovalToken<SendCustomerMessageInput>(approved.payload, approved.token));
     }
     await refresh();
     setAssistantText(`${approved.action} completed in the mock system.`);
@@ -232,6 +243,10 @@ function App() {
       <ApprovalDrawer approvals={pendingApprovals} onApprove={approveAndRun} onReject={reject} />
     </main>
   );
+}
+
+function withApprovalToken<T extends { approvalToken: string }>(payload: unknown, approvalToken: string): T {
+  return { ...(payload as Omit<T, "approvalToken">), approvalToken } as T;
 }
 
 function VoicePanel(props: {

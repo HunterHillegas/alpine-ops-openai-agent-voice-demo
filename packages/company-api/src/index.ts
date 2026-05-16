@@ -1,15 +1,8 @@
 import {
   type Approval,
   type Asset,
-  type CaseSummary,
   type CompanyState,
-  type Customer,
   type EventLogEntry,
-  type InternalNote,
-  type InventoryItem,
-  type KnownIssuePattern,
-  type Technician,
-  type TelemetryPoint,
   type Ticket,
   type WorkOrder,
   createSeedState,
@@ -18,70 +11,9 @@ import {
 } from "@alpine/mock-data";
 import { estimateRepairPlan, firmwareStatus } from "./diagnostics";
 import { replayDemoScenario } from "./replay";
-
-export type ApiResult<T> = { ok: true; data: T } | { ok: false; code: string; message: string; matches?: unknown[] };
-
-export interface CompanyApi {
-  getState(): CompanyState;
-  reset(scenarioId?: string): CompanyState;
-  searchCustomers(query: string): ApiResult<Customer[]>;
-  getCustomer(customerId: string): ApiResult<Customer>;
-  getCustomerAssets(customerId: string): ApiResult<Asset[]>;
-  getOpenTickets(customerId: string): ApiResult<Ticket[]>;
-  getServiceHistory(customerId: string): ApiResult<CompanyState["serviceHistory"]>;
-  getAsset(assetId: string): ApiResult<Asset>;
-  getAssetTelemetry(assetId: string): ApiResult<TelemetryPoint[]>;
-  getKnownIssuePatterns(productModel: string): ApiResult<KnownIssuePattern[]>;
-  checkFirmwareStatus(assetId: string): ApiResult<ReturnType<typeof firmwareStatus>>;
-  estimateRepairPlan(assetId: string): ApiResult<ReturnType<typeof estimateRepairPlan>>;
-  getWarrantyStatus(assetId: string): ApiResult<{ active: boolean; expiration: string; summary: string }>;
-  getPolicy(policyId: string): ApiResult<{ policyId: string; title: string; summary: string; rules: string[] }>;
-  checkPartInventory(partId: string): ApiResult<InventoryItem>;
-  findTechnicians(params: { certification: string; region: string; partId?: string }): ApiResult<Technician[]>;
-  requestHumanApproval(params: { action: string; summary: string; payload: unknown }): Approval;
-  approve(approvalId: string): ApiResult<Approval>;
-  reject(approvalId: string): ApiResult<Approval>;
-  createTicket(params: CreateTicketInput): ApiResult<Ticket>;
-  updateTicket(params: UpdateTicketInput): ApiResult<Ticket>;
-  createWorkOrder(params: CreateWorkOrderInput): ApiResult<WorkOrder>;
-  reservePart(params: { partId: string; quantity: number; approvalToken: string }): ApiResult<InventoryItem>;
-  cancelAppointment(params: { ticketId: string; approvalToken: string }): ApiResult<Ticket>;
-  createCreditMemo(params: { customerId: string; amountCents: number; reason: string; approvalToken: string }): ApiResult<{ creditMemoId: string; customerId: string; amountCents: number }>;
-  draftCustomerMessage(params: { customerId: string; workOrderId?: string; channel: "sms" | "email"; topic: string }): ApiResult<{ draftId: string; body: string }>;
-  saveInternalNote(params: { ticketId: string; body: string; approvalToken: string }): ApiResult<InternalNote>;
-  createCaseSummary(params: { ticketId: string }): ApiResult<CaseSummary>;
-  saveCustomerMessage(params: { customerId: string; channel: "sms" | "email"; body: string; approvalToken: string }): ApiResult<{ messageId: string; status: "saved" }>;
-  sendCustomerMessage(params: { messageId: string; approvalToken: string }): ApiResult<{ messageId: string; status: "sent" }>;
-  replayScenario(scenarioId: string): ApiResult<CompanyState>;
-  addEvent(entry: EventLogEntry): EventLogEntry;
-}
-
-export interface CreateWorkOrderInput {
-  ticketId: string;
-  technicianId: string;
-  windowId: string;
-  reservedParts: string[];
-  customerChargeCents: number;
-  approvalToken: string;
-}
-
-export interface CreateTicketInput {
-  customerId: string;
-  assetId: string;
-  priority: Ticket["priority"];
-  summary: string;
-  notes?: string[];
-  approvalToken: string;
-}
-
-export interface UpdateTicketInput {
-  ticketId: string;
-  status?: Ticket["status"];
-  priority?: Ticket["priority"];
-  summary?: string;
-  note?: string;
-  approvalToken: string;
-}
+import type { ApiResult, CompanyApi } from "./types";
+export type { FirmwareStatus, RepairPlan } from "./diagnostics";
+export type * from "./types";
 
 export function createCompanyApi(initialState: CompanyState = createSeedState()): CompanyApi {
   let state = clone(initialState);
