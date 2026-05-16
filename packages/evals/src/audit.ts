@@ -1,4 +1,5 @@
 import { validateLiveVoiceEnv } from "./live-voice-env";
+import { readLiveSmokeEvidence } from "./live-voice-smoke";
 
 export type AuditStatus = "passed" | "blocked";
 
@@ -15,6 +16,7 @@ export interface CompletionAudit {
 
 export function runCompletionAudit(env: NodeJS.ProcessEnv = process.env): CompletionAudit {
   const liveEnv = validateLiveVoiceEnv(env);
+  const liveSmoke = readLiveSmokeEvidence(env);
   const checks: AuditCheck[] = [
     passed("typescript-monorepo", "Workspaces cover apps/web, apps/api, packages/agents, packages/company-api, packages/mock-data, and packages/evals."),
     passed("operations-cockpit", "Playwright smoke covers dashboard render, scenario focus, replay transcript, approval execution/rejection, theme switching, and mock voice fallback."),
@@ -34,9 +36,12 @@ export function runCompletionAudit(env: NodeJS.ProcessEnv = process.env): Comple
     liveEnv.ok
       ? passed("live-webrtc-key", "OPENAI_API_KEY passed live verification preflight shape checks.")
       : blocked("live-webrtc-key", liveEnv.errors.join(" ")),
-    liveEnv.ok && env.LIVE_VOICE_VERIFIED === "1"
-      ? passed("live-webrtc-verified", "LIVE_VOICE_VERIFIED=1 indicates the live browser microphone/WebRTC checklist passed in this environment.")
-      : blocked("live-webrtc-verified", "Run npm run test:live and the manual microphone checklist, then set LIVE_VOICE_VERIFIED=1 for strict completion audit.")
+    liveEnv.ok && liveSmoke.ok
+      ? passed("live-webrtc-smoke", liveSmoke.evidence)
+      : blocked("live-webrtc-smoke", liveEnv.ok ? liveSmoke.evidence : "Load a valid OPENAI_API_KEY before evaluating live smoke evidence."),
+    liveEnv.ok && liveSmoke.ok && env.LIVE_VOICE_VERIFIED === "1"
+      ? passed("live-audio-checklist", "LIVE_VOICE_VERIFIED=1 indicates the spoken microphone/audio checklist passed in this environment.")
+      : blocked("live-audio-checklist", "Complete the spoken microphone checklist, then set LIVE_VOICE_VERIFIED=1 for strict completion audit.")
   ];
 
   return {

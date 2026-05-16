@@ -6,6 +6,8 @@ import { evalFixtures } from "./index";
 import { runEvalFixtures } from "./runner";
 
 describe("eval fixtures", () => {
+  const noLiveSmokeEnv = { LIVE_WEBRTC_SMOKE_RESULT_PATH: "/tmp/alpine-missing-live-smoke.json" };
+
   it("cover the required demo categories", () => {
     expect(evalFixtures.map((fixture) => fixture.id)).toEqual([
       "dead-charger-success",
@@ -181,7 +183,7 @@ describe("eval fixtures", () => {
   });
 
   it("completion audit reports live voice as blocked without a key and verification marker", () => {
-    const audit = runCompletionAudit({});
+    const audit = runCompletionAudit(noLiveSmokeEnv);
 
     expect(audit.status).toBe("blocked");
     expect(audit.checks.find((check) => check.id === "platinum-desktop-fidelity")).toMatchObject({
@@ -192,27 +194,38 @@ describe("eval fixtures", () => {
     expect(audit.checks.find((check) => check.id === "trace-redaction")?.evidence).toContain("activity rail tests");
     expect(audit.checks.find((check) => check.id === "docs")?.evidence).toContain("docs/scenarios.md");
     expect(audit.checks.find((check) => check.id === "live-webrtc-key")?.status).toBe("blocked");
-    expect(audit.checks.find((check) => check.id === "live-webrtc-verified")?.status).toBe("blocked");
+    expect(audit.checks.find((check) => check.id === "live-webrtc-smoke")?.status).toBe("blocked");
+    expect(audit.checks.find((check) => check.id === "live-audio-checklist")?.status).toBe("blocked");
   });
 
   it("completion audit blocks placeholder keys before live voice verification", () => {
-    const audit = runCompletionAudit({ OPENAI_API_KEY: "sk-test" });
+    const audit = runCompletionAudit({ ...noLiveSmokeEnv, OPENAI_API_KEY: "sk-test" });
 
     expect(audit.status).toBe("blocked");
     expect(audit.checks.find((check) => check.id === "live-webrtc-key")?.status).toBe("blocked");
-    expect(audit.checks.find((check) => check.id === "live-webrtc-verified")?.status).toBe("blocked");
+    expect(audit.checks.find((check) => check.id === "live-webrtc-smoke")?.status).toBe("blocked");
+    expect(audit.checks.find((check) => check.id === "live-audio-checklist")?.status).toBe("blocked");
   });
 
-  it("completion audit still blocks when a plausible key is present but live voice is not verified", () => {
-    const audit = runCompletionAudit({ OPENAI_API_KEY: "sk-proj-examplelivekey123" });
+  it("completion audit still blocks when a plausible key is present but live smoke is not verified", () => {
+    const audit = runCompletionAudit({ ...noLiveSmokeEnv, OPENAI_API_KEY: "sk-proj-examplelivekey123" });
 
     expect(audit.status).toBe("blocked");
     expect(audit.checks.find((check) => check.id === "live-webrtc-key")?.status).toBe("passed");
-    expect(audit.checks.find((check) => check.id === "live-webrtc-verified")?.status).toBe("blocked");
+    expect(audit.checks.find((check) => check.id === "live-webrtc-smoke")?.status).toBe("blocked");
+    expect(audit.checks.find((check) => check.id === "live-audio-checklist")?.status).toBe("blocked");
   });
 
-  it("completion audit passes when live voice key and verification marker are available", () => {
-    const audit = runCompletionAudit({ OPENAI_API_KEY: "sk-proj-examplelivekey123", LIVE_VOICE_VERIFIED: "1" });
+  it("completion audit still blocks after live smoke until spoken audio checklist is verified", () => {
+    const audit = runCompletionAudit({ OPENAI_API_KEY: "sk-proj-examplelivekey123", LIVE_WEBRTC_SMOKE_VERIFIED: "1" });
+
+    expect(audit.status).toBe("blocked");
+    expect(audit.checks.find((check) => check.id === "live-webrtc-smoke")?.status).toBe("passed");
+    expect(audit.checks.find((check) => check.id === "live-audio-checklist")?.status).toBe("blocked");
+  });
+
+  it("completion audit passes when key, live smoke, and spoken checklist markers are available", () => {
+    const audit = runCompletionAudit({ OPENAI_API_KEY: "sk-proj-examplelivekey123", LIVE_WEBRTC_SMOKE_VERIFIED: "1", LIVE_VOICE_VERIFIED: "1" });
 
     expect(audit.status).toBe("passed");
     expect(audit.checks.every((check) => check.status === "passed")).toBe(true);

@@ -25,7 +25,7 @@ OPENAI_API_KEY=<real-key> npm run test:live
 
 Use a real server-side OpenAI API key. The preflight blocks missing, test, or placeholder values before launching Chromium.
 
-The live smoke starts isolated API/web servers, grants microphone permission to Chromium, clicks **Connect voice**, verifies that the console reaches `live` / `WebRTC` status with the live connection transcript, and sends one dispatcher text turn through the connected realtime session. This automated smoke has passed in the current workspace. It does not replace the spoken-audio checklist below.
+The live smoke starts isolated API/web servers, grants microphone permission to Chromium, clicks **Connect voice**, verifies that the console reaches `live` / `WebRTC` status with the live connection transcript, sends one dispatcher text turn through the connected realtime session, and writes ignored evidence to `packages/evals/results/live-smoke.json`. This automated smoke has passed in the current workspace. It does not replace the spoken-audio checklist below.
 
 ## Expected Checks
 
