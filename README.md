@@ -102,3 +102,7 @@ See `docs/live-voice-verification.md` for the manual live-key checklist, `docs/d
 ## Mocking Boundary
 
 All company data, telemetry, ticket updates, work orders, part reservations, customer messages, cancellations, and credit memos are fake. Reset restores seeded data. Approval tokens are local mock tokens only.
+
+## License
+
+MIT. See [LICENSE](./LICENSE).

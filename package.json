@@ -2,6 +2,7 @@
   "name": "alpine-fieldops-voice-agent",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "description": "Browser-based OpenAI realtime voice-agent demo for a fictional EV-charger and solar-battery field-service operation.",
   "type": "module",
   "workspaces": [

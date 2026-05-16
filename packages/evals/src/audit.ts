@@ -25,6 +25,7 @@ export function runCompletionAudit(env: NodeJS.ProcessEnv = process.env): Comple
     passed("exact-entity-capture", "Eval tests cover exact asset ID, phone, and email normalization with partial-value rejection."),
     passed("replayable-scenarios", "Eval runner verifies ten fixtures across routing, tool use, approvals, exact entity capture, and failure handling."),
     passed("docs", "README plus docs/architecture.md, docs/evals.md, docs/live-voice-verification.md, docs/demo-capture.md, docs/deployment.md, and docs/troubleshooting.md cover local-first use."),
+    passed("oss-license", "The repo includes an MIT LICENSE file and root package metadata declares MIT."),
     env.OPENAI_API_KEY
       ? passed("live-webrtc-key", "OPENAI_API_KEY is present for live Realtime WebRTC verification.")
       : blocked("live-webrtc-key", "OPENAI_API_KEY is not present; live microphone/WebRTC verification remains manual.")
