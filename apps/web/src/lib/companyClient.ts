@@ -26,9 +26,13 @@ export const companyClient = {
   sendCustomerMessage: (payload: unknown) => post("/messages/send", payload),
   realtimeSession: () => postRaw<RealtimeSessionResponse>("/realtime/session", {}),
   searchCustomers: (query: string) => request<unknown>(`/customers/search?q=${encodeURIComponent(query)}`),
+  getCustomer: (customerId: string) => request<unknown>(`/customers/${encodeURIComponent(customerId)}`),
+  getCustomerAssets: (customerId: string) => request<unknown>(`/customers/${encodeURIComponent(customerId)}/assets`),
+  getOpenTickets: (customerId: string) => request<unknown>(`/customers/${encodeURIComponent(customerId)}/tickets/open`),
   getAsset: (assetId: string) => request<unknown>(`/assets/${encodeURIComponent(assetId)}`),
   getAssetTelemetry: (assetId: string) => request<unknown>(`/assets/${encodeURIComponent(assetId)}/telemetry`),
   getWarrantyStatus: (assetId: string) => request<unknown>(`/warranty/${encodeURIComponent(assetId)}`),
+  getPolicy: (policyId: string) => request<unknown>(`/policies/${encodeURIComponent(policyId)}`),
   checkPartInventory: (partId: string) => request<unknown>(`/inventory/${encodeURIComponent(partId)}`),
   findTechnicians: (params: { certification: string; region: string; partId?: string }) => {
     const searchParams = new URLSearchParams({ certification: params.certification, region: params.region });

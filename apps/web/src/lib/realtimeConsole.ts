@@ -78,6 +78,24 @@ export function buildAlpineRealtimeAgent() {
         execute: async ({ query }) => companyClient.searchCustomers(query)
       }),
       tool({
+        name: "getCustomer",
+        description: "Fetch one resolved customer by internal customer ID.",
+        parameters: z.object({ customerId: z.string().min(1) }),
+        execute: async ({ customerId }) => companyClient.getCustomer(customerId)
+      }),
+      tool({
+        name: "getCustomerAssets",
+        description: "List assets owned by one resolved customer.",
+        parameters: z.object({ customerId: z.string().min(1) }),
+        execute: async ({ customerId }) => companyClient.getCustomerAssets(customerId)
+      }),
+      tool({
+        name: "getOpenTickets",
+        description: "List open tickets for one resolved customer.",
+        parameters: z.object({ customerId: z.string().min(1) }),
+        execute: async ({ customerId }) => companyClient.getOpenTickets(customerId)
+      }),
+      tool({
         name: "createTicket",
         description: "Create a mocked service ticket only after explicit confirmation, UI approval, and approval token.",
         parameters: z.object({
@@ -174,6 +192,12 @@ export function buildAlpineRealtimeAgent() {
         description: "Check warranty coverage for a confirmed exact asset ID.",
         parameters: z.object({ assetId: assetIdSchema }),
         execute: async ({ assetId }) => companyClient.getWarrantyStatus(assetId)
+      }),
+      tool({
+        name: "getPolicy",
+        description: "Fetch policy notes by policy ID.",
+        parameters: z.object({ policyId: z.string().min(1) }),
+        execute: async ({ policyId }) => companyClient.getPolicy(policyId)
       }),
       tool({
         name: "cancelAppointment",

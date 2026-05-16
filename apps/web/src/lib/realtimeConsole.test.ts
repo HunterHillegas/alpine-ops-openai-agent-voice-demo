@@ -18,11 +18,14 @@ describe("realtime console integration", () => {
 
   it("exposes write tools only on bounded specialists with approval-token parameters", () => {
     const agent = buildAlpineRealtimeAgent();
+    const customer = agent.handoffs.find((handoff) => ("agentName" in handoff ? handoff.agentName : handoff.name) === "Customer Context Agent");
     const dispatch = agent.handoffs.find((handoff) => ("agentName" in handoff ? handoff.agentName : handoff.name) === "Dispatch Agent");
     const policy = agent.handoffs.find((handoff) => ("agentName" in handoff ? handoff.agentName : handoff.name) === "Policy and Billing Agent");
 
+    expect(toolNames(customer)).toEqual(["searchCustomers", "getCustomer", "getCustomerAssets", "getOpenTickets", "createTicket", "updateTicket"]);
     expect(toolNames(dispatch)).toContain("createWorkOrder");
     expect(toolNames(dispatch)).toContain("reservePart");
+    expect(toolNames(policy)).toContain("getPolicy");
     expect(toolNames(policy)).toContain("cancelAppointment");
     expect(toolNames(policy)).toContain("createCreditMemo");
     const composer = agent.handoffs.find((handoff) => ("agentName" in handoff ? handoff.agentName : handoff.name) === "Message Composer Agent");
