@@ -37,6 +37,27 @@ export interface TelemetryPoint {
   connectivityStatus: "online" | "intermittent" | "offline";
 }
 
+export interface ServiceHistoryEntry {
+  historyId: string;
+  customerId: string;
+  assetId: string;
+  date: string; summary: string; outcome: string;
+}
+
+export interface KnownIssuePattern {
+  patternId: string;
+  productModel: string;
+  symptoms: string[];
+  likelyPartId: string;
+  confidence: "low" | "medium" | "high"; summary: string;
+}
+
+export interface InternalNote {
+  noteId: string;
+  ticketId: string;
+  body: string; createdAt: string;
+}
+
 export interface Ticket {
   ticketId: string;
   customerId: string;
@@ -100,6 +121,13 @@ export interface CustomerMessage {
   sentAt?: string;
 }
 
+export interface CaseSummary {
+  summaryId: string;
+  ticketId: string;
+  body: string;
+  createdAt: string;
+}
+
 export interface Approval {
   approvalId: string;
   token: string;
@@ -138,12 +166,16 @@ export interface CompanyState {
   customers: Customer[];
   assets: Asset[];
   telemetry: TelemetryPoint[];
+  serviceHistory: ServiceHistoryEntry[];
+  knownIssuePatterns: KnownIssuePattern[];
   tickets: Ticket[];
   technicians: Technician[];
   inventory: InventoryItem[];
   policies: Policy[];
   workOrders: WorkOrder[];
   customerMessages: CustomerMessage[];
+  internalNotes: InternalNote[];
+  caseSummaries: CaseSummary[];
   approvals: Approval[];
   events: EventLogEntry[];
 }
@@ -324,6 +356,42 @@ export function createSeedState(): CompanyState {
         connectivityStatus: "online"
       }
     ],
+    serviceHistory: [
+      {
+        historyId: "hist_amelia_install",
+        customerId: "cus_amelia_brooks",
+        assetId: "CHG-8821",
+        date: "2025-06-20",
+        summary: "Installed AlpineCharge Pro 48A with dedicated breaker.",
+        outcome: "Passed commissioning tests; no follow-up required."
+      },
+      {
+        historyId: "hist_maya_trip",
+        customerId: "cus_maya_chen",
+        assetId: "BAT-7712",
+        date: "2026-02-11",
+        summary: "Investigated battery gateway thermal trip.",
+        outcome: "Cleaned intake and advised inverter module replacement if trip recurs."
+      }
+    ],
+    knownIssuePatterns: [
+      {
+        patternId: "issue_chg_outage_pcb",
+        productModel: "AlpineCharge Pro 48A",
+        symptoms: ["voltage_drop", "ground_fault_reset", "post_outage_control_board_check"],
+        likelyPartId: "PCB-48A-R3",
+        confidence: "high",
+        summary: "Post-outage reset loop on 48A chargers usually indicates control-board failure."
+      },
+      {
+        patternId: "issue_bat_inverter_thermal",
+        productModel: "AlpineVault Home 20",
+        symptoms: ["inverter_thermal_trip", "cooling_derate"],
+        likelyPartId: "INV-HOME20-R2",
+        confidence: "medium",
+        summary: "Repeated thermal trips point to inverter module replacement after airflow check."
+      }
+    ],
     tickets: [
       {
         ticketId: "TCK-1044",
@@ -399,6 +467,8 @@ export function createSeedState(): CompanyState {
     ],
     workOrders: [],
     customerMessages: [],
+    internalNotes: [],
+    caseSummaries: [],
     approvals: [],
     events: []
   };

@@ -96,6 +96,12 @@ export function buildAlpineRealtimeAgent() {
         execute: async ({ customerId }) => companyClient.getOpenTickets(customerId)
       }),
       tool({
+        name: "getServiceHistory",
+        description: "List prior service visits for one resolved customer.",
+        parameters: z.object({ customerId: z.string().min(1) }),
+        execute: async ({ customerId }) => companyClient.getServiceHistory(customerId)
+      }),
+      tool({
         name: "createTicket",
         description: "Create a mocked service ticket only after explicit confirmation, UI approval, and approval token.",
         parameters: z.object({
@@ -133,6 +139,24 @@ export function buildAlpineRealtimeAgent() {
         description: "Fetch recent telemetry for a confirmed exact asset ID.",
         parameters: z.object({ assetId: assetIdSchema }),
         execute: async ({ assetId }) => companyClient.getAssetTelemetry(assetId)
+      }),
+      tool({
+        name: "getKnownIssuePatterns",
+        description: "Fetch known issue patterns for a product model.",
+        parameters: z.object({ productModel: z.string().min(3) }),
+        execute: async ({ productModel }) => companyClient.getKnownIssuePatterns(productModel)
+      }),
+      tool({
+        name: "checkFirmwareStatus",
+        description: "Check firmware status and telemetry warnings for a confirmed exact asset ID.",
+        parameters: z.object({ assetId: assetIdSchema }),
+        execute: async ({ assetId }) => companyClient.checkFirmwareStatus(assetId)
+      }),
+      tool({
+        name: "estimateRepairPlan",
+        description: "Estimate likely part, severity, and safe repair steps for a confirmed exact asset ID.",
+        parameters: z.object({ assetId: assetIdSchema }),
+        execute: async ({ assetId }) => companyClient.estimateRepairPlan(assetId)
       })
     ]
   });
@@ -238,6 +262,22 @@ export function buildAlpineRealtimeAgent() {
           topic: params.topic,
           ...(params.workOrderId ? { workOrderId: params.workOrderId } : {})
         })
+      }),
+      tool({
+        name: "saveInternalNote",
+        description: "Save a mocked internal dispatch note only after UI approval and approval token.",
+        parameters: z.object({
+          ticketId: z.string(),
+          body: z.string(),
+          approvalToken: z.string()
+        }),
+        execute: async (params) => companyClient.saveInternalNote(params)
+      }),
+      tool({
+        name: "createCaseSummary",
+        description: "Create a grounded summary from the current mock case state.",
+        parameters: z.object({ ticketId: z.string() }),
+        execute: async (params) => companyClient.createCaseSummary(params)
       }),
       tool({
         name: "saveCustomerMessage",

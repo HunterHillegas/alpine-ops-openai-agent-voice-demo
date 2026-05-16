@@ -1,10 +1,13 @@
 import {
   type Approval,
   type Asset,
+  type CaseSummary,
   type CompanyState,
   type Customer,
   type EventLogEntry,
+  type InternalNote,
   type InventoryItem,
+  type KnownIssuePattern,
   type Technician,
   type TelemetryPoint,
   type Ticket,
@@ -13,6 +16,8 @@ import {
   event,
   getScenario
 } from "@alpine/mock-data";
+import { estimateRepairPlan, firmwareStatus } from "./diagnostics";
+import { replayDemoScenario } from "./replay";
 
 export type ApiResult<T> = { ok: true; data: T } | { ok: false; code: string; message: string; matches?: unknown[] };
 
@@ -23,8 +28,12 @@ export interface CompanyApi {
   getCustomer(customerId: string): ApiResult<Customer>;
   getCustomerAssets(customerId: string): ApiResult<Asset[]>;
   getOpenTickets(customerId: string): ApiResult<Ticket[]>;
+  getServiceHistory(customerId: string): ApiResult<CompanyState["serviceHistory"]>;
   getAsset(assetId: string): ApiResult<Asset>;
   getAssetTelemetry(assetId: string): ApiResult<TelemetryPoint[]>;
+  getKnownIssuePatterns(productModel: string): ApiResult<KnownIssuePattern[]>;
+  checkFirmwareStatus(assetId: string): ApiResult<ReturnType<typeof firmwareStatus>>;
+  estimateRepairPlan(assetId: string): ApiResult<ReturnType<typeof estimateRepairPlan>>;
   getWarrantyStatus(assetId: string): ApiResult<{ active: boolean; expiration: string; summary: string }>;
   getPolicy(policyId: string): ApiResult<{ policyId: string; title: string; summary: string; rules: string[] }>;
   checkPartInventory(partId: string): ApiResult<InventoryItem>;
@@ -39,6 +48,8 @@ export interface CompanyApi {
   cancelAppointment(params: { ticketId: string; approvalToken: string }): ApiResult<Ticket>;
   createCreditMemo(params: { customerId: string; amountCents: number; reason: string; approvalToken: string }): ApiResult<{ creditMemoId: string; customerId: string; amountCents: number }>;
   draftCustomerMessage(params: { customerId: string; workOrderId?: string; channel: "sms" | "email"; topic: string }): ApiResult<{ draftId: string; body: string }>;
+  saveInternalNote(params: { ticketId: string; body: string; approvalToken: string }): ApiResult<InternalNote>;
+  createCaseSummary(params: { ticketId: string }): ApiResult<CaseSummary>;
   saveCustomerMessage(params: { customerId: string; channel: "sms" | "email"; body: string; approvalToken: string }): ApiResult<{ messageId: string; status: "saved" }>;
   sendCustomerMessage(params: { messageId: string; approvalToken: string }): ApiResult<{ messageId: string; status: "sent" }>;
   replayScenario(scenarioId: string): ApiResult<CompanyState>;
@@ -134,6 +145,12 @@ export function createCompanyApi(initialState: CompanyState = createSeedState())
       return success(clone(tickets));
     },
 
+    getServiceHistory: (customerId) => {
+      const history = state.serviceHistory.filter((item) => item.customerId === customerId);
+      addEvent(event("Customer Context Agent", "tool_call", "Service history lookup", { toolName: "getServiceHistory", args: { customerId }, resultSummary: `${history.length} visit(s)` }));
+      return success(clone(history));
+    },
+
     getAsset: (assetId) => {
       if (!/^([A-Z]{3})-\d{4}$/.test(assetId)) {
         addEvent(event("Safety / Approval Layer", "guardrail", "Blocked partial asset lookup", { args: { assetId }, error: "Exact asset IDs must match ABC-1234." }));
@@ -148,6 +165,26 @@ export function createCompanyApi(initialState: CompanyState = createSeedState())
       const points = state.telemetry.filter((point) => point.assetId === assetId);
       addEvent(event("Diagnostics Agent", "tool_call", "Telemetry lookup", { toolName: "getAssetTelemetry", args: { assetId }, resultSummary: `${points.length} recent point(s)` }));
       return points.length ? success(clone(points)) : failure("telemetry_not_found", `No telemetry found for ${assetId}.`);
+    },
+
+    getKnownIssuePatterns: (productModel) => {
+      const patterns = state.knownIssuePatterns.filter((pattern) => pattern.productModel === productModel);
+      addEvent(event("Diagnostics Agent", "tool_call", "Known issue pattern lookup", { toolName: "getKnownIssuePatterns", args: { productModel }, resultSummary: `${patterns.length} pattern(s)` }));
+      return success(clone(patterns));
+    },
+
+    checkFirmwareStatus: (assetId) => {
+      const asset = state.assets.find((item) => item.assetId === assetId);
+      addEvent(event("Diagnostics Agent", "tool_call", "Firmware status check", { toolName: "checkFirmwareStatus", args: { assetId } }));
+      if (!asset) return failure("asset_not_found", `No asset found for ${assetId}.`);
+      return success(firmwareStatus(asset, state.telemetry.filter((point) => point.assetId === assetId)));
+    },
+
+    estimateRepairPlan: (assetId) => {
+      const asset = state.assets.find((item) => item.assetId === assetId);
+      addEvent(event("Diagnostics Agent", "tool_result", "Repair plan estimated", { toolName: "estimateRepairPlan", args: { assetId } }));
+      if (!asset) return failure("asset_not_found", `No asset found for ${assetId}.`);
+      return success(estimateRepairPlan(state, asset));
     },
 
     getWarrantyStatus: (assetId) => {
@@ -331,6 +368,29 @@ export function createCompanyApi(initialState: CompanyState = createSeedState())
       return success({ draftId: `msg_${Math.random().toString(36).slice(2, 9)}`, body });
     },
 
+    saveInternalNote: ({ ticketId, body, approvalToken }) => {
+      const approval = requireApprovedToken(approvalToken, "saveInternalNote");
+      if (!approval.ok) return approval;
+      const ticket = state.tickets.find((item) => item.ticketId === ticketId);
+      if (!ticket) return failure("ticket_not_found", `No ticket found for ${ticketId}.`);
+      const note = { noteId: `NOTE-${Math.floor(1000 + Math.random() * 9000)}`, ticketId, body, createdAt: new Date().toISOString() };
+      state.internalNotes.unshift(note);
+      addEvent(event("Message Composer Agent", "state_change", "Internal note saved", { toolName: "saveInternalNote", args: { ticketId }, resultSummary: note.noteId }));
+      return success(clone(note));
+    },
+
+    createCaseSummary: ({ ticketId }) => {
+      const ticket = state.tickets.find((item) => item.ticketId === ticketId);
+      if (!ticket) return failure("ticket_not_found", `No ticket found for ${ticketId}.`);
+      const asset = state.assets.find((item) => item.assetId === ticket.assetId);
+      const plan = asset ? estimateRepairPlan(state, asset) : undefined;
+      const body = `${ticket.ticketId}: ${ticket.summary}. ${plan?.summary ?? "No repair plan available."}`;
+      const summary = { summaryId: `SUM-${Math.floor(1000 + Math.random() * 9000)}`, ticketId, body, createdAt: new Date().toISOString() };
+      state.caseSummaries.unshift(summary);
+      addEvent(event("Message Composer Agent", "tool_result", "Case summary created", { toolName: "createCaseSummary", args: { ticketId }, resultSummary: body }));
+      return success(clone(summary));
+    },
+
     saveCustomerMessage: ({ customerId, channel, body, approvalToken }) => {
       const approval = requireApprovedToken(approvalToken, "saveCustomerMessage");
       if (!approval.ok) return approval;
@@ -368,69 +428,7 @@ export function createCompanyApi(initialState: CompanyState = createSeedState())
       return success({ messageId, status: message.status });
     },
 
-    replayScenario: (scenarioId) => {
-      api.reset(scenarioId);
-      if (scenarioId === "dead-charger-outage") {
-        addEvent(event("Realtime Triage Agent", "heard_entity", "Heard asset ID candidate: CHG-8821", { args: { candidate: "CHG-8821" } }));
-        addEvent(event("Realtime Triage Agent", "confirmation", "Confirmed exact identifier", { args: { assetId: "CHG-8821" } }));
-        api.searchCustomers("Amelia Brooks");
-        api.getAsset("CHG-8821");
-        api.getAssetTelemetry("CHG-8821");
-        api.getWarrantyStatus("CHG-8821");
-        api.checkPartInventory("PCB-48A-R3");
-        api.findTechnicians({ certification: "charger_service", region: "Santa Barbara", partId: "PCB-48A-R3" });
-        api.requestHumanApproval({
-          action: "createWorkOrder",
-          summary: "Schedule Marco Diaz tomorrow 10:00-12:00 for warranty control-board replacement on CHG-8821.",
-          payload: { ticketId: "TCK-1044", technicianId: "tech_marco_diaz", windowId: "win_marco_1012", reservedParts: ["PCB-48A-R3"], customerChargeCents: 0 }
-        });
-        addEvent(event("Realtime Triage Agent", "summary", "Ready for dispatcher approval: active warranty, likely control-board fault, Marco Diaz available tomorrow 10:00-12:00."));
-      } else if (scenarioId === "refund-cancellation") {
-        api.getPolicy("cancellation-refund");
-        api.getOpenTickets("cus_noah_reed");
-        api.requestHumanApproval({
-          action: "cancelAppointment",
-          summary: "Cancel Noah Reed's pending install. Refund still requires a separate credit-memo approval.",
-          payload: { ticketId: "TCK-1048" }
-        });
-      } else if (scenarioId === "unclear-asset-id") {
-        addEvent(event("Realtime Triage Agent", "heard_entity", "Heard partial asset ID: CHG-8...", { args: { candidate: "CHG-8" } }));
-        addEvent(event("Realtime Triage Agent", "tool_call", "Waiting for complete asset ID", { toolName: "waitForMoreAudio", args: { reason: "partial spoken asset ID" } }));
-        addEvent(event("Safety / Approval Layer", "guardrail", "Lookup blocked until exact asset ID is confirmed", { error: "Partial spoken ID" }));
-      } else if (scenarioId === "ambiguous-customer") {
-        const result = api.searchCustomers("Amelia");
-        if (!result.ok) {
-          addEvent(event("Customer Context Agent", "failure", "Ambiguous customer match; ask for phone, email, or address", {
-            toolName: "searchCustomers",
-            args: { query: "Amelia" },
-            error: result.message
-          }));
-        }
-      } else if (scenarioId === "warranty-expired") {
-        api.searchCustomers("Maya Chen");
-        api.getAsset("BAT-7712");
-        api.getWarrantyStatus("BAT-7712");
-        addEvent(event("Policy and Billing Agent", "guardrail", "Warranty expired; estimate customer charge before scheduling", {
-          args: { assetId: "BAT-7712" }
-        }));
-      } else if (scenarioId === "part-out-of-stock") {
-        api.searchCustomers("Maya Chen");
-        api.getAsset("BAT-7712");
-        api.getAssetTelemetry("BAT-7712");
-        api.checkPartInventory("INV-HOME20-R2");
-        addEvent(event("Dispatch Agent", "failure", "Part out of stock; no reservation attempted", { toolName: "checkPartInventory", args: { partId: "INV-HOME20-R2" }, error: "quantity=0" }));
-      } else if (scenarioId === "tool-failure-retry-once") {
-        const result = api.getAsset("CHG-0000");
-        if (!result.ok) {
-          addEvent(event("Customer Context Agent", "failure", "Asset lookup failed; ask for corrected exact ID", {
-            toolName: "getAsset",
-            args: { assetId: "CHG-0000" },
-            error: result.message
-          }));
-        }
-      }
-      return success(api.getState());
-    },
+    replayScenario: (scenarioId) => success(replayDemoScenario(api, scenarioId, addEvent)),
 
     addEvent
   };

@@ -7,7 +7,7 @@ Alpine FieldOps uses a small TypeScript monorepo:
 - `apps/web`: browser cockpit, scenario controls, transcript, approvals, and trace UI.
 - `apps/api`: Fastify API for mock company operations plus realtime session credential creation.
 - `packages/mock-data`: source of truth for deterministic fixtures and shared types.
-- `packages/company-api`: in-memory business logic, approval-token enforcement, writes, and event logging.
+- `packages/company-api`: in-memory business logic, diagnostic helpers, approval-token enforcement, writes, replay orchestration, and event logging.
 - `packages/agents`: realtime instructions, specialist roster, tool contracts, and exact-ID normalization.
 - `packages/evals`: scripted fixtures that assert tool use, approval, exact-ID, and failure behavior.
 
@@ -33,7 +33,7 @@ Read tools run once exact required fields are known. Write tools require:
 4. Approved token passed to the write endpoint.
 5. Successful write response before the assistant claims completion.
 
-Approval-gated writes include ticket creation/update, work-order creation, part reservation, appointment cancellation, credit memo creation, and customer-message save/send.
+Approval-gated writes include ticket creation/update, internal note save, work-order creation, part reservation, appointment cancellation, credit memo creation, and customer-message save/send.
 
 ## Trace Events
 
@@ -42,6 +42,7 @@ The event log stores user-visible operational trace only:
 - heard entity candidates
 - exact-ID confirmation
 - tool calls and results
+- service history, known issue, firmware, and repair-plan lookups
 - handoffs
 - guardrails
 - approval requests and decisions

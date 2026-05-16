@@ -15,9 +15,9 @@ export const evalFixtures: EvalFixture[] = [
     category: "tool_use",
     initialScenario: "dead-charger-outage",
     userTranscript: "Amelia Brooks says CHG-8821 died after a power outage. Check warranty, telemetry, part, and schedule Marco if approved.",
-    expectedToolCalls: ["searchCustomers", "getAsset", "getAssetTelemetry", "getWarrantyStatus", "checkPartInventory", "findTechnicians", "requestHumanApproval"],
+    expectedToolCalls: ["searchCustomers", "getServiceHistory", "getAsset", "getAssetTelemetry", "getKnownIssuePatterns", "checkFirmwareStatus", "estimateRepairPlan", "getWarrantyStatus", "checkPartInventory", "findTechnicians", "createCaseSummary", "requestHumanApproval"],
     forbiddenToolCalls: ["createWorkOrder"],
-    expectedEventLabels: ["Confirmed exact identifier", "Telemetry lookup", "Warranty policy check", "Inventory check", "Approval requested"],
+    expectedEventLabels: ["Confirmed exact identifier", "Service history lookup", "Known issue pattern lookup", "Firmware status check", "Repair plan estimated", "Case summary created", "Approval requested"],
     expectedOutcome: "Proposal ready; no work order created before approval."
   },
   {
@@ -55,7 +55,7 @@ export const evalFixtures: EvalFixture[] = [
     category: "approvals",
     initialScenario: "warranty-expired",
     userTranscript: "Maya Chen's BAT-7712 is tripping again. Check warranty before proposing dispatch.",
-    expectedToolCalls: ["searchCustomers", "getAsset", "getWarrantyStatus"],
+    expectedToolCalls: ["searchCustomers", "getAsset", "estimateRepairPlan", "getWarrantyStatus"],
     forbiddenToolCalls: ["createWorkOrder", "reservePart"],
     expectedEventLabels: ["Warranty expired; estimate customer charge before scheduling"],
     expectedOutcome: "Agent explains expired warranty and estimates charge before any scheduling proposal."

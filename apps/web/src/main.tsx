@@ -118,6 +118,9 @@ function App() {
     if (approved.action === "createCreditMemo") {
       await companyClient.createCreditMemo({ ...(approved.payload as object), approvalToken: approved.token });
     }
+    if (approved.action === "saveInternalNote") {
+      await companyClient.saveInternalNote({ ...(approved.payload as object), approvalToken: approved.token });
+    }
     if (approved.action === "reservePart") {
       await companyClient.reservePart({ ...(approved.payload as object), approvalToken: approved.token });
     }
@@ -257,6 +260,8 @@ function CaseWorkspace({ customer, asset, ticket, telemetry, state }: {
   const tech = state.technicians.find((item) => item.vanInventory.includes(likelyPartId)) ?? state.technicians.find((item) => item.region === "Santa Barbara");
   const workOrder = state.workOrders.find((item) => item.ticketId === ticket?.ticketId) ?? state.workOrders[0];
   const customerMessages = state.customerMessages.filter((message) => message.customerId === customer?.id);
+  const internalNotes = state.internalNotes.filter((note) => note.ticketId === ticket?.ticketId);
+  const caseSummaries = state.caseSummaries.filter((summary) => summary.ticketId === ticket?.ticketId);
   const warrantyPolicy = state.policies.find((policy) => policy.policyId === "warranty-standard");
   const cancellationPolicy = state.policies.find((policy) => policy.policyId === "cancellation-refund");
   const schedule = tech?.schedule ?? [];
@@ -359,14 +364,11 @@ function CaseWorkspace({ customer, asset, ticket, telemetry, state }: {
             <p>Hi {customer?.name.split(" ")[0] ?? "there"}, Alpine FieldOps found {warrantyActive ? "an active warranty" : "an expired warranty"} and {part?.quantity ? "local part availability" : "no local stock for the likely part"}. We can follow up with the next safe dispatch option.</p>
           </div>
           <div className="message-ledger">
-            <span>Mock messages</span>
-            {customerMessages.length === 0 ? (
-              <p>No saved or sent customer messages.</p>
-            ) : (
-              customerMessages.map((message) => (
-                <p key={message.messageId}><b>{message.status}</b> · {message.channel} · {message.body}</p>
-              ))
-            )}
+            <span>Mock records</span>
+            {caseSummaries.map((summary) => <p key={summary.summaryId}><b>summary</b> · {summary.body}</p>)}
+            {internalNotes.map((note) => <p key={note.noteId}><b>note</b> · {note.body}</p>)}
+            {customerMessages.map((message) => <p key={message.messageId}><b>{message.status}</b> · {message.channel} · {message.body}</p>)}
+            {!caseSummaries.length && !internalNotes.length && !customerMessages.length && <p>No saved notes, summaries, or customer messages.</p>}
           </div>
         </section>
       </div>
@@ -421,7 +423,7 @@ function ApprovalDrawer({ approvals, onApprove, onReject }: { approvals: Approva
       </div>
       <div className="approval-list">
         {approvals.length === 0 ? (
-          <p>Read-only lookups can run automatically. Ticket writes, scheduling, cancellation, refund, part reservation, and message send wait here.</p>
+          <p>Read-only lookups can run automatically. Ticket writes, internal notes, scheduling, cancellation, refund, part reservation, and message send wait here.</p>
         ) : approvals.map((approval) => (
           <article key={approval.approvalId}>
             <b>{approval.action}</b>

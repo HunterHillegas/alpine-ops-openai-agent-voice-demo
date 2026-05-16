@@ -36,11 +36,15 @@ app.get<{ Querystring: { q?: string } }>("/customers/search", async (request) =>
 app.get<{ Params: { customerId: string } }>("/customers/:customerId", async (request) => company.getCustomer(request.params.customerId));
 app.get<{ Params: { customerId: string } }>("/customers/:customerId/assets", async (request) => company.getCustomerAssets(request.params.customerId));
 app.get<{ Params: { customerId: string } }>("/customers/:customerId/tickets/open", async (request) => company.getOpenTickets(request.params.customerId));
+app.get<{ Params: { customerId: string } }>("/customers/:customerId/service-history", async (request) => company.getServiceHistory(request.params.customerId));
 app.get<{ Params: { assetId: string } }>("/assets/:assetId", async (request) => company.getAsset(request.params.assetId));
 app.get<{ Params: { assetId: string } }>("/assets/:assetId/telemetry", async (request) => {
   await delay(180);
   return company.getAssetTelemetry(request.params.assetId);
 });
+app.get<{ Params: { assetId: string } }>("/assets/:assetId/firmware", async (request) => company.checkFirmwareStatus(request.params.assetId));
+app.get<{ Params: { assetId: string } }>("/assets/:assetId/repair-plan", async (request) => company.estimateRepairPlan(request.params.assetId));
+app.get<{ Querystring: { productModel?: string } }>("/known-issues", async (request) => company.getKnownIssuePatterns(request.query.productModel ?? ""));
 app.get<{ Params: { assetId: string } }>("/warranty/:assetId", async (request) => company.getWarrantyStatus(request.params.assetId));
 app.get<{ Params: { policyId: string } }>("/policies/:policyId", async (request) => company.getPolicy(request.params.policyId));
 app.get<{ Params: { partId: string } }>("/inventory/:partId", async (request) => company.checkPartInventory(request.params.partId));
@@ -93,6 +97,8 @@ app.post<{ Body: { partId: string; quantity: number; approvalToken: string } }>(
 app.post<{ Body: { ticketId: string; approvalToken: string } }>("/appointments/cancel", async (request) => company.cancelAppointment(request.body));
 app.post<{ Body: { customerId: string; amountCents: number; reason: string; approvalToken: string } }>("/billing/credits", async (request) => company.createCreditMemo(request.body));
 app.post<{ Body: { customerId: string; workOrderId?: string; channel: "sms" | "email"; topic: string } }>("/messages/draft", async (request) => company.draftCustomerMessage(request.body));
+app.post<{ Body: { ticketId: string; body: string; approvalToken: string } }>("/notes/internal", async (request) => company.saveInternalNote(request.body));
+app.post<{ Body: { ticketId: string } }>("/case-summaries", async (request) => company.createCaseSummary(request.body));
 app.post<{ Body: { customerId: string; channel: "sms" | "email"; body: string; approvalToken: string } }>("/messages/save", async (request) => company.saveCustomerMessage(request.body));
 app.post<{ Body: { messageId: string; approvalToken: string } }>("/messages/send", async (request) => company.sendCustomerMessage(request.body));
 

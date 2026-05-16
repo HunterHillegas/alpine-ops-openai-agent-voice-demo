@@ -25,6 +25,7 @@ describe("eval fixtures", () => {
       "reservePart",
       "cancelAppointment",
       "createCreditMemo",
+      "saveInternalNote",
       "saveCustomerMessage",
       "sendCustomerMessage"
     ]);
@@ -118,6 +119,22 @@ describe("eval fixtures", () => {
     expect(api.getState().customerMessages).toHaveLength(0);
   });
 
+  it("returns specialist diagnostic context for the main charger scenario", () => {
+    const api = createCompanyApi();
+
+    const history = api.getServiceHistory("cus_amelia_brooks");
+    const patterns = api.getKnownIssuePatterns("AlpineCharge Pro 48A");
+    const firmware = api.checkFirmwareStatus("CHG-8821");
+    const plan = api.estimateRepairPlan("CHG-8821");
+    const summary = api.createCaseSummary({ ticketId: "TCK-1044" });
+
+    expect(history.ok && history.data[0]?.assetId).toBe("CHG-8821");
+    expect(patterns.ok && patterns.data[0]?.likelyPartId).toBe("PCB-48A-R3");
+    expect(firmware.ok && firmware.data.updateRecommended).toBe(true);
+    expect(plan.ok && plan.data.likelyPartId).toBe("PCB-48A-R3");
+    expect(summary.ok && summary.data.body).toContain("control-board failure");
+  });
+
   it("creates and updates tickets only after approval", () => {
     const api = createCompanyApi();
     const denied = api.createTicket({
@@ -177,6 +194,21 @@ describe("eval fixtures", () => {
 
   it("saves and sends mocked customer messages only after approval", () => {
     const api = createCompanyApi();
+    const noteApproval = api.requestHumanApproval({
+      action: "saveInternalNote",
+      summary: "Save dispatch note.",
+      payload: { ticketId: "TCK-1044", body: "Validated known issue pattern." }
+    });
+    api.approve(noteApproval.approvalId);
+
+    const note = api.saveInternalNote({
+      ticketId: "TCK-1044",
+      body: "Validated known issue pattern.",
+      approvalToken: noteApproval.token
+    });
+    expect(note.ok).toBe(true);
+    expect(api.getState().internalNotes[0]?.body).toContain("known issue");
+
     const saveApproval = api.requestHumanApproval({
       action: "saveCustomerMessage",
       summary: "Save drafted customer SMS.",

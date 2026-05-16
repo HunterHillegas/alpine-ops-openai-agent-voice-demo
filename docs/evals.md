@@ -3,7 +3,7 @@
 The first eval package is fixture-driven and focuses on hard behavioral boundaries:
 
 - Routing: warranty to Policy/Billing, telemetry to Diagnostics, scheduling to Dispatch.
-- Tool use: lookup before update, telemetry before diagnosis, inventory before part reservation.
+- Tool use: lookup before update, service history before account summary, telemetry and known-issue matching before repair plan, inventory before part reservation.
 - Approvals: no write side effects before approval.
 - Exact entity capture: no partial asset lookup.
 - Failure handling: unknown IDs, out of stock, expired warranty, duplicate names.
@@ -27,6 +27,6 @@ npm test
 npm run test:ui
 ~~~
 
-`npm test` checks the fixture contracts, exact-ID behavior, replay event labels, approval-token enforcement, and realtime agent/tool shape. `npm run test:ui` checks the browser-visible cockpit flow against the mock API.
+`npm test` checks the fixture contracts, exact-ID behavior, replay event labels, expected/forbidden tool calls, specialist diagnostic tools, approval-token enforcement, and realtime agent/tool shape. `npm run test:ui` checks the browser-visible cockpit flow against the mock API.
 
 Next slice: add a scripted live-agent runner that executes each fixture through the realtime/tool orchestration layer and compares expected/forbidden tool calls plus final UI event labels.
