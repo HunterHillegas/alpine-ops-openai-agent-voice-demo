@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalizeSpokenAssetId, toolDefinitions } from "@alpine/agents";
+import { normalizeSpokenAssetId, normalizeSpokenEmail, normalizeSpokenPhone, toolDefinitions } from "@alpine/agents";
 import { createCompanyApi } from "@alpine/company-api";
 import { evalFixtures } from "./index";
 import { runEvalFixtures } from "./runner";
@@ -36,6 +36,13 @@ describe("eval fixtures", () => {
   it("normalizes exact spoken asset IDs conservatively", () => {
     expect(normalizeSpokenAssetId("C H G dash 8821")).toEqual({ status: "complete", assetId: "CHG-8821" });
     expect(normalizeSpokenAssetId("C H G eight... no wait").status).toBe("partial");
+  });
+
+  it("normalizes phone numbers and emails only when complete", () => {
+    expect(normalizeSpokenPhone("805 555 0147")).toEqual({ status: "complete", phone: "+1-805-555-0147" });
+    expect(normalizeSpokenPhone("805 555").status).toBe("partial");
+    expect(normalizeSpokenEmail("amelia dot brooks at example dot test")).toEqual({ status: "complete", email: "amelia.brooks@example.test" });
+    expect(normalizeSpokenEmail("amelia at example").status).toBe("partial");
   });
 
   it("does not create a work order during the replay before approval", () => {

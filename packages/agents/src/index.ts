@@ -34,6 +34,8 @@ export const agentRoster = [
 ] as const;
 
 export const exactAssetIdSchema = z.string().regex(/^[A-Z]{3}-\d{4}$/, "Use exact normalized asset ID like CHG-8821.");
+export const exactEmailSchema = z.string().email().regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Use a complete email address.");
+export const exactPhoneSchema = z.string().regex(/^\+1-\d{3}-\d{3}-\d{4}$/, "Use normalized US phone like +1-805-555-0147.");
 
 export const toolDefinitions = [
   readTool("searchCustomers", "Search customers by exact or partial name once the spoken name is clear.", z.object({ query: z.string().min(2) })),
@@ -95,6 +97,26 @@ export function normalizeSpokenAssetId(input: string): { status: "complete"; ass
   const assetId = `${letters}-${digits}`;
   const parsed = exactAssetIdSchema.safeParse(assetId);
   return parsed.success ? { status: "complete", assetId } : { status: "partial", reason: parsed.error.issues[0]?.message ?? "Invalid asset ID." };
+}
+
+export function normalizeSpokenPhone(input: string): { status: "complete"; phone: string } | { status: "partial"; reason: string } {
+  const digits = input.replace(/\D/g, "");
+  const withoutCountry = digits.length === 11 && digits.startsWith("1") ? digits.slice(1) : digits;
+  if (withoutCountry.length !== 10) return { status: "partial", reason: "Need a complete 10-digit US phone number." };
+  const phone = `+1-${withoutCountry.slice(0, 3)}-${withoutCountry.slice(3, 6)}-${withoutCountry.slice(6)}`;
+  const parsed = exactPhoneSchema.safeParse(phone);
+  return parsed.success ? { status: "complete", phone } : { status: "partial", reason: parsed.error.issues[0]?.message ?? "Invalid phone number." };
+}
+
+export function normalizeSpokenEmail(input: string): { status: "complete"; email: string } | { status: "partial"; reason: string } {
+  const email = input
+    .toLowerCase()
+    .replace(/\s+at\s+/g, "@")
+    .replace(/\s+dot\s+/g, ".")
+    .replace(/\s+/g, "")
+    .replace(/,/g, ".");
+  const parsed = exactEmailSchema.safeParse(email);
+  return parsed.success ? { status: "complete", email } : { status: "partial", reason: "Need a complete email address with mailbox, domain, and top-level domain." };
 }
 
 function readTool(name: string, description: string, schema: z.ZodType) {
