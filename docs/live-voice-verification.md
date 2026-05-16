@@ -11,6 +11,8 @@ VITE_API_URL=http://localhost:8787 npm run dev:web
 
 Open `http://localhost:5173`.
 
+Both servers bind localhost by default. For a LAN-visible demo, run the API with `HOST=0.0.0.0` and pass `-- --host 0.0.0.0` to `npm run dev:web`.
+
 ## Expected Checks
 
 1. Click **Connect voice**.

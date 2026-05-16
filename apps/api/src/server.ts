@@ -2,9 +2,10 @@ import { buildApiApp } from "./app";
 
 const app = buildApiApp();
 const port = Number(process.env.PORT ?? 8787);
+const host = process.env.HOST ?? "127.0.0.1";
 
 try {
-  await app.listen({ port, host: "0.0.0.0" });
+  await app.listen({ port, host });
 } catch (error) {
   app.log.error(error);
   process.exit(1);

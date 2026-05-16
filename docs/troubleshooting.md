@@ -8,10 +8,16 @@ Run:
 npm run dev:api
 ~~~
 
-Default API port is `8787`. Override with:
+Default API host/port is `127.0.0.1:8787`. Override with:
 
 ~~~bash
 PORT=8790 npm run dev:api
+~~~
+
+For a LAN-visible demo, set an explicit host:
+
+~~~bash
+HOST=0.0.0.0 PORT=8787 npm run dev:api
 ~~~
 
 ## Web App Cannot Load State
@@ -20,6 +26,12 @@ Ensure the API is running and the web app uses the same base URL:
 
 ~~~bash
 VITE_API_URL=http://localhost:8787 npm run dev:web
+~~~
+
+The web app also binds localhost by default. For LAN-visible browser testing, run Vite with an explicit host:
+
+~~~bash
+npm run dev:web -- --host 0.0.0.0
 ~~~
 
 ## Realtime Endpoint Returns Mock Mode
