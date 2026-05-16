@@ -15,6 +15,9 @@ test("renders seeded operations cockpit", async ({ page }) => {
   await expect(page.getByText("Control board, AlpineCharge Pro 48A R3")).toBeVisible();
   await expect(page.getByText("Policy notes")).toBeVisible();
   await expect(page.getByText("Technician schedule")).toBeVisible();
+  await expect(page.getByText("Push-to-talk armed")).toBeVisible();
+  await page.getByRole("button", { name: "Open mic" }).click();
+  await expect(page.getByText("Open mic standby")).toBeVisible();
   await expect(page.getByText("No pending side effects")).toBeVisible();
 });
 
@@ -28,6 +31,7 @@ test("replays main scenario and executes approved work order", async ({ page }) 
   await expect(page.getByText('"CHG-8821"').first()).toBeVisible();
   await expect(page.getByText("Replay transcript")).toBeVisible();
   await expect(page.locator(".transcript-feed").getByText("I found active warranty coverage")).toBeVisible();
+  await expect(page.getByText("No interruption during replay.")).toBeVisible();
 
   await page.getByRole("button", { name: "Approve and run" }).click();
 

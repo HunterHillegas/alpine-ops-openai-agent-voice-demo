@@ -11,6 +11,7 @@ export interface RealtimeConsoleCallbacks {
   onAssistantText: (text: string) => void;
   onUserText: (text: string) => void;
   onError: (message: string) => void;
+  onInterruption: (message: string) => void;
   onRefreshState: () => void | Promise<void>;
 }
 
@@ -365,7 +366,9 @@ function wireSessionEvents(session: RealtimeSession, callbacks: RealtimeConsoleC
     await callbacks.onRefreshState();
   });
   session.on("audio_interrupted", () => {
-    callbacks.onAssistantText("Interrupted. Listening for the next dispatcher instruction.");
+    const message = "Interrupted. Listening for the next dispatcher instruction.";
+    callbacks.onInterruption(message);
+    callbacks.onAssistantText(message);
   });
   session.on("error", (error) => {
     callbacks.onError(errorMessage(error.error));

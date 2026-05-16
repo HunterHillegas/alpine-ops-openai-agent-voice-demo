@@ -15,6 +15,8 @@ function App() {
   const [userText, setUserText] = useState("");
   const [assistantText, setAssistantText] = useState("Ready for a dispatch request. Load a scenario or connect voice.");
   const [transcriptTurns, setTranscriptTurns] = useState<TranscriptTurn[]>([]);
+  const [micMode, setMicMode] = useState<"push-to-talk" | "open-mic">("push-to-talk");
+  const [bargeInStatus, setBargeInStatus] = useState("Idle");
   const [error, setError] = useState<string | null>(null);
   const realtimeRef = useRef<AlpineRealtimeConsole | null>(null);
 
@@ -70,8 +72,9 @@ function App() {
   async function resetDemo() {
     const next = await companyClient.reset(scenarioId);
     setState(next);
-    setTranscriptTurns([]);
-    setAssistantText("Demo data reset. Scenario seed restored.");
+      setTranscriptTurns([]);
+      setBargeInStatus("Idle");
+      setAssistantText("Demo data reset. Scenario seed restored.");
   }
 
   async function replay() {
@@ -79,6 +82,7 @@ function App() {
     const replayTranscript = scenarioTranscripts[scenarioId] ?? [];
     setState(next);
     setTranscriptTurns(replayTranscript);
+    setBargeInStatus("No interruption during replay.");
     setAssistantText(replayTranscript.findLast((turn) => turn.speaker === "assistant")?.text ?? next.events[0]?.label ?? "Scenario replay loaded.");
   }
 
@@ -99,6 +103,7 @@ function App() {
       onAssistantText: setAssistantText,
       onUserText: setUserText,
       onError: setError,
+      onInterruption: setBargeInStatus,
       onRefreshState: refresh
     });
 
@@ -168,6 +173,9 @@ function App() {
           setUserText={setUserText}
           assistantText={assistantText}
           transcriptTurns={transcriptTurns}
+          micMode={micMode}
+          setMicMode={setMicMode}
+          bargeInStatus={bargeInStatus}
           selectedScenario={selectedScenario}
           onSubmitTextFallback={submitTextFallback}
         />
@@ -220,6 +228,9 @@ function VoicePanel(props: {
   setUserText: (value: string) => void;
   assistantText: string;
   transcriptTurns: TranscriptTurn[];
+  micMode: "push-to-talk" | "open-mic";
+  setMicMode: (mode: "push-to-talk" | "open-mic") => void;
+  bargeInStatus: string;
   selectedScenario: DemoScenario | undefined;
   onSubmitTextFallback: (event: React.FormEvent) => void;
 }) {
@@ -234,8 +245,14 @@ function VoicePanel(props: {
         <b>48A</b>
       </div>
       <div className="mic-row">
-        <button className="control-button">Push to talk</button>
-        <button className="control-button secondary">Open mic</button>
+        <button className={`control-button ${props.micMode === "push-to-talk" ? "active" : ""}`} aria-pressed={props.micMode === "push-to-talk"} onClick={() => props.setMicMode("push-to-talk")}>Push to talk</button>
+        <button className={`control-button secondary ${props.micMode === "open-mic" ? "active" : ""}`} aria-pressed={props.micMode === "open-mic"} onClick={() => props.setMicMode("open-mic")}>Open mic</button>
+      </div>
+      <div className="barge-indicator">
+        <label>Mic mode</label>
+        <p>{props.micMode === "open-mic" ? "Open mic standby" : "Push-to-talk armed"}</p>
+        <label>Barge-in</label>
+        <p>{props.bargeInStatus}</p>
       </div>
       <div className="transcript">
         <label>User transcript</label>
