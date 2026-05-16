@@ -180,15 +180,24 @@ describe("eval fixtures", () => {
     expect(results.flatMap((result) => result.stateErrors)).toEqual([]);
   });
 
-  it("completion audit reports live voice as blocked without an API key", () => {
+  it("completion audit reports live voice as blocked without a key and verification marker", () => {
     const audit = runCompletionAudit({});
 
     expect(audit.status).toBe("blocked");
     expect(audit.checks.find((check) => check.id === "live-webrtc-key")?.status).toBe("blocked");
+    expect(audit.checks.find((check) => check.id === "live-webrtc-verified")?.status).toBe("blocked");
   });
 
-  it("completion audit passes when live voice key is available", () => {
+  it("completion audit still blocks when a key is present but live voice is not verified", () => {
     const audit = runCompletionAudit({ OPENAI_API_KEY: "sk-test" });
+
+    expect(audit.status).toBe("blocked");
+    expect(audit.checks.find((check) => check.id === "live-webrtc-key")?.status).toBe("passed");
+    expect(audit.checks.find((check) => check.id === "live-webrtc-verified")?.status).toBe("blocked");
+  });
+
+  it("completion audit passes when live voice key and verification marker are available", () => {
+    const audit = runCompletionAudit({ OPENAI_API_KEY: "sk-test", LIVE_VOICE_VERIFIED: "1" });
 
     expect(audit.status).toBe("passed");
     expect(audit.checks.every((check) => check.status === "passed")).toBe(true);

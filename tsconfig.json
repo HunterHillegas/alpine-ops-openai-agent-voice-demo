@@ -9,6 +9,7 @@
     "packages/**/*.ts",
     "tests/**/*.ts",
     "playwright.config.ts",
+    "playwright.live.config.ts",
     "vitest.config.ts"
   ]
 }

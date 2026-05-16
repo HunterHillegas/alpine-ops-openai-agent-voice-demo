@@ -85,17 +85,18 @@ npm test
 npm run evals
 npm run audit
 npm run test:ui
+npm run test:live
 npm run build
 npm run docs:list
 ~~~
 
-`npm run evals` prints a JSON report for the scripted fixtures and writes `packages/evals/results/latest.json` for local inspection. `npm run audit` prints a completion-audit report and marks live WebRTC as blocked until an API key is present; use `npm run audit:strict` when live verification is available. `npm run test:ui` starts isolated smoke servers on API port `8788` and web port `5174`, then verifies the dashboard render, main scenario replay, approval execution, mock voice fallback, text fallback replay, and unclear-ID guardrail in Chromium.
+`npm run evals` prints a JSON report for the scripted fixtures and writes `packages/evals/results/latest.json` for local inspection. `npm run audit` prints a completion-audit report and marks live WebRTC as blocked until an API key and live verification marker are present; use `npm run audit:strict` after the live checklist passes. `npm run test:ui` starts isolated smoke servers on API port `8788` and web port `5174`, then verifies the dashboard render, main scenario replay, approval execution, mock voice fallback, text fallback replay, and unclear-ID guardrail in Chromium. `npm run test:live` requires `OPENAI_API_KEY` and verifies that the browser reaches a live WebRTC session.
 
 ## Current Voice Status
 
 The repo has the server-side realtime session endpoint, a lazy-loaded browser `RealtimeAgent` / `RealtimeSession` wrapper, specialist handoffs, and function tools that call the mock API. Without an API key, **Connect voice** enters mock mode. With `OPENAI_API_KEY` on the API server, the browser uses the ephemeral client secret to connect over WebRTC.
 
-Remaining live-voice verification: exercise the full microphone/audio path with a real key. Local tests cover realtime session credential minting, mock voice fallback, transcript event handling, approval refresh events, and interruption/error surfacing.
+Remaining live-voice verification: run `OPENAI_API_KEY=sk-... npm run test:live`, exercise the full microphone/audio checklist in `docs/live-voice-verification.md`, then run `LIVE_VOICE_VERIFIED=1 npm run audit:strict`. Local tests cover realtime session credential minting, mock voice fallback, transcript event handling, approval refresh events, and interruption/error surfacing.
 
 See `docs/live-voice-verification.md` for the manual live-key checklist, `docs/demo-capture.md` for screenshot/GIF capture steps, and `docs/deployment.md` for optional Vercel/Render notes.
 

@@ -29,7 +29,10 @@ export function runCompletionAudit(env: NodeJS.ProcessEnv = process.env): Comple
     passed("oss-license", "The repo includes an MIT LICENSE file and root package metadata declares MIT."),
     env.OPENAI_API_KEY
       ? passed("live-webrtc-key", "OPENAI_API_KEY is present for live Realtime WebRTC verification.")
-      : blocked("live-webrtc-key", "OPENAI_API_KEY is not present; live microphone/WebRTC verification remains manual.")
+      : blocked("live-webrtc-key", "OPENAI_API_KEY is not present; live microphone/WebRTC verification remains manual."),
+    env.OPENAI_API_KEY && env.LIVE_VOICE_VERIFIED === "1"
+      ? passed("live-webrtc-verified", "LIVE_VOICE_VERIFIED=1 indicates the live browser microphone/WebRTC checklist passed in this environment.")
+      : blocked("live-webrtc-verified", "Run npm run test:live and the manual microphone checklist, then set LIVE_VOICE_VERIFIED=1 for strict completion audit.")
   ];
 
   return {

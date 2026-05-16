@@ -33,6 +33,7 @@ npm test
 npm run evals
 npm run audit
 npm run test:ui
+npm run test:live
 ~~~
 
-`npm test` checks the fixture contracts, exact-ID behavior, replay event labels, expected/forbidden tool calls and counts, specialist diagnostic tools, approval-token enforcement, API route behavior, completion-audit behavior, realtime agent/tool shape, and realtime transcript/approval/interruption event handling. `npm run evals` emits a JSON pass/fail report from `packages/evals/src/run.ts` and writes `packages/evals/results/latest.json` for local inspection; generated result files are ignored. `npm run audit` emits a JSON completion report from `packages/evals/src/audit-run.ts`; it reports live WebRTC as blocked until `OPENAI_API_KEY` is available. `npm run test:ui` checks the browser-visible cockpit flow against the mock API.
+`npm test` checks the fixture contracts, exact-ID behavior, replay event labels, expected/forbidden tool calls and counts, specialist diagnostic tools, approval-token enforcement, API route behavior, completion-audit behavior, realtime agent/tool shape, and realtime transcript/approval/interruption event handling. `npm run evals` emits a JSON pass/fail report from `packages/evals/src/run.ts` and writes `packages/evals/results/latest.json` for local inspection; generated result files are ignored. `npm run audit` emits a JSON completion report from `packages/evals/src/audit-run.ts`; it reports live WebRTC as blocked until `OPENAI_API_KEY` and `LIVE_VOICE_VERIFIED=1` are available. `npm run test:ui` checks the browser-visible cockpit flow against the mock API. `npm run test:live` requires `OPENAI_API_KEY` and checks the browser live WebRTC connection path.

@@ -19,6 +19,7 @@
     "audit": "node --import tsx packages/evals/src/audit-run.ts",
     "audit:strict": "node --import tsx packages/evals/src/audit-run.ts --strict",
     "test:ui": "playwright test",
+    "test:live": "node --import tsx packages/evals/src/live-voice-preflight.ts && playwright test -c playwright.live.config.ts",
     "test:all": "npm run typecheck && npm test && npm run test:ui && npm run build && npm run docs:list",
     "typecheck": "tsc --noEmit",
     "docs:list": "find docs -maxdepth 2 -type f | sort",
