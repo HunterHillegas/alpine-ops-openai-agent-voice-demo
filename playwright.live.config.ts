@@ -27,13 +27,13 @@ export default defineConfig({
     {
       command: "npm run smoke:api",
       url: "http://127.0.0.1:8788/health",
-      reuseExistingServer: true,
+      reuseExistingServer: false,
       timeout: 20_000
     },
     {
       command: "npm run smoke:web",
       url: "http://127.0.0.1:5174",
-      reuseExistingServer: true,
+      reuseExistingServer: false,
       timeout: 20_000
     }
   ]
