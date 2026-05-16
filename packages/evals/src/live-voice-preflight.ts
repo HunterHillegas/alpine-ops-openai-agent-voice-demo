@@ -5,7 +5,7 @@ const result = validateLiveVoiceEnv(process.env);
 if (!result.ok) {
   console.error("Live voice verification cannot start:");
   for (const error of result.errors) console.error(`- ${error}`);
-  console.error("Run with a real key: OPENAI_API_KEY=sk-... npm run test:live");
+  console.error("Run with a real key: OPENAI_API_KEY=<real-key> npm run test:live");
   process.exit(1);
 }
 

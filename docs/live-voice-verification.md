@@ -5,7 +5,7 @@ Use this checklist when an OpenAI API key is available. The current automated su
 ## Setup
 
 ~~~bash
-OPENAI_API_KEY=sk-... npm run dev:api
+OPENAI_API_KEY=<real-key> npm run dev:api
 VITE_API_URL=http://localhost:8787 npm run dev:web
 ~~~
 
@@ -18,10 +18,10 @@ Both servers bind localhost by default. For a LAN-visible demo, run the API with
 Run this when a real API key is available:
 
 ~~~bash
-OPENAI_API_KEY=sk-... npm run test:live
+OPENAI_API_KEY=<real-key> npm run test:live
 ~~~
 
-Replace `sk-...` with a real server-side OpenAI API key. The preflight blocks missing, test, or placeholder values before launching Chromium.
+Use a real server-side OpenAI API key. The preflight blocks missing, test, or placeholder values before launching Chromium.
 
 The live smoke starts isolated API/web servers, grants microphone permission to Chromium, clicks **Connect voice**, and verifies that the console reaches `live` / `WebRTC` status with the live connection transcript. It does not replace the spoken-audio checklist below.
 

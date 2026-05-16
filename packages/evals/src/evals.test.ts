@@ -188,8 +188,16 @@ describe("eval fixtures", () => {
     expect(audit.checks.find((check) => check.id === "live-webrtc-verified")?.status).toBe("blocked");
   });
 
-  it("completion audit still blocks when a key is present but live voice is not verified", () => {
+  it("completion audit blocks placeholder keys before live voice verification", () => {
     const audit = runCompletionAudit({ OPENAI_API_KEY: "sk-test" });
+
+    expect(audit.status).toBe("blocked");
+    expect(audit.checks.find((check) => check.id === "live-webrtc-key")?.status).toBe("blocked");
+    expect(audit.checks.find((check) => check.id === "live-webrtc-verified")?.status).toBe("blocked");
+  });
+
+  it("completion audit still blocks when a plausible key is present but live voice is not verified", () => {
+    const audit = runCompletionAudit({ OPENAI_API_KEY: "sk-proj-examplelivekey123" });
 
     expect(audit.status).toBe("blocked");
     expect(audit.checks.find((check) => check.id === "live-webrtc-key")?.status).toBe("passed");
@@ -197,7 +205,7 @@ describe("eval fixtures", () => {
   });
 
   it("completion audit passes when live voice key and verification marker are available", () => {
-    const audit = runCompletionAudit({ OPENAI_API_KEY: "sk-test", LIVE_VOICE_VERIFIED: "1" });
+    const audit = runCompletionAudit({ OPENAI_API_KEY: "sk-proj-examplelivekey123", LIVE_VOICE_VERIFIED: "1" });
 
     expect(audit.status).toBe("passed");
     expect(audit.checks.every((check) => check.status === "passed")).toBe(true);

@@ -39,7 +39,7 @@ npm run dev:web -- --host 0.0.0.0
 Set `OPENAI_API_KEY` for the API process:
 
 ~~~bash
-OPENAI_API_KEY=sk-... npm run dev:api
+OPENAI_API_KEY=<real-key> npm run dev:api
 ~~~
 
 The key stays server-side. The browser should only receive an ephemeral realtime credential.

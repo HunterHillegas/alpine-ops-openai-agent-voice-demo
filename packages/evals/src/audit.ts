@@ -1,3 +1,5 @@
+import { validateLiveVoiceEnv } from "./live-voice-env";
+
 export type AuditStatus = "passed" | "blocked";
 
 export interface AuditCheck {
@@ -12,6 +14,7 @@ export interface CompletionAudit {
 }
 
 export function runCompletionAudit(env: NodeJS.ProcessEnv = process.env): CompletionAudit {
+  const liveEnv = validateLiveVoiceEnv(env);
   const checks: AuditCheck[] = [
     passed("typescript-monorepo", "Workspaces cover apps/web, apps/api, packages/agents, packages/company-api, packages/mock-data, and packages/evals."),
     passed("operations-cockpit", "Playwright smoke covers dashboard render, scenario focus, replay transcript, approvals, theme switching, and mock voice fallback."),
@@ -27,10 +30,10 @@ export function runCompletionAudit(env: NodeJS.ProcessEnv = process.env): Comple
     passed("replayable-scenarios", "Eval runner verifies thirteen fixtures across routing, tool use, tool-call counts, approvals, exact entity capture, failure handling, approved writes, final mock state, sent-message summary, and refund completion."),
     passed("docs", "README plus docs/architecture.md, docs/evals.md, docs/live-voice-verification.md, docs/demo-capture.md, docs/deployment.md, and docs/troubleshooting.md cover local-first use."),
     passed("oss-license", "The repo includes an MIT LICENSE file and root package metadata declares MIT."),
-    env.OPENAI_API_KEY
-      ? passed("live-webrtc-key", "OPENAI_API_KEY is present for live Realtime WebRTC verification.")
-      : blocked("live-webrtc-key", "OPENAI_API_KEY is not present; live microphone/WebRTC verification remains manual."),
-    env.OPENAI_API_KEY && env.LIVE_VOICE_VERIFIED === "1"
+    liveEnv.ok
+      ? passed("live-webrtc-key", "OPENAI_API_KEY passed live verification preflight shape checks.")
+      : blocked("live-webrtc-key", liveEnv.errors.join(" ")),
+    liveEnv.ok && env.LIVE_VOICE_VERIFIED === "1"
       ? passed("live-webrtc-verified", "LIVE_VOICE_VERIFIED=1 indicates the live browser microphone/WebRTC checklist passed in this environment.")
       : blocked("live-webrtc-verified", "Run npm run test:live and the manual microphone checklist, then set LIVE_VOICE_VERIFIED=1 for strict completion audit.")
   ];
