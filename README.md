@@ -9,7 +9,7 @@ No real CRM, SMS, calendar, billing, inventory, refund, or dispatch systems are 
 - React/Vite operations cockpit with voice controls, transcript, customer/asset cards, telemetry, service timeline, work-order plan, approval drawer, and agent activity rail.
 - Fastify mock company API with deterministic fixtures, read endpoints, write endpoints, approval-token enforcement, event log, scenario replay, and reset.
 - TypeScript packages for mock data, typed company API, agent/tool definitions, and eval fixtures.
-- Realtime session endpoint that keeps \`OPENAI_API_KEY\` server-side. Without a key it returns mock mode so the visual demo still runs.
+- Realtime session endpoint that keeps `OPENAI_API_KEY` server-side. Without a key it returns mock mode so the visual demo still runs.
 - Guardrail examples for exact asset IDs and approval-gated write actions.
 
 ## Quick Start
@@ -19,7 +19,7 @@ npm install
 npm run dev
 ~~~
 
-Open the web app at \`http://localhost:5173\`. The API runs at \`http://localhost:8787\`.
+Open the web app at `http://localhost:5173`. The API runs at `http://localhost:8787`.
 
 Optional live realtime credentials:
 
@@ -27,7 +27,7 @@ Optional live realtime credentials:
 OPENAI_API_KEY=sk-... npm run dev:api
 ~~~
 
-The browser does not receive the API key. \`apps/api\` mints a realtime client secret at \`POST /realtime/session\`.
+The browser does not receive the API key. `apps/api` mints a realtime client secret at `POST /realtime/session`.
 
 ## Demo Script
 
@@ -37,7 +37,7 @@ Open the dashboard. Point out Alpine FieldOps, connection state, model indicator
 
 ### 0:20 Start Voice Session
 
-Click **Connect voice**. With no API key, the UI enters mock mode. With \`OPENAI_API_KEY\`, the API returns a realtime session credential for the browser WebRTC wiring.
+Click **Connect voice**. With no API key, the UI enters mock mode. With `OPENAI_API_KEY`, the API returns a realtime session credential for the browser WebRTC wiring.
 
 ### 0:40 Main Request
 
@@ -88,7 +88,9 @@ npm run docs:list
 
 ## Current Voice Status
 
-The repo has the server-side realtime session endpoint and UI lifecycle state. Full browser WebRTC microphone/audio streaming is the next implementation slice: connect \`RealtimeAgent\` and \`RealtimeSession\` in \`apps/web\`, wire function tools to \`apps/api\`, and stream transcript/audio events into the existing UI state and event rail.
+The repo has the server-side realtime session endpoint, a lazy-loaded browser `RealtimeAgent` / `RealtimeSession` wrapper, specialist handoffs, and function tools that call the mock API. Without an API key, **Connect voice** enters mock mode. With `OPENAI_API_KEY` on the API server, the browser uses the ephemeral client secret to connect over WebRTC.
+
+Remaining live-voice hardening: exercise the full microphone/audio path with a real key, expand SDK approval-resume handling for write tools, and add browser automation around live transcript events.
 
 ## Mocking Boundary
 

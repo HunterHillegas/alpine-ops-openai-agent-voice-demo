@@ -4,31 +4,31 @@
 
 Alpine FieldOps uses a small TypeScript monorepo:
 
-- \`apps/web\`: browser cockpit, scenario controls, transcript, approvals, and trace UI.
-- \`apps/api\`: Fastify API for mock company operations plus realtime session credential creation.
-- \`packages/mock-data\`: source of truth for deterministic fixtures and shared types.
-- \`packages/company-api\`: in-memory business logic, approval-token enforcement, writes, and event logging.
-- \`packages/agents\`: realtime instructions, specialist roster, tool contracts, and exact-ID normalization.
-- \`packages/evals\`: scripted fixtures that assert tool use, approval, exact-ID, and failure behavior.
+- `apps/web`: browser cockpit, scenario controls, transcript, approvals, and trace UI.
+- `apps/api`: Fastify API for mock company operations plus realtime session credential creation.
+- `packages/mock-data`: source of truth for deterministic fixtures and shared types.
+- `packages/company-api`: in-memory business logic, approval-token enforcement, writes, and event logging.
+- `packages/agents`: realtime instructions, specialist roster, tool contracts, and exact-ID normalization.
+- `packages/evals`: scripted fixtures that assert tool use, approval, exact-ID, and failure behavior.
 
 ## Voice Integration
 
 The intended live path is OpenAI Agents SDK realtime in the browser:
 
-1. Browser requests \`POST /realtime/session\`.
-2. API uses server-side \`OPENAI_API_KEY\` to create an ephemeral realtime credential.
-3. Browser starts a \`RealtimeSession\` with the client secret.
+1. Browser requests `POST /realtime/session`.
+2. API uses server-side `OPENAI_API_KEY` to create an ephemeral realtime credential.
+3. Browser lazy-loads the Agents SDK and starts a `RealtimeSession` with the client secret.
 4. Function tools call the mock company API.
 5. Tool calls, handoffs, approvals, and results append to the event rail.
 
-The current implementation includes step 1 and 2. Without an API key, the endpoint returns mock mode so the demo shell remains usable.
+Without an API key, the endpoint returns mock mode so the demo shell remains usable. The server sets `OpenAI-Safety-Identifier` while minting the ephemeral client secret so the browser never needs the standard API key.
 
 ## Approval Boundary
 
 Read tools run once exact required fields are known. Write tools require:
 
 1. Spoken/user confirmation.
-2. \`requestHumanApproval\`.
+2. `requestHumanApproval`.
 3. UI approval card approval.
 4. Approved token passed to the write endpoint.
 5. Successful write response before the assistant claims completion.

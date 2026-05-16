@@ -1,26 +1,27 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { realtimeModel } from "@alpine/agents";
 import type { Approval, CompanyState, DemoScenario, EventLogEntry } from "@alpine/mock-data";
+import { companyClient } from "./lib/companyClient";
+import type { AlpineRealtimeConsole, VoiceConnection } from "./lib/realtimeConsole";
 import "./styles.css";
-
-const apiBase = import.meta.env.VITE_API_URL ?? "http://localhost:8787";
-
-type ApiEnvelope<T> = { ok: true; data: T } | { ok: false; code?: string; message?: string; data?: T; mode?: string };
 
 function App() {
   const [state, setState] = useState<CompanyState | null>(null);
   const [scenarios, setScenarios] = useState<DemoScenario[]>([]);
   const [scenarioId, setScenarioId] = useState("dead-charger-outage");
-  const [connection, setConnection] = useState<"disconnected" | "connecting" | "live" | "mock">("disconnected");
+  const [connection, setConnection] = useState<VoiceConnection>("disconnected");
   const [userText, setUserText] = useState("");
   const [assistantText, setAssistantText] = useState("Ready for a dispatch request. Load a scenario or connect voice.");
   const [error, setError] = useState<string | null>(null);
+  const realtimeRef = useRef<AlpineRealtimeConsole | null>(null);
 
   useEffect(() => {
     void refresh();
-    void request<DemoScenario[]>("/scenarios").then(setScenarios).catch((err: Error) => setError(err.message));
+    void companyClient.scenarios().then(setScenarios).catch((err: Error) => setError(err.message));
   }, []);
+
+  useEffect(() => () => realtimeRef.current?.disconnect(), []);
 
   const customer = useMemo(() => state?.customers.find((item) => item.id === "cus_amelia_brooks") ?? state?.customers[0], [state]);
   const asset = useMemo(() => state?.assets.find((item) => item.customerId === customer?.id), [state, customer]);
@@ -30,18 +31,19 @@ function App() {
   const selectedScenario = scenarios.find((scenario) => scenario.id === scenarioId);
 
   async function refresh() {
-    const next = await request<CompanyState>("/state");
+    const next = await companyClient.state();
     setState(next);
   }
 
   async function connectVoice() {
-    setConnection("connecting");
     setError(null);
     try {
-      const response = await fetch(`${apiBase}/realtime/session`, { method: "POST" });
-      const payload = (await response.json()) as { ok: boolean; mode?: "live" | "mock"; data?: { note?: string } };
-      setConnection(payload.mode === "live" ? "live" : "mock");
-      setAssistantText(payload.mode === "live" ? "Realtime session credential ready. Browser WebRTC wiring is next." : payload.data?.note ?? "Mock voice mode active.");
+      if (connection === "live" || connection === "mock") {
+        realtimeRef.current?.disconnect();
+        return;
+      }
+      const realtime = await getRealtimeConsole();
+      await realtime.connect();
     } catch (err) {
       setConnection("disconnected");
       setError(err instanceof Error ? err.message : "Unable to connect realtime session.");
@@ -49,13 +51,13 @@ function App() {
   }
 
   async function resetDemo() {
-    const next = await post<CompanyState>("/reset", { scenarioId });
+    const next = await companyClient.reset(scenarioId);
     setState(next);
     setAssistantText("Demo data reset. Scenario seed restored.");
   }
 
   async function replay() {
-    const next = await post<CompanyState>(`/demo/replay/${scenarioId}`, {});
+    const next = await companyClient.replay(scenarioId);
     setState(next);
     setAssistantText(next.events[0]?.label ?? "Scenario replay loaded.");
   }
@@ -63,23 +65,39 @@ function App() {
   async function submitTextFallback(event: React.FormEvent) {
     event.preventDefault();
     if (!userText.trim()) return;
-    setAssistantText("Text fallback captured. Use Run replay for deterministic tool and approval trace until live agent routing is wired.");
+    const realtime = await getRealtimeConsole();
+    realtime.sendText(userText);
     setUserText("");
   }
 
+  async function getRealtimeConsole() {
+    if (realtimeRef.current) return realtimeRef.current;
+
+    const { AlpineRealtimeConsole } = await import("./lib/realtimeConsole");
+    realtimeRef.current = new AlpineRealtimeConsole({
+      onConnectionChange: setConnection,
+      onAssistantText: setAssistantText,
+      onUserText: setUserText,
+      onError: setError,
+      onRefreshState: refresh
+    });
+
+    return realtimeRef.current;
+  }
+
   async function approveAndRun(approval: Approval) {
-    const approved = await post<Approval>(`/approvals/${approval.approvalId}/approve`, {});
+    const approved = await companyClient.approve(approval.approvalId);
     if (approved.action === "createWorkOrder") {
-      await post("/work-orders", { ...(approved.payload as object), approvalToken: approved.token });
+      await companyClient.createWorkOrder({ ...(approved.payload as object), approvalToken: approved.token });
     }
     if (approved.action === "cancelAppointment") {
-      await post("/appointments/cancel", { ...(approved.payload as object), approvalToken: approved.token });
+      await companyClient.cancelAppointment({ ...(approved.payload as object), approvalToken: approved.token });
     }
     await refresh();
   }
 
   async function reject(approval: Approval) {
-    await post(`/approvals/${approval.approvalId}/reject`, {});
+    await companyClient.reject(approval.approvalId);
     await refresh();
   }
 
@@ -147,7 +165,7 @@ function TopBar(props: {
         </select>
         <button onClick={props.onReplay}>Run replay</button>
         <button onClick={props.onReset}>Reset data</button>
-        <button className="primary-action" onClick={props.onConnect}>Connect voice</button>
+        <button className="primary-action" onClick={props.onConnect}>{props.connection === "live" || props.connection === "mock" ? "Disconnect" : "Connect voice"}</button>
       </div>
     </header>
   );
@@ -337,25 +355,6 @@ function ApprovalDrawer({ approvals, onApprove, onReject }: { approvals: Approva
       </div>
     </section>
   );
-}
-
-async function request<T>(path: string): Promise<T> {
-  const response = await fetch(`${apiBase}${path}`);
-  return unwrap<T>(await response.json());
-}
-
-async function post<T>(path: string, body: unknown): Promise<T> {
-  const response = await fetch(`${apiBase}${path}`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(body)
-  });
-  return unwrap<T>(await response.json());
-}
-
-function unwrap<T>(payload: ApiEnvelope<T>): T {
-  if (!payload.ok) throw new Error(payload.message ?? payload.code ?? "API request failed");
-  return payload.data as T;
 }
 
 createRoot(document.getElementById("root")!).render(<App />);

@@ -85,10 +85,11 @@ app.post("/realtime/session", async (_request, reply) => {
 
   const response = await fetch("https://api.openai.com/v1/realtime/client_secrets", {
     method: "POST",
-    headers: {
-      authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      "content-type": "application/json"
-    },
+        headers: {
+          authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          "content-type": "application/json",
+          "OpenAI-Safety-Identifier": "alpine-fieldops-demo-dispatcher"
+        },
     body: JSON.stringify({
       session: {
         type: "realtime",

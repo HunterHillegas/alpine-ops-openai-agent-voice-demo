@@ -8,7 +8,7 @@ The first eval package is fixture-driven and focuses on hard behavioral boundari
 - Exact entity capture: no partial asset lookup.
 - Failure handling: unknown IDs, out of stock, expired warranty, duplicate names.
 
-Fixtures live in \`packages/evals/src/index.ts\`. Behavior tests live in \`packages/evals/src/evals.test.ts\`.
+Fixtures live in `packages/evals/src/index.ts`. Behavior tests live in `packages/evals/src/evals.test.ts`.
 
 Run:
 

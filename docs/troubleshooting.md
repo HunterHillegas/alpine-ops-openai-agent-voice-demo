@@ -8,7 +8,7 @@ Run:
 npm run dev:api
 ~~~
 
-Default API port is \`8787\`. Override with:
+Default API port is `8787`. Override with:
 
 ~~~bash
 PORT=8790 npm run dev:api
@@ -24,13 +24,17 @@ VITE_API_URL=http://localhost:8787 npm run dev:web
 
 ## Realtime Endpoint Returns Mock Mode
 
-Set \`OPENAI_API_KEY\` for the API process:
+Set `OPENAI_API_KEY` for the API process:
 
 ~~~bash
 OPENAI_API_KEY=sk-... npm run dev:api
 ~~~
 
 The key stays server-side. The browser should only receive an ephemeral realtime credential.
+
+## Connect Voice Loads Slowly The First Time
+
+The Agents SDK is lazy-loaded when **Connect voice** is clicked. This keeps the initial cockpit shell smaller and shifts the realtime transport code into a separate browser chunk.
 
 ## Approval Does Not Execute
 
