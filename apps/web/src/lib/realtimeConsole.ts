@@ -112,6 +112,29 @@ export function buildAlpineRealtimeAgent() {
           region: params.region,
           ...(params.partId ? { partId: params.partId } : {})
         })
+      }),
+      tool({
+        name: "createWorkOrder",
+        description: "Create a mocked work order only after the dispatcher approves the UI card and provides its approval token.",
+        parameters: z.object({
+          ticketId: z.string(),
+          technicianId: z.string(),
+          windowId: z.string(),
+          reservedParts: z.array(z.string()),
+          customerChargeCents: z.number().int().nonnegative(),
+          approvalToken: z.string()
+        }),
+        execute: async (params) => companyClient.createWorkOrder(params)
+      }),
+      tool({
+        name: "reservePart",
+        description: "Reserve mocked inventory only after the dispatcher approves the UI card and provides its approval token.",
+        parameters: z.object({
+          partId: z.string(),
+          quantity: z.number().int().positive(),
+          approvalToken: z.string()
+        }),
+        execute: async (params) => companyClient.reservePart(params)
       })
     ]
   });
@@ -125,6 +148,23 @@ export function buildAlpineRealtimeAgent() {
         description: "Check warranty coverage for a confirmed exact asset ID.",
         parameters: z.object({ assetId: assetIdSchema }),
         execute: async ({ assetId }) => companyClient.getWarrantyStatus(assetId)
+      }),
+      tool({
+        name: "cancelAppointment",
+        description: "Cancel a mocked appointment only after explicit confirmation, UI approval, and approval token.",
+        parameters: z.object({ ticketId: z.string(), approvalToken: z.string() }),
+        execute: async (params) => companyClient.cancelAppointment(params)
+      }),
+      tool({
+        name: "createCreditMemo",
+        description: "Create a mocked credit memo only after explicit confirmation, UI approval, and approval token.",
+        parameters: z.object({
+          customerId: z.string(),
+          amountCents: z.number().int().positive(),
+          reason: z.string(),
+          approvalToken: z.string()
+        }),
+        execute: async (params) => companyClient.createCreditMemo(params)
       })
     ]
   });
