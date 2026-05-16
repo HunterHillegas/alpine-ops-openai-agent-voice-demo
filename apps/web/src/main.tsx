@@ -242,7 +242,7 @@ function App() {
           selectedScenario={selectedScenario}
           onSubmitTextFallback={submitTextFallback}
         />
-        <CaseWorkspace customer={customer} asset={asset} ticket={ticket} telemetry={telemetry} state={state} />
+        <CaseWorkspace customer={customer} asset={asset} ticket={ticket} telemetry={telemetry} state={state} scenario={selectedScenario} />
         <ActivityRail events={state.events} />
       </section>
 
@@ -311,23 +311,27 @@ function VoicePanel(props: {
   );
 }
 
-function CaseWorkspace({ customer, asset, ticket, telemetry, state }: {
+function CaseWorkspace({ customer, asset, ticket, telemetry, state, scenario }: {
   customer: CompanyState["customers"][number] | undefined;
   asset: CompanyState["assets"][number] | undefined;
   ticket: CompanyState["tickets"][number] | undefined;
   telemetry: CompanyState["telemetry"];
   state: CompanyState;
+  scenario: DemoScenario | undefined;
 }) {
   const warrantyActive = asset ? new Date(asset.warrantyExpiration) >= new Date("2026-05-16") : false;
+  const showCancellationPolicy = scenario?.id === "refund-cancellation" || ticket?.summary.toLowerCase().includes("install pending");
   const likelyPartId = asset?.productModel.includes("AlpineVault Home 20") ? "INV-HOME20-R2" : "PCB-48A-R3";
   const part = state.inventory.find((item) => item.partId === likelyPartId);
   const tech = state.technicians.find((item) => item.vanInventory.includes(likelyPartId)) ?? state.technicians.find((item) => item.region === "Santa Barbara");
   const workOrder = state.workOrders.find((item) => item.ticketId === ticket?.ticketId) ?? state.workOrders[0];
   const customerMessages = state.customerMessages.filter((message) => message.customerId === customer?.id);
+  const creditMemos = state.creditMemos.filter((credit) => credit.customerId === customer?.id);
   const internalNotes = state.internalNotes.filter((note) => note.ticketId === ticket?.ticketId);
   const caseSummaries = state.caseSummaries.filter((summary) => summary.ticketId === ticket?.ticketId);
   const warrantyPolicy = state.policies.find((policy) => policy.policyId === "warranty-standard");
   const cancellationPolicy = state.policies.find((policy) => policy.policyId === "cancellation-refund");
+  const policy = showCancellationPolicy ? cancellationPolicy : warrantyPolicy;
   const schedule = tech?.schedule ?? [];
 
   return (
@@ -394,11 +398,11 @@ function CaseWorkspace({ customer, asset, ticket, telemetry, state }: {
         <section className="policy-panel">
           <div className="panel-heading">
             <span>Policy notes</span>
-            <strong>{warrantyActive ? warrantyPolicy?.policyId : cancellationPolicy?.policyId}</strong>
+            <strong>{policy?.policyId}</strong>
           </div>
-          <p>{warrantyActive ? warrantyPolicy?.summary : cancellationPolicy?.summary}</p>
+          <p>{policy?.summary}</p>
           <ul>
-            {(warrantyActive ? warrantyPolicy?.rules : cancellationPolicy?.rules)?.map((rule) => <li key={rule}>{rule}</li>)}
+            {policy?.rules.map((rule) => <li key={rule}>{rule}</li>)}
           </ul>
         </section>
 
@@ -431,13 +435,18 @@ function CaseWorkspace({ customer, asset, ticket, telemetry, state }: {
             <span>Mock records</span>
             {caseSummaries.map((summary) => <p key={summary.summaryId}><b>summary</b> · {summary.body}</p>)}
             {internalNotes.map((note) => <p key={note.noteId}><b>note</b> · {note.body}</p>)}
+            {creditMemos.map((credit) => <p key={credit.creditMemoId}><b>credit</b> · {formatCents(credit.amountCents)} · {credit.reason}</p>)}
             {customerMessages.map((message) => <p key={message.messageId}><b>{message.status}</b> · {message.channel} · {message.body}</p>)}
-            {!caseSummaries.length && !internalNotes.length && !customerMessages.length && <p>No saved notes, summaries, or customer messages.</p>}
+            {!caseSummaries.length && !internalNotes.length && !creditMemos.length && !customerMessages.length && <p>No saved notes, summaries, credits, or customer messages.</p>}
           </div>
         </section>
       </div>
     </section>
   );
+}
+
+function formatCents(amountCents: number) {
+  return "$" + (amountCents / 100).toFixed(2);
 }
 
 function InfoPanel({ title, value, meta, children }: { title: string; value: string | undefined; meta: string | undefined; children: React.ReactNode }) {

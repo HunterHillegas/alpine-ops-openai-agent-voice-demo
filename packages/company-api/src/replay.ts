@@ -11,6 +11,7 @@ export function replayDemoScenario(
   else if (scenarioId === "dead-charger-approved") replayApprovedDeadCharger(api, addEvent);
   else if (scenarioId === "dead-charger-sent") replaySentDeadCharger(api, addEvent);
   else if (scenarioId === "refund-cancellation") replayRefundCancellation(api);
+  else if (scenarioId === "refund-cancellation-approved") replayApprovedRefundCancellation(api);
   else if (scenarioId === "unclear-asset-id") replayUnclearAssetId(addEvent);
   else if (scenarioId === "ambiguous-customer") replayAmbiguousCustomer(api, addEvent);
   else if (scenarioId === "warranty-expired") replayWarrantyExpired(api, addEvent);
@@ -109,9 +110,34 @@ function replayRefundCancellation(api: CompanyApi) {
   api.getOpenTickets("cus_noah_reed");
   api.requestHumanApproval({
     action: "cancelAppointment",
-    summary: "Cancel Noah Reed's pending install. Refund still requires a separate credit-memo approval.",
+    summary: "Cancel Noah Reed's pending install and release tomorrow's crew slot.",
     payload: { ticketId: "TCK-1048" }
   });
+  api.requestHumanApproval({
+    action: "createCreditMemo",
+    summary: "Create a mocked $250 deposit refund credit memo after cancellation approval.",
+    payload: { customerId: "cus_noah_reed", amountCents: 25000, reason: "Customer cancelled install before cutoff." }
+  });
+}
+
+function replayApprovedRefundCancellation(api: CompanyApi) {
+  replayRefundCancellation(api);
+  const approvals = [...api.getState().approvals].reverse();
+  for (const approval of approvals) {
+    api.approve(approval.approvalId);
+    if (approval.action === "cancelAppointment") {
+      api.cancelAppointment({ ticketId: "TCK-1048", approvalToken: approval.token });
+    }
+    if (approval.action === "createCreditMemo") {
+      api.createCreditMemo({
+        customerId: "cus_noah_reed",
+        amountCents: 25000,
+        reason: "Customer cancelled install before cutoff.",
+        approvalToken: approval.token
+      });
+    }
+  }
+  api.addEvent(event("Policy and Billing Agent", "summary", "Approved cancellation and mocked deposit refund completed."));
 }
 
 function replayUnclearAssetId(addEvent: (entry: EventLogEntry) => EventLogEntry) {

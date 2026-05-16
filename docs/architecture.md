@@ -33,7 +33,7 @@ Read tools run once exact required fields are known. Write tools require:
 4. Approved token passed to the write endpoint.
 5. Successful write response before the assistant claims completion.
 
-Approval-gated writes include ticket creation/update, internal note save, work-order creation, part reservation, appointment cancellation, credit memo creation, and customer-message save/send.
+Approval-gated writes include ticket creation/update, internal note save, work-order creation, part reservation, appointment cancellation, credit memo creation, and customer-message save/send. Credit memos are retained in mock state so the refund scenario is replayable and auditable without touching real billing.
 
 ## Trace Events
 

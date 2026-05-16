@@ -69,6 +69,10 @@ function stateExpectationErrors(fixture: EvalFixture, state: CompanyState): stri
     errors.push(`expected ${expected.caseSummaryCount} case summary record(s), saw ${state.caseSummaries.length}`);
   }
 
+  if (expected.creditMemoCount !== undefined && state.creditMemos.length !== expected.creditMemoCount) {
+    errors.push(`expected ${expected.creditMemoCount} credit memo record(s), saw ${state.creditMemos.length}`);
+  }
+
   if (expected.customerMessageCount !== undefined && state.customerMessages.length !== expected.customerMessageCount) {
     errors.push(`expected ${expected.customerMessageCount} customer message record(s), saw ${state.customerMessages.length}`);
   }

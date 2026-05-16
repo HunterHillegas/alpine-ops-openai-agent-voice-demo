@@ -12,6 +12,7 @@ export interface EvalFixture {
     pendingApprovalActions: string[];
     approvedApprovalActions?: string[];
     caseSummaryCount?: number;
+    creditMemoCount?: number;
     customerMessageCount?: number;
     customerMessageStatuses?: string[];
     inventoryQuantities?: Record<string, number>;
@@ -33,6 +34,7 @@ const noWriteState: EvalFixture["expectedState"] = {
   workOrderCount: 0,
   pendingApprovalActions: [],
   caseSummaryCount: 0,
+  creditMemoCount: 0,
   customerMessageCount: 0
 };
 
@@ -150,8 +152,27 @@ export const evalFixtures: EvalFixture[] = [
     expectedToolCalls: ["getPolicy", "getOpenTickets", "requestHumanApproval"],
     forbiddenToolCalls: ["cancelAppointment", "createCreditMemo"],
     expectedEventLabels: ["Approval requested"],
-    expectedState: { ...noWriteState, pendingApprovalActions: ["cancelAppointment"], ticketStatuses: { "TCK-1048": "open" } },
+    expectedState: { ...noWriteState, pendingApprovalActions: ["createCreditMemo", "cancelAppointment"], ticketStatuses: { "TCK-1048": "open" } },
     expectedOutcome: "Cancellation/refund is pending; no side effects occur before approval."
+  },
+  {
+    id: "refund-approved-cancel-credit",
+    category: "approvals",
+    initialScenario: "refund-cancellation-approved",
+    userTranscript: "Approve the cancellation and mocked deposit refund after the policy check.",
+    expectedToolCalls: ["getPolicy", "getOpenTickets", "requestHumanApproval", "cancelAppointment", "createCreditMemo"],
+    forbiddenToolCalls: [],
+    expectedEventLabels: ["Appointment cancelled", "Credit memo created", "Approved cancellation and mocked deposit refund completed."],
+    expectedState: {
+      workOrderCount: 0,
+      pendingApprovalActions: [],
+      approvedApprovalActions: ["cancelAppointment", "createCreditMemo"],
+      caseSummaryCount: 0,
+      creditMemoCount: 1,
+      customerMessageCount: 0,
+      ticketStatuses: { "TCK-1048": "cancelled" }
+    },
+    expectedOutcome: "Approved cancellation and deposit refund mutate only the mocked ticket and credit-memo state."
   },
   {
     id: "warranty-expired",

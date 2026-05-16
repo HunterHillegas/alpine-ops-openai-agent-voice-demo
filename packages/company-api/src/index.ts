@@ -302,9 +302,16 @@ export function createCompanyApi(initialState: CompanyState = createSeedState())
       if (!approval.ok) return approval;
       const customer = state.customers.find((item) => item.id === customerId);
       if (!customer) return failure("customer_not_found", `No customer found for ${customerId}.`);
-      const credit = { creditMemoId: `CRM-${Math.floor(1000 + Math.random() * 9000)}`, customerId, amountCents };
+      const credit = {
+        creditMemoId: `CRM-${Math.floor(1000 + Math.random() * 9000)}`,
+        customerId,
+        amountCents,
+        reason,
+        createdAt: new Date().toISOString()
+      };
+      state.creditMemos.unshift(credit);
       addEvent(event("Policy and Billing Agent", "state_change", "Credit memo created", { toolName: "createCreditMemo", args: { customerId, amountCents, reason }, resultSummary: credit.creditMemoId }));
-      return success(credit);
+      return success(clone(credit));
     },
 
     draftCustomerMessage: ({ customerId, workOrderId, channel, topic }) => {

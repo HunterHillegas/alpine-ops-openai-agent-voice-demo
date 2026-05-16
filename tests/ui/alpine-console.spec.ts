@@ -38,9 +38,9 @@ test("replays main scenario and executes approved work order", async ({ page }) 
   await expect(page.getByText("Replay transcript")).toBeVisible();
   await expect(page.locator(".transcript-feed").getByText("I found active warranty coverage")).toBeVisible();
   await expect(page.getByText("No interruption during replay.")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Realtime Triage Agent" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Diagnostics Agent" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Dispatch Agent" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Realtime Triage Agent", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Diagnostics Agent", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Dispatch Agent", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Handoff to Diagnostics Agent" })).toBeVisible();
 
   await page.getByRole("button", { name: "Approve and run" }).click();
@@ -62,7 +62,7 @@ test("replays main scenario and executes approved work order", async ({ page }) 
   await page.getByRole("button", { name: "Approve and run" }).click();
 
   await expect(page.getByRole("heading", { name: "Customer message sent" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Case summary created" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Case summary created" }).first()).toBeVisible();
   await expect(page.getByText("TCK-1044 scheduled with Marco Diaz")).toBeVisible();
   await expect(page.getByText("customer message mock-sent")).toBeVisible();
   await expect(page.getByText("No pending side effects")).toBeVisible();
@@ -90,6 +90,18 @@ test("unclear asset scenario blocks partial ID lookup", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Lookup blocked until exact asset ID is confirmed" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Heard partial asset ID: CHG-8..." })).toBeVisible();
   await expect(page.getByText("No pending side effects")).toBeVisible();
+});
+
+test("refund scenario queues separate cancellation and credit approvals", async ({ page }) => {
+  await page.getByLabel("Load scenario").selectOption("refund-cancellation");
+  await expect(page.getByText("Cancellation and deposit refunds require explicit customer confirmation")).toBeVisible();
+
+  await page.getByRole("button", { name: "Run replay" }).click();
+
+  await expect(page.getByText("2 pending")).toBeVisible();
+  await expect(page.getByText("cancelAppointment", { exact: true })).toBeVisible();
+  await expect(page.getByText("createCreditMemo", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Approval requested" }).first()).toBeVisible();
 });
 
 test("scenario selection focuses the active workspace", async ({ page }) => {

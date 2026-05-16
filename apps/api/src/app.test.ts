@@ -148,6 +148,10 @@ describe("api routes", () => {
       payload: { customerId: "cus_noah_reed", amountCents: 25000, reason: "Customer cancelled install.", approvalToken: credit.token }
     });
     expect(expectOk(credited.json<Envelope<{ creditMemoId: string }>>()).creditMemoId).toMatch(/^CRM-/);
+    const creditState = await app.inject({ method: "GET", url: "/state" });
+    expect(expectOk(creditState.json<Envelope<{ creditMemos: Array<{ amountCents: number; reason: string }> }>>()).creditMemos).toEqual([
+      expect.objectContaining({ amountCents: 25000, reason: "Customer cancelled install." })
+    ]);
 
     const note = await approve("saveInternalNote", { ticketId: "TCK-1044", body: "Validated outage diagnostic path." });
     const savedNote = await app.inject({

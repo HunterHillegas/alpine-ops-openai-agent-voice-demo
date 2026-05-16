@@ -3,6 +3,7 @@ import type {
   Asset,
   CaseSummary,
   CompanyState,
+  CreditMemo,
   Customer,
   EventLogEntry,
   InternalNote,
@@ -103,11 +104,7 @@ export interface CreateCreditMemoInput {
   approvalToken: string;
 }
 
-export interface CreditMemoResult {
-  creditMemoId: string;
-  customerId: string;
-  amountCents: number;
-}
+export type CreditMemoResult = CreditMemo;
 
 export interface DraftCustomerMessageInput {
   customerId: string;

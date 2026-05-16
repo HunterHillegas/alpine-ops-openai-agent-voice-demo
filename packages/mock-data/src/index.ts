@@ -122,6 +122,14 @@ export interface CustomerMessage {
   sentAt?: string;
 }
 
+export interface CreditMemo {
+  creditMemoId: string;
+  customerId: string;
+  amountCents: number;
+  reason: string;
+  createdAt: string;
+}
+
 export interface CaseSummary {
   summaryId: string;
   ticketId: string;
@@ -143,17 +151,7 @@ export interface EventLogEntry {
   eventId: string;
   timestamp: string;
   agentName: string;
-  type:
-    | "heard_entity"
-    | "confirmation"
-    | "tool_call"
-    | "tool_result"
-    | "handoff"
-    | "guardrail"
-    | "approval"
-    | "state_change"
-    | "failure"
-    | "summary";
+  type: "heard_entity" | "confirmation" | "tool_call" | "tool_result" | "handoff" | "guardrail" | "approval" | "state_change" | "failure" | "summary";
   label: string;
   toolName?: string;
   handoffTarget?: string;
@@ -175,6 +173,7 @@ export interface CompanyState {
   policies: Policy[];
   workOrders: WorkOrder[];
   customerMessages: CustomerMessage[];
+  creditMemos: CreditMemo[];
   internalNotes: InternalNote[];
   caseSummaries: CaseSummary[];
   approvals: Approval[];
@@ -468,6 +467,7 @@ export function createSeedState(): CompanyState {
     ],
     workOrders: [],
     customerMessages: [],
+    creditMemos: [],
     internalNotes: [],
     caseSummaries: [],
     approvals: [],

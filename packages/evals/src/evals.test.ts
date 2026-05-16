@@ -17,6 +17,7 @@ describe("eval fixtures", () => {
       "ambiguous-customer",
       "unclear-asset-id",
       "refund-requires-approval",
+      "refund-approved-cancel-credit",
       "warranty-expired",
       "part-out-of-stock",
       "tool-failure-retry-once"
@@ -401,5 +402,10 @@ describe("eval fixtures", () => {
     expect(credit.ok).toBe(true);
     if (!credit.ok) return;
     expect(credit.data.creditMemoId).toMatch(/^CRM-/);
+    expect(api.getState().creditMemos[0]).toMatchObject({
+      customerId: "cus_noah_reed",
+      amountCents: 25000,
+      reason: "Customer cancelled install before cutoff."
+    });
   });
 });
