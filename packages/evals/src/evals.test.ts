@@ -1,12 +1,17 @@
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { normalizeSpokenAssetId, normalizeSpokenEmail, normalizeSpokenPhone, normalizeSpokenTicketId, normalizeSpokenWindowId, toolDefinitions } from "@alpine/agents";
 import { createCompanyApi } from "@alpine/company-api";
 import { runCompletionAudit } from "./audit";
 import { evalFixtures } from "./index";
+import { readLiveAudioChecklistEvidence, writeLiveAudioChecklistEvidence } from "./live-audio-checklist";
 import { runEvalFixtures } from "./runner";
 
 describe("eval fixtures", () => {
   const noLiveSmokeEnv = { LIVE_WEBRTC_SMOKE_RESULT_PATH: "/tmp/alpine-missing-live-smoke.json" };
+  const noLiveAudioEnv = { LIVE_AUDIO_CHECKLIST_RESULT_PATH: "/tmp/alpine-missing-live-audio-checklist.json" };
 
   it("cover the required demo categories", () => {
     expect(evalFixtures.map((fixture) => fixture.id)).toEqual([
@@ -183,7 +188,7 @@ describe("eval fixtures", () => {
   });
 
   it("completion audit reports live voice as blocked without a key and verification marker", () => {
-    const audit = runCompletionAudit(noLiveSmokeEnv);
+    const audit = runCompletionAudit({ ...noLiveSmokeEnv, ...noLiveAudioEnv });
 
     expect(audit.status).toBe("blocked");
     expect(audit.checks.find((check) => check.id === "platinum-desktop-fidelity")).toMatchObject({
@@ -199,7 +204,7 @@ describe("eval fixtures", () => {
   });
 
   it("completion audit blocks placeholder keys before live voice verification", () => {
-    const audit = runCompletionAudit({ ...noLiveSmokeEnv, OPENAI_API_KEY: "sk-test" });
+    const audit = runCompletionAudit({ ...noLiveSmokeEnv, ...noLiveAudioEnv, OPENAI_API_KEY: "sk-test" });
 
     expect(audit.status).toBe("blocked");
     expect(audit.checks.find((check) => check.id === "live-webrtc-key")?.status).toBe("blocked");
@@ -208,7 +213,7 @@ describe("eval fixtures", () => {
   });
 
   it("completion audit still blocks when a plausible key is present but live smoke is not verified", () => {
-    const audit = runCompletionAudit({ ...noLiveSmokeEnv, OPENAI_API_KEY: "sk-proj-examplelivekey123" });
+    const audit = runCompletionAudit({ ...noLiveSmokeEnv, ...noLiveAudioEnv, OPENAI_API_KEY: "sk-proj-examplelivekey123" });
 
     expect(audit.status).toBe("blocked");
     expect(audit.checks.find((check) => check.id === "live-webrtc-key")?.status).toBe("passed");
@@ -217,11 +222,43 @@ describe("eval fixtures", () => {
   });
 
   it("completion audit still blocks after live smoke until spoken audio checklist is verified", () => {
-    const audit = runCompletionAudit({ OPENAI_API_KEY: "sk-proj-examplelivekey123", LIVE_WEBRTC_SMOKE_VERIFIED: "1" });
+    const audit = runCompletionAudit({ ...noLiveAudioEnv, OPENAI_API_KEY: "sk-proj-examplelivekey123", LIVE_WEBRTC_SMOKE_VERIFIED: "1" });
 
     expect(audit.status).toBe("blocked");
     expect(audit.checks.find((check) => check.id === "live-webrtc-smoke")?.status).toBe("passed");
     expect(audit.checks.find((check) => check.id === "live-audio-checklist")?.status).toBe("blocked");
+  });
+
+  it("does not record spoken audio checklist evidence without explicit verification", () => {
+    const path = join(mkdtempSync(join(tmpdir(), "alpine-live-audio-")), "marker.json");
+
+    try {
+      expect(() => writeLiveAudioChecklistEvidence({}, path)).toThrow("Set LIVE_VOICE_VERIFIED=1");
+      expect(readLiveAudioChecklistEvidence({}, path)).toMatchObject({ ok: false });
+    } finally {
+      rmSync(dirname(path), { force: true, recursive: true });
+    }
+  });
+
+  it("completion audit passes with persisted spoken checklist evidence", () => {
+    const path = join(mkdtempSync(join(tmpdir(), "alpine-live-audio-")), "marker.json");
+
+    try {
+      writeLiveAudioChecklistEvidence({ LIVE_VOICE_VERIFIED: "1" }, path);
+      const audit = runCompletionAudit({
+        OPENAI_API_KEY: "sk-proj-examplelivekey123",
+        LIVE_WEBRTC_SMOKE_VERIFIED: "1",
+        LIVE_AUDIO_CHECKLIST_RESULT_PATH: path
+      });
+
+      expect(audit.status).toBe("passed");
+      expect(audit.checks.find((check) => check.id === "live-audio-checklist")).toMatchObject({
+        status: "passed",
+        evidence: expect.stringContaining("Spoken microphone/audio checklist marker recorded")
+      });
+    } finally {
+      rmSync(dirname(path), { force: true, recursive: true });
+    }
   });
 
   it("completion audit passes when key, live smoke, and spoken checklist markers are available", () => {

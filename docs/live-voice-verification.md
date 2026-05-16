@@ -39,9 +39,10 @@ The live smoke starts isolated API/web servers, grants microphone permission to 
 8. Approval drawer receives a pending write action before any work order, cancellation, refund, reservation, save, or send mutates mock state.
 9. Approving the card updates the mock state and event rail.
 10. Disconnect returns status to `disconnected`.
-11. After the smoke test and spoken checklist both pass, run:
+11. After the smoke test and spoken checklist both pass, record the local marker and run strict audit:
 
 ~~~bash
+LIVE_VOICE_VERIFIED=1 npm run verify:live-audio
 LIVE_VOICE_VERIFIED=1 npm run audit:strict
 ~~~
 

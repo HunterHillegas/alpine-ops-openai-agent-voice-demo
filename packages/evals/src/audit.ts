@@ -1,4 +1,5 @@
 import { validateLiveVoiceEnv } from "./live-voice-env";
+import { readLiveAudioChecklistEvidence } from "./live-audio-checklist";
 import { readLiveSmokeEvidence } from "./live-voice-smoke";
 
 export type AuditStatus = "passed" | "blocked";
@@ -17,6 +18,7 @@ export interface CompletionAudit {
 export function runCompletionAudit(env: NodeJS.ProcessEnv = process.env): CompletionAudit {
   const liveEnv = validateLiveVoiceEnv(env);
   const liveSmoke = readLiveSmokeEvidence(env);
+  const liveAudio = readLiveAudioChecklistEvidence(env);
   const checks: AuditCheck[] = [
     passed("typescript-monorepo", "Workspaces cover apps/web, apps/api, packages/agents, packages/company-api, packages/mock-data, and packages/evals."),
     passed("operations-cockpit", "Playwright smoke covers dashboard render, scenario focus, replay transcript, approval execution/rejection, theme switching, and mock voice fallback."),
@@ -39,9 +41,9 @@ export function runCompletionAudit(env: NodeJS.ProcessEnv = process.env): Comple
     liveEnv.ok && liveSmoke.ok
       ? passed("live-webrtc-smoke", liveSmoke.evidence)
       : blocked("live-webrtc-smoke", liveEnv.ok ? liveSmoke.evidence : "Load a valid OPENAI_API_KEY before evaluating live smoke evidence."),
-    liveEnv.ok && liveSmoke.ok && env.LIVE_VOICE_VERIFIED === "1"
-      ? passed("live-audio-checklist", "LIVE_VOICE_VERIFIED=1 indicates the spoken microphone/audio checklist passed in this environment.")
-      : blocked("live-audio-checklist", "Complete the spoken microphone checklist, then set LIVE_VOICE_VERIFIED=1 for strict completion audit.")
+    liveEnv.ok && liveSmoke.ok && liveAudio.ok
+      ? passed("live-audio-checklist", liveAudio.evidence)
+      : blocked("live-audio-checklist", liveAudio.evidence)
   ];
 
   return {
