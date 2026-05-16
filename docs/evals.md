@@ -8,7 +8,7 @@ The first eval package is fixture-driven and focuses on hard behavioral boundari
 - Exact entity capture: no partial asset, ticket, appointment-window, phone, or email capture.
 - Failure handling: unknown IDs, out of stock, expired warranty, duplicate names.
 
-Fixtures live in `packages/evals/src/index.ts`. Each fixture defines expected tool calls, forbidden tool calls, expected UI event labels, and expected final mock state such as work-order count, pending approval actions, ticket status, inventory quantity, case summaries, credit memos, and customer-message records. Behavior tests live in `packages/evals/src/evals.test.ts`.
+Fixtures live in `packages/evals/src/index.ts`. Each fixture defines expected tool calls, forbidden tool calls, expected UI event labels, and expected final mock state such as work-order count, pending approval actions, ticket status, inventory quantity, case summaries, credit memos, and customer-message records. Behavior tests live in `packages/evals/src/evals.test.ts`. See `docs/scenarios.md` for the browser scenario and fixture catalog.
 
 Current fixture IDs:
 

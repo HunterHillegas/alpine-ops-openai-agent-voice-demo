@@ -74,7 +74,7 @@ packages/agents       Agent roster, realtime instructions, tool schemas, exact-I
 packages/company-api  In-memory fake company API with approval-gated writes
 packages/mock-data    Seed fixtures and shared domain types
 packages/evals        Eval fixtures and behavior tests
-docs                  Architecture, evals, demo capture, live verification, troubleshooting
+docs                  Architecture, scenarios, evals, demo capture, live verification, troubleshooting
 ~~~
 
 ## Gates
@@ -99,7 +99,7 @@ The repo has the server-side realtime session endpoint, a lazy-loaded browser `R
 
 Live-voice verification is intentionally deferred for this handoff. Local tests cover realtime session credential minting, mock voice fallback, transcript event handling, approval refresh events, and interruption/error surfacing. To finish the strict live gate later, run `OPENAI_API_KEY=<real-key> npm run test:live`, exercise the full microphone/audio checklist in `docs/live-voice-verification.md`, then run `LIVE_VOICE_VERIFIED=1 npm run audit:strict`.
 
-See `docs/live-voice-verification.md` for the manual live-key checklist, `docs/demo-capture.md` for screenshot/GIF capture steps, and `docs/deployment.md` for optional Vercel/Render notes.
+See `docs/scenarios.md` for replay/eval scenario coverage, `docs/live-voice-verification.md` for the manual live-key checklist, `docs/demo-capture.md` for screenshot/GIF capture steps, and `docs/deployment.md` for optional Vercel/Render notes.
 
 ## Mocking Boundary
 
