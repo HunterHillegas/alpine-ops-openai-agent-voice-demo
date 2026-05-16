@@ -4,7 +4,7 @@ import type { DemoScenario } from "@alpine/mock-data";
 export type ThemeId = "nextstep" | "platinum";
 
 const themes: { id: ThemeId; name: string }[] = [
-  { id: "nextstep", name: "NeXTStep" },
+  { id: "nextstep", name: "NeXTSTEP" },
   { id: "platinum", name: "MacOS 8 Platinum" }
 ];
 

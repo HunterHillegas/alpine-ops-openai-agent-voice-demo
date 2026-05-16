@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { scenarioTranscripts, type Approval, type CompanyState, type DemoScenario, type TranscriptTurn } from "@alpine/mock-data";
 import { ActivityRail } from "./components/ActivityRail";
+import { NextStepFurniture } from "./components/NextStepFurniture";
 import { TopBar, type ThemeId } from "./components/TopBar";
 import { companyClient } from "./lib/companyClient";
 import { dispatchSummaryText, ticketIdForCustomerMessage } from "./lib/dispatchSummary";
@@ -215,6 +216,7 @@ function App() {
 
   return (
     <main className="app-shell" data-theme={theme}>
+      <NextStepFurniture />
       <TopBar
         connection={connection}
         scenarioId={scenarioId}

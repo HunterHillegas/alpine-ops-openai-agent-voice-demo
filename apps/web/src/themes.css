@@ -1,33 +1,121 @@
 html[data-theme="nextstep"] {
-  color-scheme: dark;
-  --bg: #151719;
-  --bg-2: #202428;
-  --panel: rgba(45, 49, 52, 0.94);
-  --panel-strong: #363b40;
-  --line: rgba(255, 255, 255, 0.24);
-  --text: #f5f4ee;
-  --muted: #bec3c7;
-  --accent: #00a9c8;
-  --accent-2: #f0c66a;
-  --danger: #ff7a6e;
-  --cyan: #5cc7d8;
-  --shadow: 0 18px 46px rgba(0, 0, 0, 0.5);
+  color-scheme: light;
+  --bg: #565878;
+  --bg-2: #4d506f;
+  --panel: #adadad;
+  --panel-strong: #b9b9b9;
+  --line: #111;
+  --text: #050505;
+  --muted: #303030;
+  --accent: #005f9a;
+  --accent-2: #007b48;
+  --danger: #7d1010;
+  --cyan: #005f9a;
+  --shadow: 6px 6px 0 rgba(0, 0, 0, 0.28);
   --page-bg:
-    radial-gradient(circle at 20% 12%, rgba(255, 255, 255, 0.09), transparent 28%),
-    linear-gradient(135deg, #101214 0%, #2b3034 46%, #111315 100%);
-  --chrome-bg: linear-gradient(180deg, rgba(61, 66, 70, 0.96), rgba(33, 36, 39, 0.96));
-  --control-bg: linear-gradient(180deg, #4b5156, #24282b);
-  --control-hover-border: rgba(240, 198, 106, 0.72);
-  --primary-text: #091215;
-  --field-bg: #171a1d;
-  --raised-bg: rgba(255, 255, 255, 0.07);
-  --inset-bg: rgba(0, 0, 0, 0.28);
-  --copy-strong: #ecebe5;
-  --brand-bg: linear-gradient(145deg, #495057, #1f2427);
-  --brand-border: rgba(255, 255, 255, 0.32);
-  --radius: 4px;
-  --radius-lg: 5px;
-  font-family: "Avenir Next", "Helvetica Neue", Helvetica, sans-serif;
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.06) 1px, transparent 1px),
+    #565878;
+  --chrome-bg: #adadad;
+  --control-bg: #b6b6b6;
+  --control-hover-border: #000;
+  --primary-text: #050505;
+  --field-bg: #f2f2f2;
+  --raised-bg: #bdbdbd;
+  --inset-bg: #d2d2d2;
+  --copy-strong: #050505;
+  --brand-bg: #050505;
+  --brand-border: #050505;
+  --radius: 0;
+  --radius-lg: 0;
+  font-family: "Helvetica Neue", Helvetica, Geneva, sans-serif;
+}
+
+html[data-theme="nextstep"] body {
+  background-size: 64px 64px;
+}
+
+html[data-theme="nextstep"] .app-shell {
+  position: relative;
+  padding: 14px 90px 18px 122px;
+}
+
+.nextstep-menu,
+.nextstep-dock {
+  display: none;
+}
+
+html[data-theme="nextstep"] .nextstep-menu {
+  display: grid;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  width: 110px;
+  border-right: 2px solid #050505;
+  border-bottom: 2px solid #050505;
+  background: #b6b6b6;
+  color: #050505;
+  font-size: 12px;
+  line-height: 1.42;
+  box-shadow:
+    inset 1px 1px #f7f7f7,
+    inset -1px -1px #555;
+}
+
+html[data-theme="nextstep"] .nextstep-menu b {
+  background: #050505;
+  color: #fff;
+  font-weight: 800;
+  padding: 1px 3px;
+}
+
+html[data-theme="nextstep"] .nextstep-menu span {
+  border-top: 1px solid #777;
+  padding: 1px 3px;
+}
+
+html[data-theme="nextstep"] .nextstep-dock {
+  display: grid;
+  gap: 10px;
+  position: fixed;
+  top: 0;
+  right: 10px;
+  z-index: 4;
+  width: 54px;
+  color: #6cff38;
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.08;
+  text-align: center;
+}
+
+html[data-theme="nextstep"] .nextstep-dock b,
+html[data-theme="nextstep"] .nextstep-dock span {
+  display: grid;
+  width: 54px;
+  min-height: 54px;
+  place-items: center;
+  border: 2px solid #f0f0f0;
+  border-top-color: #050505;
+  border-left-color: #050505;
+  background: #e2e2e2;
+  color: #050505;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.34);
+}
+
+html[data-theme="nextstep"] .nextstep-dock b {
+  background:
+    linear-gradient(135deg, transparent 0 48%, #fff 49% 51%, transparent 52%),
+    linear-gradient(45deg, #050505 0 50%, #1c3f21 51% 70%, #341b52 71%);
+  color: #f3f062;
+  transform: rotate(-8deg);
+}
+
+html[data-theme="nextstep"] .nextstep-dock span:nth-child(2) {
+  background: #f4f4f4;
+  color: #008d41;
 }
 
 html[data-theme="platinum"] {
@@ -83,20 +171,216 @@ html[data-theme="nextstep"] .event-card,
 html[data-theme="nextstep"] .transcript,
 html[data-theme="nextstep"] .barge-indicator {
   box-shadow:
-    inset 1px 1px rgba(255, 255, 255, 0.18),
-    inset -1px -1px rgba(0, 0, 0, 0.54),
+    inset 1px 1px #efefef,
+    inset -1px -1px #545454,
     var(--shadow);
 }
 
 html[data-theme="nextstep"] button,
-html[data-theme="nextstep"] select {
+html[data-theme="nextstep"] select,
+html[data-theme="nextstep"] input {
+  border-color: #111;
+  background: #b6b6b6;
+  color: #050505;
   box-shadow:
-    inset 1px 1px rgba(255, 255, 255, 0.24),
-    inset -1px -1px rgba(0, 0, 0, 0.62);
+    inset 2px 2px #efefef,
+    inset -2px -2px #676767;
 }
 
 html[data-theme="nextstep"] .primary-action {
-  background: linear-gradient(180deg, #43d5eb, #0086a0);
+  background: #c7c7c7;
+}
+
+html[data-theme="nextstep"] .topbar,
+html[data-theme="nextstep"] .panel,
+html[data-theme="nextstep"] .workspace,
+html[data-theme="nextstep"] .approval-drawer {
+  border: 2px solid #050505;
+  background: #adadad;
+}
+
+html[data-theme="nextstep"] .topbar {
+  position: relative;
+  align-items: flex-start;
+  padding-top: 28px;
+}
+
+html[data-theme="nextstep"] .console-grid {
+  grid-template-columns: minmax(230px, 0.78fr) minmax(410px, 1.55fr) minmax(230px, 0.78fr);
+  gap: 10px;
+}
+
+html[data-theme="nextstep"] .topbar::before,
+html[data-theme="nextstep"] .panel-heading,
+html[data-theme="nextstep"] .workspace-header {
+  border-bottom: 2px solid #050505;
+  background: #050505;
+  color: #fff;
+}
+
+html[data-theme="nextstep"] .topbar::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 20px;
+  content: "AlpineOps.app";
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 20px;
+  text-align: center;
+}
+
+html[data-theme="nextstep"] .panel-heading,
+html[data-theme="nextstep"] .workspace-header {
+  margin: -14px -14px 14px;
+  padding: 3px 8px;
+}
+
+html[data-theme="nextstep"] .workspace-header {
+  margin: -16px -16px 14px;
+}
+
+html[data-theme="nextstep"] .panel-heading span,
+html[data-theme="nextstep"] .panel-heading strong,
+html[data-theme="nextstep"] .workspace-header h2,
+html[data-theme="nextstep"] .workspace-header p {
+  color: #fff;
+}
+
+html[data-theme="nextstep"] .brand-mark {
+  width: 52px;
+  height: 52px;
+  border: 2px solid #050505;
+  background:
+    linear-gradient(135deg, transparent 0 48%, #fff 49% 51%, transparent 52%),
+    linear-gradient(45deg, #050505 0 50%, #1c3f21 51% 70%, #341b52 71%);
+  color: #f3f062;
+  font-size: 0;
+  transform: rotate(-8deg);
+}
+
+html[data-theme="nextstep"] .brand-mark::after {
+  content: "NeXT";
+  font-size: 0.7rem;
+  line-height: 1;
+}
+
+html[data-theme="nextstep"] .status-pill,
+html[data-theme="nextstep"] .model-pill,
+html[data-theme="nextstep"] .priority {
+  border-radius: 0;
+  background: #d7d7d7;
+  color: #050505;
+  box-shadow:
+    inset 1px 1px #efefef,
+    inset -1px -1px #676767;
+}
+
+html[data-theme="nextstep"] .control-button.active {
+  border-color: #111;
+  background: #b6b6b6;
+  color: #005f9a;
+}
+
+html[data-theme="nextstep"] .info-panel,
+html[data-theme="nextstep"] .chart-panel,
+html[data-theme="nextstep"] .timeline-panel,
+html[data-theme="nextstep"] .policy-panel,
+html[data-theme="nextstep"] .schedule-panel,
+html[data-theme="nextstep"] .plan-panel,
+html[data-theme="nextstep"] .event-card,
+html[data-theme="nextstep"] .transcript,
+html[data-theme="nextstep"] .barge-indicator,
+html[data-theme="nextstep"] .approval-list article {
+  border: 2px solid #111;
+  background: #c4c4c4;
+}
+
+html[data-theme="nextstep"] .info-panel h3,
+html[data-theme="nextstep"] .event-card small,
+html[data-theme="nextstep"] .follow-up span,
+html[data-theme="nextstep"] .message-ledger span,
+html[data-theme="nextstep"] .transcript-feed b,
+html[data-theme="nextstep"] .timeline-panel li span,
+html[data-theme="nextstep"] .schedule-panel b {
+  color: #050505;
+}
+
+html[data-theme="nextstep"] .voice-orb {
+  border: 2px solid #050505;
+  border-radius: 0;
+  background:
+    linear-gradient(135deg, #050505 0 42%, #0a5d32 43% 58%, #301251 59% 100%);
+  box-shadow:
+    inset 2px 2px #efefef,
+    inset -2px -2px #4c4c4c,
+    var(--shadow);
+}
+
+html[data-theme="nextstep"] .voice-orb span {
+  border-color: rgba(255, 255, 255, 0.72);
+  border-radius: 0;
+}
+
+html[data-theme="nextstep"] .voice-orb b {
+  color: #f3f062;
+}
+
+html[data-theme="nextstep"] .bar {
+  border: 1px solid #050505;
+  border-radius: 0;
+  background: repeating-linear-gradient(180deg, #050505 0 3px, #d9d9d9 3px 6px);
+}
+
+html[data-theme="nextstep"] .event-args {
+  border-color: #111;
+  background: #efefef;
+  color: #050505;
+}
+
+html[data-theme="nextstep"] .policy-panel li,
+html[data-theme="nextstep"] .follow-up,
+html[data-theme="nextstep"] .message-ledger {
+  border-left-color: #050505;
+}
+
+html[data-theme="nextstep"] .approval-drawer {
+  backdrop-filter: none;
+}
+
+html[data-theme="nextstep"] .approval-list article {
+  background: #d0d0d0;
+}
+
+html[data-theme="nextstep"] .agent-group-heading {
+  gap: 6px;
+}
+
+html[data-theme="nextstep"] .agent-group-heading h3 {
+  flex: 1;
+  min-width: 0;
+}
+
+html[data-theme="nextstep"] .agent-group-heading span {
+  min-width: 2ch;
+  text-align: right;
+}
+
+html[data-theme="nextstep"] button:hover {
+  transform: none;
+  background: #d8d8d8;
+}
+
+@media (max-width: 1180px) {
+  html[data-theme="nextstep"] .app-shell {
+    padding: 12px;
+  }
+
+  html[data-theme="nextstep"] .nextstep-menu,
+  html[data-theme="nextstep"] .nextstep-dock {
+    display: none;
+  }
 }
 
 html[data-theme="platinum"] .topbar,
