@@ -16,6 +16,7 @@ export function runCompletionAudit(env: NodeJS.ProcessEnv = process.env): Comple
     passed("typescript-monorepo", "Workspaces cover apps/web, apps/api, packages/agents, packages/company-api, packages/mock-data, and packages/evals."),
     passed("operations-cockpit", "Playwright smoke covers dashboard render, scenario focus, replay transcript, approvals, theme switching, and mock voice fallback."),
     passed("theme-support", "The web UI exposes NeXTStep as the default theme and MacOS 8 Platinum as a switchable top-bar theme."),
+    passed("grouped-traces", "Activity rail groups visible tool, handoff, approval, and state-change events by agent."),
     passed("trace-redaction", "Trace formatter tests redact phone numbers, emails, tokens, and client secrets while preserving operational IDs."),
     passed("mock-company-api", "Company API exposes resettable customers, assets, telemetry, warranty, policy, inventory, technicians, tickets, work orders, messages, notes, event log, and route-level tests."),
     passed("realtime-session-route", "API route tests cover mock mode without a key and live client-secret minting with the server API key kept out of browser responses."),

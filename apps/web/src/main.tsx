@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { scenarioTranscripts, type Approval, type CompanyState, type DemoScenario, type EventLogEntry, type TranscriptTurn } from "@alpine/mock-data";
+import { scenarioTranscripts, type Approval, type CompanyState, type DemoScenario, type TranscriptTurn } from "@alpine/mock-data";
+import { ActivityRail } from "./components/ActivityRail";
 import { TopBar, type ThemeId } from "./components/TopBar";
 import { companyClient } from "./lib/companyClient";
 import type { AlpineRealtimeConsole, VoiceConnection } from "./lib/realtimeConsole";
-import { formatEventArgs } from "./lib/traceFormat";
 import "./styles.css";
 import "./cockpit.css";
 import "./themes.css";
@@ -393,33 +393,6 @@ function InfoPanel({ title, value, meta, children }: { title: string; value: str
       <p>{meta ?? "No data"}</p>
       {children}
     </article>
-  );
-}
-
-function ActivityRail({ events }: { events: EventLogEntry[] }) {
-  return (
-    <aside className="panel activity-rail">
-      <div className="panel-heading">
-        <span>Agent activity</span>
-        <strong>{events.length} events</strong>
-      </div>
-      <div className="event-list">
-        {events.map((event) => (
-          <article className={`event-card ${event.type}`} key={event.eventId}>
-            <div>
-              <time>{new Date(event.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</time>
-              <b>{event.agentName}</b>
-            </div>
-            <h4>{event.label}</h4>
-            <p>{event.toolName ?? event.handoffTarget ?? event.type}</p>
-            {event.args && <code className="event-args">{formatEventArgs(event.args)}</code>}
-            {event.resultSummary && <small>{event.resultSummary}</small>}
-            {event.approvalStatus && <small>{event.approvalStatus}</small>}
-            {event.error && <small className="event-error">{event.error}</small>}
-          </article>
-        ))}
-      </div>
-    </aside>
   );
 }
 

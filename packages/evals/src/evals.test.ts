@@ -84,6 +84,26 @@ describe("eval fixtures", () => {
     }
   });
 
+  it("main replay emits visible specialist handoffs", () => {
+    const api = createCompanyApi();
+    const replay = api.replayScenario("dead-charger-outage");
+
+    expect(replay.ok).toBe(true);
+    if (!replay.ok) return;
+
+    const handoffs = replay.data.events
+      .filter((event) => event.type === "handoff")
+      .map((event) => event.handoffTarget);
+
+    expect(handoffs).toEqual([
+      "Message Composer Agent",
+      "Dispatch Agent",
+      "Policy and Billing Agent",
+      "Diagnostics Agent",
+      "Customer Context Agent"
+    ]);
+  });
+
   it("replay scenarios honor expected and forbidden tool calls", () => {
     for (const fixture of evalFixtures) {
       const api = createCompanyApi();

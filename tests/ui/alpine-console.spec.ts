@@ -38,6 +38,10 @@ test("replays main scenario and executes approved work order", async ({ page }) 
   await expect(page.getByText("Replay transcript")).toBeVisible();
   await expect(page.locator(".transcript-feed").getByText("I found active warranty coverage")).toBeVisible();
   await expect(page.getByText("No interruption during replay.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Realtime Triage Agent" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Diagnostics Agent" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Dispatch Agent" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Handoff to Diagnostics Agent" })).toBeVisible();
 
   await page.getByRole("button", { name: "Approve and run" }).click();
 

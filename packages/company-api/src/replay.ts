@@ -20,16 +20,21 @@ export function replayDemoScenario(
 function replayDeadCharger(api: CompanyApi, addEvent: (entry: EventLogEntry) => EventLogEntry) {
   addEvent(event("Realtime Triage Agent", "heard_entity", "Heard asset ID candidate: CHG-8821", { args: { candidate: "CHG-8821" } }));
   addEvent(event("Realtime Triage Agent", "confirmation", "Confirmed exact identifier", { args: { assetId: "CHG-8821" } }));
+  addEvent(event("Realtime Triage Agent", "handoff", "Handoff to Customer Context Agent", { handoffTarget: "Customer Context Agent" }));
   api.searchCustomers("Amelia Brooks");
   api.getServiceHistory("cus_amelia_brooks");
   api.getAsset("CHG-8821");
+  addEvent(event("Realtime Triage Agent", "handoff", "Handoff to Diagnostics Agent", { handoffTarget: "Diagnostics Agent" }));
   api.getAssetTelemetry("CHG-8821");
   api.getKnownIssuePatterns("AlpineCharge Pro 48A");
   api.checkFirmwareStatus("CHG-8821");
   api.estimateRepairPlan("CHG-8821");
+  addEvent(event("Realtime Triage Agent", "handoff", "Handoff to Policy and Billing Agent", { handoffTarget: "Policy and Billing Agent" }));
   api.getWarrantyStatus("CHG-8821");
+  addEvent(event("Realtime Triage Agent", "handoff", "Handoff to Dispatch Agent", { handoffTarget: "Dispatch Agent" }));
   api.checkPartInventory("PCB-48A-R3");
   api.findTechnicians({ certification: "charger_service", region: "Santa Barbara", partId: "PCB-48A-R3" });
+  addEvent(event("Realtime Triage Agent", "handoff", "Handoff to Message Composer Agent", { handoffTarget: "Message Composer Agent" }));
   api.createCaseSummary({ ticketId: "TCK-1044" });
   api.requestHumanApproval({
     action: "createWorkOrder",

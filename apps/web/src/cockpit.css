@@ -209,9 +209,41 @@ dd {
 .event-list {
   display: grid;
   max-height: 584px;
-  gap: 9px;
+  gap: 12px;
   overflow: auto;
   padding-right: 4px;
+}
+
+.agent-event-group {
+  display: grid;
+  gap: 8px;
+}
+
+.agent-group-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel-strong);
+  color: var(--text);
+  padding: 7px 9px;
+}
+
+.agent-group-heading h3 {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.agent-group-heading span {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
 }
 
 .event-card {
