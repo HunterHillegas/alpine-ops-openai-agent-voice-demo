@@ -25,9 +25,8 @@ Run:
 ~~~bash
 npm test
 npm run evals
+npm run audit
 npm run test:ui
 ~~~
 
-`npm test` checks the fixture contracts, exact-ID behavior, replay event labels, expected/forbidden tool calls, specialist diagnostic tools, approval-token enforcement, and realtime agent/tool shape. `npm run evals` emits a JSON pass/fail report from `packages/evals/src/run.ts`. `npm run test:ui` checks the browser-visible cockpit flow against the mock API.
-
-Next slice: add a scripted live-agent runner that executes each fixture through the realtime/tool orchestration layer and compares expected/forbidden tool calls plus final UI event labels.
+`npm test` checks the fixture contracts, exact-ID behavior, replay event labels, expected/forbidden tool calls, specialist diagnostic tools, approval-token enforcement, completion-audit behavior, and realtime agent/tool shape. `npm run evals` emits a JSON pass/fail report from `packages/evals/src/run.ts`. `npm run audit` emits a JSON completion report from `packages/evals/src/audit-run.ts`; it reports live WebRTC as blocked until `OPENAI_API_KEY` is available. `npm run test:ui` checks the browser-visible cockpit flow against the mock API.

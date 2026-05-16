@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { normalizeSpokenAssetId, normalizeSpokenEmail, normalizeSpokenPhone, toolDefinitions } from "@alpine/agents";
 import { createCompanyApi } from "@alpine/company-api";
+import { runCompletionAudit } from "./audit";
 import { evalFixtures } from "./index";
 import { runEvalFixtures } from "./runner";
 
@@ -93,6 +94,20 @@ describe("eval fixtures", () => {
 
     expect(results).toHaveLength(evalFixtures.length);
     expect(results.every((result) => result.passed)).toBe(true);
+  });
+
+  it("completion audit reports live voice as blocked without an API key", () => {
+    const audit = runCompletionAudit({});
+
+    expect(audit.status).toBe("blocked");
+    expect(audit.checks.find((check) => check.id === "live-webrtc-key")?.status).toBe("blocked");
+  });
+
+  it("completion audit passes when live voice key is available", () => {
+    const audit = runCompletionAudit({ OPENAI_API_KEY: "sk-test" });
+
+    expect(audit.status).toBe("passed");
+    expect(audit.checks.every((check) => check.status === "passed")).toBe(true);
   });
 
   it("surfaces ambiguous customer matches without continuing to writes", () => {
