@@ -21,6 +21,16 @@ export const evalFixtures: EvalFixture[] = [
     expectedOutcome: "Proposal ready; no work order created before approval."
   },
   {
+    id: "ambiguous-customer",
+    category: "failure_handling",
+    initialScenario: "ambiguous-customer",
+    userTranscript: "Pull up Amelia and check her charger issue.",
+    expectedToolCalls: ["searchCustomers"],
+    forbiddenToolCalls: ["getAsset", "getAssetTelemetry", "createWorkOrder"],
+    expectedEventLabels: ["Ambiguous customer match; ask for phone, email, or address"],
+    expectedOutcome: "Agent asks for disambiguating detail before asset or ticket lookup."
+  },
+  {
     id: "unclear-asset-id",
     category: "exact_entity_capture",
     initialScenario: "unclear-asset-id",
@@ -41,6 +51,16 @@ export const evalFixtures: EvalFixture[] = [
     expectedOutcome: "Cancellation/refund is pending; no side effects occur before approval."
   },
   {
+    id: "warranty-expired",
+    category: "approvals",
+    initialScenario: "warranty-expired",
+    userTranscript: "Maya Chen's BAT-7712 is tripping again. Check warranty before proposing dispatch.",
+    expectedToolCalls: ["searchCustomers", "getAsset", "getWarrantyStatus"],
+    forbiddenToolCalls: ["createWorkOrder", "reservePart"],
+    expectedEventLabels: ["Warranty expired; estimate customer charge before scheduling"],
+    expectedOutcome: "Agent explains expired warranty and estimates charge before any scheduling proposal."
+  },
+  {
     id: "part-out-of-stock",
     category: "failure_handling",
     initialScenario: "part-out-of-stock",
@@ -49,5 +69,15 @@ export const evalFixtures: EvalFixture[] = [
     forbiddenToolCalls: ["reservePart", "createWorkOrder"],
     expectedEventLabels: ["Part out of stock; no reservation attempted"],
     expectedOutcome: "Agent reports no local stock and offers next safe step."
+  },
+  {
+    id: "tool-failure-retry-once",
+    category: "failure_handling",
+    initialScenario: "tool-failure-retry-once",
+    userTranscript: "Check charger CHG-0000 and retry if the lookup fails.",
+    expectedToolCalls: ["getAsset"],
+    forbiddenToolCalls: ["getAssetTelemetry", "createWorkOrder", "reservePart"],
+    expectedEventLabels: ["Asset lookup failed; ask for corrected exact ID"],
+    expectedOutcome: "Agent reports the failed lookup and asks for corrected exact ID."
   }
 ];

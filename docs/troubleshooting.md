@@ -36,6 +36,14 @@ The key stays server-side. The browser should only receive an ephemeral realtime
 
 The Agents SDK is lazy-loaded when **Connect voice** is clicked. This keeps the initial cockpit shell smaller and shifts the realtime transport code into a separate browser chunk.
 
+## Playwright Browser Missing
+
+If `npm run test:ui` reports that the Chromium executable is missing, install the browser once:
+
+~~~bash
+npx playwright install chromium
+~~~
+
 ## Approval Does Not Execute
 
 Write endpoints require the approved token produced by the approval card. Rejecting an approval leaves state unchanged by design.

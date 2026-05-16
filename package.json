@@ -14,10 +14,15 @@
     "dev:web": "npm run dev -w apps/web",
     "build": "tsc --noEmit && npm run build -w apps/web",
     "test": "vitest run",
+    "test:ui": "playwright test",
+    "test:all": "npm run typecheck && npm test && npm run test:ui && npm run build && npm run docs:list",
     "typecheck": "tsc --noEmit",
-    "docs:list": "find docs -maxdepth 2 -type f | sort"
+    "docs:list": "find docs -maxdepth 2 -type f | sort",
+    "smoke:api": "PORT=8788 npm run start -w apps/api",
+    "smoke:web": "VITE_API_URL=http://127.0.0.1:8788 npm run dev -w apps/web -- --host 127.0.0.1 --port 5174 --strictPort"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@types/node": "^25.8.0",
     "@vitejs/plugin-react": "^5.0.4",
     "typescript": "^5.9.3",

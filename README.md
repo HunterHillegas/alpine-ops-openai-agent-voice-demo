@@ -82,9 +82,12 @@ docs                  Architecture and troubleshooting
 ~~~bash
 npm run typecheck
 npm test
+npm run test:ui
 npm run build
 npm run docs:list
 ~~~
+
+`npm run test:ui` starts isolated smoke servers on API port `8788` and web port `5174`, then verifies the dashboard render, main scenario replay, approval execution, mock voice fallback, and unclear-ID guardrail in Chromium.
 
 ## Current Voice Status
 

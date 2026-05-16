@@ -7,8 +7,13 @@ const app = Fastify({ logger: true });
 const company = createCompanyApi();
 const port = Number(process.env.PORT ?? 8787);
 
-app.addHook("onRequest", async (_request, reply) => {
-  reply.header("access-control-allow-origin", process.env.ALLOWED_ORIGIN ?? "http://localhost:5173");
+app.addHook("onRequest", async (request, reply) => {
+  const origin = request.headers.origin;
+  const allowedOrigin = origin && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
+    ? origin
+    : process.env.ALLOWED_ORIGIN ?? "http://localhost:5173";
+
+  reply.header("access-control-allow-origin", allowedOrigin);
   reply.header("access-control-allow-methods", "GET,POST,OPTIONS");
   reply.header("access-control-allow-headers", "content-type,authorization");
 });

@@ -173,12 +173,32 @@ export const scenarios: DemoScenario[] = [
     openingPrompt: "Look up charger C H G eight... no, wait..."
   },
   {
+    id: "ambiguous-customer",
+    name: "Ambiguous customer",
+    summary: "Multiple Amelia records force the agent to ask for one disambiguating detail before continuing.",
+    openingPrompt: "Pull up Amelia and check her charger issue."
+  },
+  {
+    id: "warranty-expired",
+    name: "Warranty expired",
+    summary: "Maya Chen's battery asset is out of warranty, so the agent must estimate charges before scheduling.",
+    openingPrompt: "Maya Chen's BAT-7712 is tripping again. Check warranty before proposing dispatch.",
+    primaryCustomerId: "cus_maya_chen",
+    primaryAssetId: "BAT-7712"
+  },
+  {
     id: "part-out-of-stock",
     name: "Part out of stock",
     summary: "The diagnostic path finds the needed inverter module but local stock is zero.",
     openingPrompt: "Maya Chen's battery gateway keeps tripping. Check telemetry and schedule service if we have the part.",
     primaryCustomerId: "cus_maya_chen",
     primaryAssetId: "BAT-7712"
+  },
+  {
+    id: "tool-failure-retry-once",
+    name: "Tool failure retry once",
+    summary: "Unknown asset lookup fails once; the agent should report the failure and ask for corrected ID instead of inventing data.",
+    openingPrompt: "Check charger CHG-0000 and retry if the lookup fails."
   }
 ];
 

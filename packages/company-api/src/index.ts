@@ -287,12 +287,37 @@ export function createCompanyApi(initialState: CompanyState = createSeedState())
       } else if (scenarioId === "unclear-asset-id") {
         addEvent(event("Realtime Triage Agent", "heard_entity", "Heard partial asset ID: CHG-8...", { args: { candidate: "CHG-8" } }));
         addEvent(event("Safety / Approval Layer", "guardrail", "Lookup blocked until exact asset ID is confirmed", { error: "Partial spoken ID" }));
+      } else if (scenarioId === "ambiguous-customer") {
+        const result = api.searchCustomers("Amelia");
+        if (!result.ok) {
+          addEvent(event("Customer Context Agent", "failure", "Ambiguous customer match; ask for phone, email, or address", {
+            toolName: "searchCustomers",
+            args: { query: "Amelia" },
+            error: result.message
+          }));
+        }
+      } else if (scenarioId === "warranty-expired") {
+        api.searchCustomers("Maya Chen");
+        api.getAsset("BAT-7712");
+        api.getWarrantyStatus("BAT-7712");
+        addEvent(event("Policy and Billing Agent", "guardrail", "Warranty expired; estimate customer charge before scheduling", {
+          args: { assetId: "BAT-7712" }
+        }));
       } else if (scenarioId === "part-out-of-stock") {
         api.searchCustomers("Maya Chen");
         api.getAsset("BAT-7712");
         api.getAssetTelemetry("BAT-7712");
         api.checkPartInventory("INV-HOME20-R2");
         addEvent(event("Dispatch Agent", "failure", "Part out of stock; no reservation attempted", { toolName: "checkPartInventory", args: { partId: "INV-HOME20-R2" }, error: "quantity=0" }));
+      } else if (scenarioId === "tool-failure-retry-once") {
+        const result = api.getAsset("CHG-0000");
+        if (!result.ok) {
+          addEvent(event("Customer Context Agent", "failure", "Asset lookup failed; ask for corrected exact ID", {
+            toolName: "getAsset",
+            args: { assetId: "CHG-0000" },
+            error: result.message
+          }));
+        }
       }
       return success(api.getState());
     },
