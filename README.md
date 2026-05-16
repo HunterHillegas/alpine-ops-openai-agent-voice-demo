@@ -86,11 +86,12 @@ npm run evals
 npm run audit
 npm run test:ui
 npm run test:live
+npm run test:all
 npm run build
 npm run docs:list
 ~~~
 
-`npm run evals` prints a JSON report for the scripted fixtures and writes `packages/evals/results/latest.json` for local inspection. `npm run audit` prints a completion-audit report and marks live WebRTC as blocked until an API key and live verification marker are present; use `npm run audit:strict` after the live checklist passes. `npm run test:ui` starts isolated smoke servers on API port `8788` and web port `5174`, then verifies the dashboard render, main scenario replay, approval execution, mock voice fallback, text fallback replay, and unclear-ID guardrail in Chromium. `npm run test:live` requires `OPENAI_API_KEY` and verifies that the browser reaches a live WebRTC session.
+`npm run evals` prints a JSON report for the scripted fixtures and writes `packages/evals/results/latest.json` for local inspection. `npm run audit` prints a completion-audit report and marks live WebRTC as blocked until an API key and live verification marker are present; use `npm run audit:strict` after the live checklist passes. `npm run test:ui` starts isolated smoke servers on API port `8788` and web port `5174`, then verifies the dashboard render, main scenario replay, approval execution, mock voice fallback, text fallback replay, and unclear-ID guardrail in Chromium. `npm run test:all` runs the local non-live gate set. `npm run test:live` requires `OPENAI_API_KEY` and verifies that the browser reaches a live WebRTC session.
 
 ## Current Voice Status
 
