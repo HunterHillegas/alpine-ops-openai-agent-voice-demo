@@ -25,7 +25,7 @@ export function ActivityRail({ events }: { events: EventLogEntry[] }) {
                 </div>
                 <h4>{event.label}</h4>
                 <p>{event.toolName ?? event.handoffTarget ?? event.type}</p>
-                {event.args && <code className="event-args">{formatEventArgs(event.args)}</code>}
+                {event.args && <code className="event-args">{eventArgsForDisplay(event.args)}</code>}
                 {event.resultSummary && <small>{event.resultSummary}</small>}
                 {event.approvalStatus && <small>{event.approvalStatus}</small>}
                 {event.error && <small className="event-error">{event.error}</small>}
@@ -44,4 +44,8 @@ export function groupEventsByAgent(events: EventLogEntry[]) {
     groups.set(event.agentName, [...(groups.get(event.agentName) ?? []), event]);
   }
   return [...groups.entries()].map(([agentName, groupEvents]) => ({ agentName, events: groupEvents }));
+}
+
+export function eventArgsForDisplay(args: Record<string, unknown>) {
+  return formatEventArgs(args);
 }
