@@ -51,3 +51,13 @@ test("unclear asset scenario blocks partial ID lookup", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Heard partial asset ID: CHG-8..." })).toBeVisible();
   await expect(page.getByText("No pending side effects")).toBeVisible();
 });
+
+test("scenario selection focuses the active workspace", async ({ page }) => {
+  await page.getByLabel("Load scenario").selectOption("part-out-of-stock");
+
+  await expect(page.getByRole("heading", { name: "Maya Chen" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "BAT-7712" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Expired" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "0 local" })).toBeVisible();
+  await expect(page.getByText("INV-HOME20-R2")).toBeVisible();
+});

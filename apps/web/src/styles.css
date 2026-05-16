@@ -447,15 +447,29 @@ dd {
   font-weight: 800;
 }
 
-.follow-up {
+.follow-up,
+.message-ledger {
   margin-top: 12px;
   border-left: 3px solid var(--accent);
   padding-left: 12px;
 }
 
-.follow-up span {
+.message-ledger {
+  border-left-color: var(--cyan);
+}
+
+.follow-up span,
+.message-ledger span {
   color: var(--accent);
   font-weight: 800;
+}
+
+.message-ledger span {
+  color: var(--cyan);
+}
+
+.message-ledger b {
+  color: var(--accent-2);
 }
 
 .activity-rail {

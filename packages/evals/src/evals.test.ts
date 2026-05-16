@@ -97,4 +97,40 @@ describe("eval fixtures", () => {
     expect(deniedSave.ok).toBe(false);
     expect(api.getState().customerMessages).toHaveLength(0);
   });
+
+  it("saves and sends mocked customer messages only after approval", () => {
+    const api = createCompanyApi();
+    const saveApproval = api.requestHumanApproval({
+      action: "saveCustomerMessage",
+      summary: "Save drafted customer SMS.",
+      payload: { customerId: "cus_amelia_brooks", channel: "sms", body: "Repair scheduled." }
+    });
+    api.approve(saveApproval.approvalId);
+
+    const saved = api.saveCustomerMessage({
+      customerId: "cus_amelia_brooks",
+      channel: "sms",
+      body: "Repair scheduled.",
+      approvalToken: saveApproval.token
+    });
+
+    expect(saved.ok).toBe(true);
+    if (!saved.ok) return;
+    expect(api.getState().customerMessages[0]?.status).toBe("saved");
+
+    const sendApproval = api.requestHumanApproval({
+      action: "sendCustomerMessage",
+      summary: "Mock-send saved customer SMS.",
+      payload: { messageId: saved.data.messageId }
+    });
+    api.approve(sendApproval.approvalId);
+
+    const sent = api.sendCustomerMessage({
+      messageId: saved.data.messageId,
+      approvalToken: sendApproval.token
+    });
+
+    expect(sent.ok).toBe(true);
+    expect(api.getState().customerMessages[0]?.status).toBe("sent");
+  });
 });

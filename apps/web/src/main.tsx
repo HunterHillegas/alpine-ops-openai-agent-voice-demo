@@ -23,12 +23,27 @@ function App() {
 
   useEffect(() => () => realtimeRef.current?.disconnect(), []);
 
-  const customer = useMemo(() => state?.customers.find((item) => item.id === "cus_amelia_brooks") ?? state?.customers[0], [state]);
-  const asset = useMemo(() => state?.assets.find((item) => item.customerId === customer?.id), [state, customer]);
-  const ticket = useMemo(() => state?.tickets.find((item) => item.customerId === customer?.id), [state, customer]);
+  const selectedScenario = scenarios.find((scenario) => scenario.id === scenarioId);
+  const customer = useMemo(() => {
+    if (!state) return undefined;
+    if (selectedScenario?.primaryCustomerId) {
+      return state.customers.find((item) => item.id === selectedScenario.primaryCustomerId);
+    }
+    if (selectedScenario?.primaryAssetId) {
+      const scenarioAsset = state.assets.find((item) => item.assetId === selectedScenario.primaryAssetId);
+      return state.customers.find((item) => item.id === scenarioAsset?.customerId);
+    }
+    return state.customers.find((item) => item.id === "cus_amelia_brooks") ?? state.customers[0];
+  }, [state, selectedScenario]);
+  const asset = useMemo(() => {
+    if (selectedScenario?.primaryAssetId) {
+      return state?.assets.find((item) => item.assetId === selectedScenario.primaryAssetId);
+    }
+    return state?.assets.find((item) => item.customerId === customer?.id);
+  }, [state, customer, selectedScenario]);
+  const ticket = useMemo(() => state?.tickets.find((item) => item.assetId === asset?.assetId) ?? state?.tickets.find((item) => item.customerId === customer?.id), [state, customer, asset]);
   const telemetry = useMemo(() => state?.telemetry.filter((point) => point.assetId === asset?.assetId) ?? [], [state, asset]);
   const pendingApprovals = state?.approvals.filter((approval) => approval.status === "pending") ?? [];
-  const selectedScenario = scenarios.find((scenario) => scenario.id === scenarioId);
 
   async function refresh() {
     const next = await companyClient.state();
@@ -106,6 +121,7 @@ function App() {
       await companyClient.sendCustomerMessage({ ...(approved.payload as object), approvalToken: approved.token });
     }
     await refresh();
+    setAssistantText(`${approved.action} completed in the mock system.`);
   }
 
   async function reject(approval: Approval) {
@@ -229,9 +245,11 @@ function CaseWorkspace({ customer, asset, ticket, telemetry, state }: {
   state: CompanyState;
 }) {
   const warrantyActive = asset ? new Date(asset.warrantyExpiration) >= new Date("2026-05-16") : false;
-  const part = state.inventory.find((item) => item.partId === "PCB-48A-R3");
-  const tech = state.technicians.find((item) => item.techId === "tech_marco_diaz");
-  const workOrder = state.workOrders[0];
+  const likelyPartId = asset?.productModel.includes("AlpineVault Home 20") ? "INV-HOME20-R2" : "PCB-48A-R3";
+  const part = state.inventory.find((item) => item.partId === likelyPartId);
+  const tech = state.technicians.find((item) => item.vanInventory.includes(likelyPartId)) ?? state.technicians.find((item) => item.region === "Santa Barbara");
+  const workOrder = state.workOrders.find((item) => item.ticketId === ticket?.ticketId) ?? state.workOrders[0];
+  const customerMessages = state.customerMessages.filter((message) => message.customerId === customer?.id);
 
   return (
     <section className="workspace">
@@ -261,7 +279,7 @@ function CaseWorkspace({ customer, asset, ticket, telemetry, state }: {
         <InfoPanel title="Warranty" value={warrantyActive ? "Active" : "Expired"} meta={asset?.warrantyExpiration}>
           <p className="plain-note">{warrantyActive ? "Parts and labor covered when telemetry supports hardware failure." : "Estimate customer charge before scheduling."}</p>
         </InfoPanel>
-        <InfoPanel title="Inventory" value={part ? `${part.quantity} local` : "Unknown"} meta="PCB-48A-R3">
+        <InfoPanel title="Inventory" value={part ? `${part.quantity} local` : "Unknown"} meta={likelyPartId}>
           <p className="plain-note">{part?.partName}</p>
         </InfoPanel>
       </div>
@@ -299,10 +317,20 @@ function CaseWorkspace({ customer, asset, ticket, telemetry, state }: {
             <span>Work-order plan</span>
             <strong>{workOrder?.workOrderId ?? "proposal"}</strong>
           </div>
-          <p>{tech?.name ?? "Qualified technician"} · tomorrow 10:00-12:00 · control-board replacement · warranty charge $0.</p>
+          <p>{tech?.name ?? "Qualified technician"} · tomorrow 10:00-12:00 · {likelyPartId === "PCB-48A-R3" ? "control-board replacement" : "battery inverter diagnosis"} · {warrantyActive ? "warranty charge $0" : "charge estimate required"}.</p>
           <div className="follow-up">
             <span>Customer follow-up draft</span>
-            <p>Hi Amelia, Alpine FieldOps found an active warranty and likely control-board fault. We can send Marco tomorrow between 10:00 and 12:00 with the needed part.</p>
+            <p>Hi {customer?.name.split(" ")[0] ?? "there"}, Alpine FieldOps found {warrantyActive ? "an active warranty" : "an expired warranty"} and {part?.quantity ? "local part availability" : "no local stock for the likely part"}. We can follow up with the next safe dispatch option.</p>
+          </div>
+          <div className="message-ledger">
+            <span>Mock messages</span>
+            {customerMessages.length === 0 ? (
+              <p>No saved or sent customer messages.</p>
+            ) : (
+              customerMessages.map((message) => (
+                <p key={message.messageId}><b>{message.status}</b> · {message.channel} · {message.body}</p>
+              ))
+            )}
           </div>
         </section>
       </div>
