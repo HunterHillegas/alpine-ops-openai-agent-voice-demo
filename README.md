@@ -37,7 +37,7 @@ Open the dashboard. Point out Alpine FieldOps, connection state, model indicator
 
 ### 0:20 Start Voice Session
 
-Click **Connect voice**. With no API key, the UI enters mock mode. With `OPENAI_API_KEY`, the API returns a realtime session credential for the browser WebRTC wiring.
+Click **Connect voice**. With no API key, the UI enters mock mode. With `OPENAI_API_KEY`, the API returns a realtime session credential for the browser WebRTC wiring. The text fallback input can also run seeded replay flows without a microphone.
 
 ### 0:40 Main Request
 
@@ -89,7 +89,7 @@ npm run build
 npm run docs:list
 ~~~
 
-`npm run evals` prints a JSON report for the scripted fixtures and writes `packages/evals/results/latest.json` for local inspection. `npm run audit` prints a completion-audit report and marks live WebRTC as blocked until an API key is present; use `npm run audit:strict` when live verification is available. `npm run test:ui` starts isolated smoke servers on API port `8788` and web port `5174`, then verifies the dashboard render, main scenario replay, approval execution, mock voice fallback, and unclear-ID guardrail in Chromium.
+`npm run evals` prints a JSON report for the scripted fixtures and writes `packages/evals/results/latest.json` for local inspection. `npm run audit` prints a completion-audit report and marks live WebRTC as blocked until an API key is present; use `npm run audit:strict` when live verification is available. `npm run test:ui` starts isolated smoke servers on API port `8788` and web port `5174`, then verifies the dashboard render, main scenario replay, approval execution, mock voice fallback, text fallback replay, and unclear-ID guardrail in Chromium.
 
 ## Current Voice Status
 

@@ -4,6 +4,7 @@ import { scenarioTranscripts, type Approval, type CompanyState, type DemoScenari
 import { ActivityRail } from "./components/ActivityRail";
 import { TopBar, type ThemeId } from "./components/TopBar";
 import { companyClient } from "./lib/companyClient";
+import { scenarioForTextFallback } from "./lib/mockTextFallback";
 import type { AlpineRealtimeConsole, VoiceConnection } from "./lib/realtimeConsole";
 import "./styles.css";
 import "./cockpit.css";
@@ -98,10 +99,23 @@ function App() {
 
   async function submitTextFallback(event: React.FormEvent) {
     event.preventDefault();
-    if (!userText.trim()) return;
-    const realtime = await getRealtimeConsole();
-    realtime.sendText(userText);
+    const message = userText.trim();
+    if (!message) return;
     setUserText("");
+    if (connection === "live") {
+      const realtime = await getRealtimeConsole();
+      realtime.sendText(message);
+      return;
+    }
+
+    const fallbackScenarioId = scenarioForTextFallback(message, scenarioId);
+    setScenarioId(fallbackScenarioId);
+    const next = await companyClient.replay(fallbackScenarioId);
+    const replayTranscript = scenarioTranscripts[fallbackScenarioId] ?? [];
+    setState(next);
+    setTranscriptTurns([{ speaker: "dispatcher", text: message }, ...replayTranscript]);
+    setBargeInStatus("Text fallback replay.");
+    setAssistantText(replayTranscript.findLast((turn) => turn.speaker === "assistant")?.text ?? next.events[0]?.label ?? "Text fallback replay loaded.");
   }
 
   async function getRealtimeConsole() {

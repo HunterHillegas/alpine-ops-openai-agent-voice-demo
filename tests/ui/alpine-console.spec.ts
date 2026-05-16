@@ -52,7 +52,7 @@ test("replays main scenario and executes approved work order", async ({ page }) 
   await expect(page.getByText(/WO-\d{4}/).first()).toBeVisible();
 });
 
-test("mock voice connection and text fallback stay safe without an API key", async ({ page }) => {
+test("mock voice connection and text fallback run seeded replay without an API key", async ({ page }) => {
   await page.getByRole("button", { name: "Connect voice" }).click();
 
   await expect(page.getByText("mock").first()).toBeVisible();
@@ -62,7 +62,9 @@ test("mock voice connection and text fallback stay safe without an API key", asy
   await page.getByPlaceholder("Text fallback for no-mic testing").fill("Check CHG-8821");
   await page.getByRole("button", { name: "Send" }).click();
 
-  await expect(page.getByText("Text fallback captured. Run a replay or connect live voice to execute agent tools.")).toBeVisible();
+  await expect(page.getByText("Text fallback replay.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Approval requested" })).toBeVisible();
+  await expect(page.getByText("createWorkOrder", { exact: true })).toBeVisible();
 });
 
 test("unclear asset scenario blocks partial ID lookup", async ({ page }) => {

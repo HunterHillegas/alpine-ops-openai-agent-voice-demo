@@ -41,4 +41,4 @@ For automated UI proof, run:
 npm run test:ui
 ~~~
 
-The test suite covers initial render, replay transcript playback, approval execution, mock voice fallback, unclear-ID guardrail, and scenario-focused workspace.
+The test suite covers initial render, replay transcript playback, approval execution, mock voice fallback, text fallback replay, unclear-ID guardrail, and scenario-focused workspace.
