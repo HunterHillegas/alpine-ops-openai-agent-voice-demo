@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { normalizeSpokenAssetId, toolDefinitions } from "@alpine/agents";
 import { createCompanyApi } from "@alpine/company-api";
 import { evalFixtures } from "./index";
+import { runEvalFixtures } from "./runner";
 
 describe("eval fixtures", () => {
   it("cover the required demo categories", () => {
@@ -78,6 +79,13 @@ describe("eval fixtures", () => {
         expect(toolCalls, fixture.id).not.toContain(forbiddenTool);
       }
     }
+  });
+
+  it("scripted eval runner reports every fixture passing", () => {
+    const results = runEvalFixtures();
+
+    expect(results).toHaveLength(evalFixtures.length);
+    expect(results.every((result) => result.passed)).toBe(true);
   });
 
   it("surfaces ambiguous customer matches without continuing to writes", () => {

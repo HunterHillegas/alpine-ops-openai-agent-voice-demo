@@ -4,7 +4,11 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./runner": "./src/runner.ts"
+  },
+  "scripts": {
+    "evals": "tsx src/run.ts"
   },
   "dependencies": {
     "@alpine/agents": "0.1.0",

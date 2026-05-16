@@ -14,6 +14,7 @@
     "dev:web": "npm run dev -w apps/web",
     "build": "tsc --noEmit && npm run build -w apps/web",
     "test": "vitest run",
+    "evals": "tsx packages/evals/src/run.ts",
     "test:ui": "playwright test",
     "test:all": "npm run typecheck && npm test && npm run test:ui && npm run build && npm run docs:list",
     "typecheck": "tsc --noEmit",
