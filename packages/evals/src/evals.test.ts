@@ -10,6 +10,7 @@ describe("eval fixtures", () => {
     expect(evalFixtures.map((fixture) => fixture.id)).toEqual([
       "dead-charger-success",
       "dead-charger-approved-dispatch",
+      "dead-charger-sent-summary",
       "routing-diagnostics",
       "routing-policy-billing",
       "routing-dispatch",

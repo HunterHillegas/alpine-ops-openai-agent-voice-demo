@@ -9,6 +9,7 @@ export function replayDemoScenario(
   api.reset(scenarioId);
   if (scenarioId === "dead-charger-outage") replayDeadCharger(api, addEvent);
   else if (scenarioId === "dead-charger-approved") replayApprovedDeadCharger(api, addEvent);
+  else if (scenarioId === "dead-charger-sent") replaySentDeadCharger(api, addEvent);
   else if (scenarioId === "refund-cancellation") replayRefundCancellation(api);
   else if (scenarioId === "unclear-asset-id") replayUnclearAssetId(addEvent);
   else if (scenarioId === "ambiguous-customer") replayAmbiguousCustomer(api, addEvent);
@@ -83,6 +84,24 @@ function replayApprovedDeadCharger(api: CompanyApi, addEvent: (entry: EventLogEn
     approvalToken: messageApproval.token
   });
   addEvent(event("Realtime Triage Agent", "summary", "Approved dispatch complete: work order scheduled, part reserved, customer text saved."));
+}
+
+function replaySentDeadCharger(api: CompanyApi, addEvent: (entry: EventLogEntry) => EventLogEntry) {
+  replayApprovedDeadCharger(api, addEvent);
+  const savedMessage = api.getState().customerMessages[0];
+  if (!savedMessage) {
+    addEvent(event("Safety / Approval Layer", "failure", "Send replay missing saved message", { error: "message_not_found" }));
+    return;
+  }
+  const sendApproval = api.requestHumanApproval({
+    action: "sendCustomerMessage",
+    summary: "Mock-send Amelia Brooks dispatch SMS.",
+    payload: { messageId: savedMessage.messageId }
+  });
+  api.approve(sendApproval.approvalId);
+  api.sendCustomerMessage({ messageId: savedMessage.messageId, approvalToken: sendApproval.token });
+  api.createCaseSummary({ ticketId: "TCK-1044" });
+  addEvent(event("Realtime Triage Agent", "summary", "Approved dispatch closed: customer text sent and final summary recorded."));
 }
 
 function replayRefundCancellation(api: CompanyApi) {

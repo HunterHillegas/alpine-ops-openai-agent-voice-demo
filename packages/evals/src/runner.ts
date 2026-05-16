@@ -73,6 +73,14 @@ function stateExpectationErrors(fixture: EvalFixture, state: CompanyState): stri
     errors.push(`expected ${expected.customerMessageCount} customer message record(s), saw ${state.customerMessages.length}`);
   }
 
+  if (expected.customerMessageStatuses) {
+    const statuses = state.customerMessages.map((message) => message.status).sort();
+    const expectedStatuses = [...expected.customerMessageStatuses].sort();
+    if (JSON.stringify(statuses) !== JSON.stringify(expectedStatuses)) {
+      errors.push(`expected customer message statuses ${expectedStatuses.join(",") || "none"}, saw ${statuses.join(",") || "none"}`);
+    }
+  }
+
   for (const [ticketId, status] of Object.entries(expected.ticketStatuses ?? {})) {
     const ticket = state.tickets.find((item) => item.ticketId === ticketId);
     if (ticket?.status !== status) errors.push(`expected ${ticketId} status ${status}, saw ${ticket?.status ?? "missing"}`);

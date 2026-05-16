@@ -4,6 +4,7 @@ import { scenarioTranscripts, type Approval, type CompanyState, type DemoScenari
 import { ActivityRail } from "./components/ActivityRail";
 import { TopBar, type ThemeId } from "./components/TopBar";
 import { companyClient } from "./lib/companyClient";
+import { dispatchSummaryText, ticketIdForCustomerMessage } from "./lib/dispatchSummary";
 import { scenarioForTextFallback } from "./lib/mockTextFallback";
 import type { AlpineRealtimeConsole, VoiceConnection } from "./lib/realtimeConsole";
 import type {
@@ -147,6 +148,7 @@ function App() {
 
   async function approveAndRun(approval: Approval) {
     const approved = await companyClient.approve(approval.approvalId);
+    let completionMessage = `${approved.action} completed in the mock system.`;
     if (approved.action === "createTicket") {
       await companyClient.createTicket(withApprovalToken<CreateTicketInput>(approved.payload, approved.token));
     }
@@ -192,10 +194,14 @@ function App() {
       });
     }
     if (approved.action === "sendCustomerMessage") {
+      const payload = approved.payload as { messageId: string };
       await companyClient.sendCustomerMessage(withApprovalToken<SendCustomerMessageInput>(approved.payload, approved.token));
+      const ticketId = ticketIdForCustomerMessage(state, payload.messageId);
+      const summary = ticketId ? await companyClient.createCaseSummary({ ticketId }) : undefined;
+      completionMessage = dispatchSummaryText(state, payload.messageId, summary);
     }
     await refresh();
-    setAssistantText(`${approved.action} completed in the mock system.`);
+    setAssistantText(completionMessage);
   }
 
   async function reject(approval: Approval) {

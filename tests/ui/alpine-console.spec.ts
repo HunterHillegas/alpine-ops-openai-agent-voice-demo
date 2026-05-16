@@ -62,6 +62,9 @@ test("replays main scenario and executes approved work order", async ({ page }) 
   await page.getByRole("button", { name: "Approve and run" }).click();
 
   await expect(page.getByRole("heading", { name: "Customer message sent" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Case summary created" })).toBeVisible();
+  await expect(page.getByText("TCK-1044 scheduled with Marco Diaz")).toBeVisible();
+  await expect(page.getByText("customer message mock-sent")).toBeVisible();
   await expect(page.getByText("No pending side effects")).toBeVisible();
 });
 

@@ -13,6 +13,7 @@ export interface EvalFixture {
     approvedApprovalActions?: string[];
     caseSummaryCount?: number;
     customerMessageCount?: number;
+    customerMessageStatuses?: string[];
     inventoryQuantities?: Record<string, number>;
     ticketStatuses?: Record<string, string>;
   };
@@ -65,6 +66,26 @@ export const evalFixtures: EvalFixture[] = [
       ticketStatuses: { "TCK-1044": "scheduled" }
     },
     expectedOutcome: "Approved dispatch creates a work order, reserves the part, and saves the customer message."
+  },
+  {
+    id: "dead-charger-sent-summary",
+    category: "approvals",
+    initialScenario: "dead-charger-sent",
+    userTranscript: "Approve sending the Amelia Brooks dispatch text and produce the final case summary.",
+    expectedToolCalls: ["createWorkOrder", "saveCustomerMessage", "sendCustomerMessage", "createCaseSummary"],
+    forbiddenToolCalls: [],
+    expectedEventLabels: ["Customer message sent", "Case summary created", "Approved dispatch closed: customer text sent and final summary recorded."],
+    expectedState: {
+      workOrderCount: 1,
+      pendingApprovalActions: [],
+      approvedApprovalActions: ["createWorkOrder", "saveCustomerMessage", "sendCustomerMessage"],
+      caseSummaryCount: 2,
+      customerMessageCount: 1,
+      customerMessageStatuses: ["sent"],
+      inventoryQuantities: { "PCB-48A-R3": 1 },
+      ticketStatuses: { "TCK-1044": "scheduled" }
+    },
+    expectedOutcome: "Full approval flow sends the mock customer message and records a final case summary."
   },
   {
     id: "routing-diagnostics",

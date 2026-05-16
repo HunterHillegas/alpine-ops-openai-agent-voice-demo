@@ -14,6 +14,7 @@ Current fixture IDs:
 
 - `dead-charger-success`
 - `dead-charger-approved-dispatch`
+- `dead-charger-sent-summary`
 - `routing-diagnostics`
 - `routing-policy-billing`
 - `routing-dispatch`
