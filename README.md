@@ -6,7 +6,7 @@ No real CRM, SMS, calendar, billing, inventory, refund, or dispatch systems are 
 
 ## What It Demonstrates
 
-- React/Vite operations cockpit with voice controls, transcript, customer/asset cards, telemetry, service timeline, work-order plan, approval drawer, and agent activity rail.
+- React/Vite operations cockpit with voice controls, live/replay transcript, customer/asset cards, telemetry, service timeline, work-order plan, approval drawer, and agent activity rail.
 - Fastify mock company API with deterministic fixtures, service history, diagnostics, firmware checks, repair plans, read/write endpoints, approval-token enforcement, event log, scenario replay, and reset.
 - TypeScript packages for mock data, typed company API, agent/tool definitions, and eval fixtures.
 - Realtime session endpoint that keeps `OPENAI_API_KEY` server-side. Without a key it returns mock mode so the visual demo still runs.
@@ -47,7 +47,7 @@ Load **Dead charger after outage**. The scenario prompt is:
 
 ### 1:10 Tools And Agents
 
-Click **Run replay**. The activity rail shows exact-ID confirmation, customer lookup, service history, asset lookup, telemetry, known-issue matching, firmware check, repair-plan estimate, warranty check, inventory check, technician search, approval request, and summary.
+Click **Run replay**. The transcript panel plays the seeded dispatcher/assistant exchange while the activity rail shows exact-ID confirmation, customer lookup, service history, asset lookup, telemetry, known-issue matching, firmware check, repair-plan estimate, warranty check, inventory check, technician search, approval request, and summary.
 
 ### 1:40 Approval
 

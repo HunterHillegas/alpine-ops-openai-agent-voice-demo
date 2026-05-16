@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { realtimeModel } from "@alpine/agents";
-import type { Approval, CompanyState, DemoScenario, EventLogEntry } from "@alpine/mock-data";
+import { scenarioTranscripts, type Approval, type CompanyState, type DemoScenario, type EventLogEntry, type TranscriptTurn } from "@alpine/mock-data";
 import { companyClient } from "./lib/companyClient";
 import type { AlpineRealtimeConsole, VoiceConnection } from "./lib/realtimeConsole";
 import "./styles.css";
@@ -14,6 +14,7 @@ function App() {
   const [connection, setConnection] = useState<VoiceConnection>("disconnected");
   const [userText, setUserText] = useState("");
   const [assistantText, setAssistantText] = useState("Ready for a dispatch request. Load a scenario or connect voice.");
+  const [transcriptTurns, setTranscriptTurns] = useState<TranscriptTurn[]>([]);
   const [error, setError] = useState<string | null>(null);
   const realtimeRef = useRef<AlpineRealtimeConsole | null>(null);
 
@@ -69,13 +70,16 @@ function App() {
   async function resetDemo() {
     const next = await companyClient.reset(scenarioId);
     setState(next);
+    setTranscriptTurns([]);
     setAssistantText("Demo data reset. Scenario seed restored.");
   }
 
   async function replay() {
     const next = await companyClient.replay(scenarioId);
+    const replayTranscript = scenarioTranscripts[scenarioId] ?? [];
     setState(next);
-    setAssistantText(next.events[0]?.label ?? "Scenario replay loaded.");
+    setTranscriptTurns(replayTranscript);
+    setAssistantText(replayTranscript.findLast((turn) => turn.speaker === "assistant")?.text ?? next.events[0]?.label ?? "Scenario replay loaded.");
   }
 
   async function submitTextFallback(event: React.FormEvent) {
@@ -163,6 +167,7 @@ function App() {
           userText={userText}
           setUserText={setUserText}
           assistantText={assistantText}
+          transcriptTurns={transcriptTurns}
           selectedScenario={selectedScenario}
           onSubmitTextFallback={submitTextFallback}
         />
@@ -214,6 +219,7 @@ function VoicePanel(props: {
   userText: string;
   setUserText: (value: string) => void;
   assistantText: string;
+  transcriptTurns: TranscriptTurn[];
   selectedScenario: DemoScenario | undefined;
   onSubmitTextFallback: (event: React.FormEvent) => void;
 }) {
@@ -235,6 +241,14 @@ function VoicePanel(props: {
         <label>User transcript</label>
         <p>{props.selectedScenario?.openingPrompt ?? "No scenario loaded."}</p>
       </div>
+      {props.transcriptTurns.length > 0 && (
+        <div className="transcript transcript-feed">
+          <label>Replay transcript</label>
+          {props.transcriptTurns.map((turn, index) => (
+            <p key={turn.speaker + index}><b>{turn.speaker}</b>{turn.text}</p>
+          ))}
+        </div>
+      )}
       <div className="transcript assistant">
         <label>Assistant spoken response</label>
         <p>{props.assistantText}</p>

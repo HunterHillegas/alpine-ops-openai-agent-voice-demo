@@ -26,6 +26,8 @@ test("replays main scenario and executes approved work order", async ({ page }) 
   await expect(page.getByText("createWorkOrder", { exact: true })).toBeVisible();
   await expect(page.getByText('"assetId"').first()).toBeVisible();
   await expect(page.getByText('"CHG-8821"').first()).toBeVisible();
+  await expect(page.getByText("Replay transcript")).toBeVisible();
+  await expect(page.locator(".transcript-feed").getByText("I found active warranty coverage")).toBeVisible();
 
   await page.getByRole("button", { name: "Approve and run" }).click();
 

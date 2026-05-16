@@ -1,4 +1,5 @@
 export type ContactChannel = "sms" | "email" | "phone";
+export { scenarioTranscripts, type TranscriptTurn } from "./transcripts";
 export type TicketStatus = "open" | "triaged" | "scheduled" | "cancelled" | "resolved";
 export type WorkOrderStatus = "proposed" | "scheduled" | "cancelled" | "complete";
 export type ApprovalStatus = "pending" | "approved" | "rejected";

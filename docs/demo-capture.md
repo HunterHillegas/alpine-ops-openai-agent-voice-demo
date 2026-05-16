@@ -13,7 +13,7 @@ npm run dev:web
 
 2. Open `http://localhost:5173`.
 3. Select **Dead charger after outage**.
-4. Click **Run replay**.
+4. Click **Run replay** and show the seeded transcript playback.
 5. Approve the work order in the drawer.
 6. Capture the full page with browser tooling.
 
@@ -26,7 +26,7 @@ Suggested sequence:
 1. Show the dashboard before replay.
 2. Click **Connect voice** to show mock or live status.
 3. Click **Run replay**.
-4. Pause on the activity rail.
+4. Pause on the replay transcript and activity rail.
 5. Approve the work order.
 6. Switch to **Unclear audio / exact ID recovery** and run replay.
 7. End on the guardrail event.
@@ -41,4 +41,4 @@ For automated UI proof, run:
 npm run test:ui
 ~~~
 
-The test suite covers initial render, replay, approval execution, mock voice fallback, unclear-ID guardrail, and scenario-focused workspace.
+The test suite covers initial render, replay transcript playback, approval execution, mock voice fallback, unclear-ID guardrail, and scenario-focused workspace.

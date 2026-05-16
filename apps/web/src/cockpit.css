@@ -186,6 +186,22 @@ dd {
   color: var(--accent-2);
 }
 
+.transcript-feed {
+  max-height: 220px;
+  overflow: auto;
+}
+
+.transcript-feed p {
+  display: grid;
+  grid-template-columns: 82px 1fr;
+  gap: 8px;
+}
+
+.transcript-feed b {
+  color: var(--accent-2);
+  text-transform: capitalize;
+}
+
 .activity-rail {
   overflow: hidden;
 }
