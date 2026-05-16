@@ -143,7 +143,22 @@ function App() {
       await companyClient.updateTicket({ ...(approved.payload as object), approvalToken: approved.token });
     }
     if (approved.action === "createWorkOrder") {
-      await companyClient.createWorkOrder({ ...(approved.payload as object), approvalToken: approved.token });
+      const workOrder = await companyClient.createWorkOrder({ ...(approved.payload as object), approvalToken: approved.token }) as { workOrderId: string };
+      const workOrderPayload = approved.payload as { ticketId?: string };
+      const ticketForMessage = state?.tickets.find((item) => item.ticketId === workOrderPayload.ticketId);
+      if (ticketForMessage) {
+        const draft = await companyClient.draftCustomerMessage({
+          customerId: ticketForMessage.customerId,
+          workOrderId: workOrder.workOrderId,
+          channel: "sms",
+          topic: "scheduled warranty repair"
+        }) as { body: string };
+        await companyClient.requestHumanApproval({
+          action: "saveCustomerMessage",
+          summary: "Save the customer SMS draft for the approved dispatch.",
+          payload: { customerId: ticketForMessage.customerId, channel: "sms", body: draft.body }
+        });
+      }
     }
     if (approved.action === "cancelAppointment") {
       await companyClient.cancelAppointment({ ...(approved.payload as object), approvalToken: approved.token });

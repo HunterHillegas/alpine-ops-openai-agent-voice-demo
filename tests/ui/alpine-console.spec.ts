@@ -47,9 +47,16 @@ test("replays main scenario and executes approved work order", async ({ page }) 
 
   await expect(page.getByRole("heading", { name: "Work order created" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Part reserved" })).toBeVisible();
-  await expect(page.getByText("No pending side effects")).toBeVisible();
   await expect(page.getByRole("heading", { name: "1 local" })).toBeVisible();
   await expect(page.getByText(/WO-\d{4}/).first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Customer message drafted" })).toBeVisible();
+  await expect(page.getByText("saveCustomerMessage", { exact: true })).toBeVisible();
+  await expect(page.getByText("1 pending")).toBeVisible();
+
+  await page.getByRole("button", { name: "Approve and run" }).click();
+
+  await expect(page.getByRole("heading", { name: "Customer message saved" })).toBeVisible();
+  await expect(page.getByText("No pending side effects")).toBeVisible();
 });
 
 test("mock voice connection and text fallback run seeded replay without an API key", async ({ page }) => {

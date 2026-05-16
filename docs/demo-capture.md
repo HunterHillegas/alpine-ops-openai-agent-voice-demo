@@ -15,7 +15,8 @@ npm run dev:web
 3. Select **Dead charger after outage**.
 4. Click **Run replay** and show the seeded transcript playback.
 5. Approve the work order in the drawer and show the part inventory drop.
-6. Capture the full page with browser tooling.
+6. Approve the queued customer-message save card.
+7. Capture the full page with browser tooling.
 
 Recommended filename: `docs/media/alpine-fieldops-console.png`.
 
@@ -27,7 +28,7 @@ Suggested sequence:
 2. Click **Connect voice** to show mock or live status.
 3. Click **Run replay**.
 4. Pause on the replay transcript and activity rail.
-5. Approve the work order.
+5. Approve the work order and then the customer-message save card.
 6. Switch to **Unclear audio / exact ID recovery** and run replay.
 7. End on the guardrail event.
 
