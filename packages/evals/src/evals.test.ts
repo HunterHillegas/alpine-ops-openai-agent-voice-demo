@@ -139,6 +139,19 @@ describe("eval fixtures", () => {
     }
   });
 
+  it("enforces tool-call counts when a scenario requires one retry", () => {
+    const retryFixture = evalFixtures.find((fixture) => fixture.id === "tool-failure-retry-once");
+    expect(retryFixture?.expectedToolCounts).toEqual({ getAsset: 2 });
+
+    const api = createCompanyApi();
+    const replay = api.replayScenario("tool-failure-retry-once");
+
+    expect(replay.ok).toBe(true);
+    if (!replay.ok) return;
+    const toolCalls = replay.data.events.filter((event) => event.type === "tool_call").flatMap((event) => event.toolName ? [event.toolName] : []);
+    expect(toolCalls.filter((toolName) => toolName === "getAsset")).toHaveLength(2);
+  });
+
   it("orders the main read-only investigation before approval requests", () => {
     const api = createCompanyApi();
     const replay = api.replayScenario("dead-charger-outage");

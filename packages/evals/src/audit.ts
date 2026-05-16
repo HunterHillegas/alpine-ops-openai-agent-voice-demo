@@ -23,7 +23,7 @@ export function runCompletionAudit(env: NodeJS.ProcessEnv = process.env): Comple
     passed("specialist-tools", "Realtime agent handoffs expose Customer Context, Diagnostics, Dispatch, Policy/Billing, and Message Composer tools."),
     passed("approval-gates", "Eval tests cover approval-token enforcement for work orders, tickets, notes, and customer messages; realtime approval tool responses do not expose tokens to the model."),
     passed("exact-entity-capture", "Eval tests cover exact asset ID, ticket ID, appointment window, phone, and email normalization with partial-value rejection."),
-    passed("replayable-scenarios", "Eval runner verifies eleven fixtures across routing, tool use, approvals, exact entity capture, failure handling, approved writes, and final mock state."),
+    passed("replayable-scenarios", "Eval runner verifies eleven fixtures across routing, tool use, tool-call counts, approvals, exact entity capture, failure handling, approved writes, and final mock state."),
     passed("docs", "README plus docs/architecture.md, docs/evals.md, docs/live-voice-verification.md, docs/demo-capture.md, docs/deployment.md, and docs/troubleshooting.md cover local-first use."),
     passed("oss-license", "The repo includes an MIT LICENSE file and root package metadata declares MIT."),
     env.OPENAI_API_KEY

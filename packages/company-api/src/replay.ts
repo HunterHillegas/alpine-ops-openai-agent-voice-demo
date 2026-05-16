@@ -129,10 +129,16 @@ function replayPartOutOfStock(api: CompanyApi, addEvent: (entry: EventLogEntry) 
 }
 
 function replayToolFailure(api: CompanyApi, addEvent: (entry: EventLogEntry) => EventLogEntry) {
-  const result = api.getAsset("CHG-0000");
-  if (!result.ok) addEvent(event("Customer Context Agent", "failure", "Asset lookup failed; ask for corrected exact ID", {
+  const first = api.getAsset("CHG-0000");
+  if (!first.ok) addEvent(event("Customer Context Agent", "failure", "Asset lookup failed; retry once", {
     toolName: "getAsset",
     args: { assetId: "CHG-0000" },
-    error: result.message
+    error: first.message
+  }));
+  const second = api.getAsset("CHG-0000");
+  if (!second.ok) addEvent(event("Customer Context Agent", "failure", "Asset lookup retry failed; ask for corrected exact ID", {
+    toolName: "getAsset",
+    args: { assetId: "CHG-0000", retry: 1 },
+    error: second.message
   }));
 }

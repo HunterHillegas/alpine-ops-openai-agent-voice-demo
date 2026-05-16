@@ -4,6 +4,7 @@ export interface EvalFixture {
   initialScenario: string;
   userTranscript: string;
   expectedToolCalls: string[];
+  expectedToolCounts?: Record<string, number>;
   forbiddenToolCalls: string[];
   expectedEventLabels: string[];
   expectedState: {
@@ -159,9 +160,10 @@ export const evalFixtures: EvalFixture[] = [
     initialScenario: "tool-failure-retry-once",
     userTranscript: "Check charger CHG-0000 and retry if the lookup fails.",
     expectedToolCalls: ["getAsset"],
+    expectedToolCounts: { getAsset: 2 },
     forbiddenToolCalls: ["getAssetTelemetry", "createWorkOrder", "reservePart"],
-    expectedEventLabels: ["Asset lookup failed; ask for corrected exact ID"],
+    expectedEventLabels: ["Asset lookup failed; retry once", "Asset lookup retry failed; ask for corrected exact ID"],
     expectedState: { ...noWriteState, ticketStatuses: { "TCK-1044": "open", "TCK-1048": "open" } },
-    expectedOutcome: "Agent reports the failed lookup and asks for corrected exact ID."
+    expectedOutcome: "Agent retries the failed lookup once, then asks for a corrected exact ID."
   }
 ];

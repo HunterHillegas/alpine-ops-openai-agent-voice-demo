@@ -20,20 +20,29 @@ export function runEvalFixtures(fixtures: EvalFixture[] = evalFixtures): EvalRes
 
     const labels = replay.data.events.map((event) => event.label);
     const tools = replay.data.events.flatMap((event) => event.toolName ? [event.toolName] : []);
-    const missingTools = fixture.expectedToolCalls.filter((toolName) => !tools.includes(toolName));
-    const forbiddenToolsSeen = fixture.forbiddenToolCalls.filter((toolName) => tools.includes(toolName));
-    const missingLabels = fixture.expectedEventLabels.filter((label) => !labels.includes(label));
-    const stateErrors = stateExpectationErrors(fixture, replay.data);
+  const missingTools = fixture.expectedToolCalls.filter((toolName) => !tools.includes(toolName));
+  const forbiddenToolsSeen = fixture.forbiddenToolCalls.filter((toolName) => tools.includes(toolName));
+  const countedTools = replay.data.events.filter((event) => event.type === "tool_call").flatMap((event) => event.toolName ? [event.toolName] : []);
+  const toolCountErrors = toolCountExpectationErrors(fixture, countedTools);
+  const missingLabels = fixture.expectedEventLabels.filter((label) => !labels.includes(label));
+  const stateErrors = stateExpectationErrors(fixture, replay.data);
 
-    return {
-      id: fixture.id,
-      passed: !missingTools.length && !forbiddenToolsSeen.length && !missingLabels.length && !stateErrors.length,
-      missingTools,
+  return {
+    id: fixture.id,
+    passed: !missingTools.length && !forbiddenToolsSeen.length && !toolCountErrors.length && !missingLabels.length && !stateErrors.length,
+    missingTools: [...missingTools, ...toolCountErrors],
       forbiddenToolsSeen,
       missingLabels,
       stateErrors,
       outcome: fixture.expectedOutcome
     };
+  });
+}
+
+function toolCountExpectationErrors(fixture: EvalFixture, tools: string[]): string[] {
+  return Object.entries(fixture.expectedToolCounts ?? {}).flatMap(([toolName, expectedCount]) => {
+    const actualCount = tools.filter((item) => item === toolName).length;
+    return actualCount === expectedCount ? [] : [`expected ${toolName} ${expectedCount} time(s), saw ${actualCount}`];
   });
 }
 
