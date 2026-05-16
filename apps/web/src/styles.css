@@ -12,6 +12,22 @@
   --danger: #ff7468;
   --cyan: #7bdff2;
   --shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+  --page-bg:
+    radial-gradient(circle at 18% 16%, rgba(126, 231, 135, 0.18), transparent 30%),
+    radial-gradient(circle at 86% 8%, rgba(123, 223, 242, 0.14), transparent 34%),
+    linear-gradient(135deg, #07100e 0%, #0b1714 46%, #11100b 100%);
+  --chrome-bg: rgba(5, 13, 11, 0.72);
+  --control-bg: rgba(255, 255, 255, 0.06);
+  --control-hover-border: rgba(126, 231, 135, 0.44);
+  --primary-text: #08210d;
+  --field-bg: rgba(0, 0, 0, 0.25);
+  --raised-bg: rgba(255, 255, 255, 0.035);
+  --inset-bg: rgba(0, 0, 0, 0.16);
+  --copy-strong: #d9e9de;
+  --brand-bg: linear-gradient(145deg, rgba(126, 231, 135, 0.24), rgba(246, 198, 91, 0.1));
+  --brand-border: rgba(126, 231, 135, 0.42);
+  --radius: 8px;
+  --radius-lg: 10px;
   font-family: "Avenir Next", "IBM Plex Sans", "Helvetica Neue", sans-serif;
 }
 
@@ -23,10 +39,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 18% 16%, rgba(126, 231, 135, 0.18), transparent 30%),
-    radial-gradient(circle at 86% 8%, rgba(123, 223, 242, 0.14), transparent 34%),
-    linear-gradient(135deg, #07100e 0%, #0b1714 46%, #11100b 100%);
+  background: var(--page-bg);
   color: var(--text);
 }
 
@@ -39,8 +52,8 @@ input {
 button,
 select {
   border: 1px solid var(--line);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius);
+  background: var(--control-bg);
   color: var(--text);
   padding: 0.7rem 0.9rem;
 }
@@ -52,7 +65,7 @@ button {
 
 button:hover {
   transform: translateY(-1px);
-  border-color: rgba(126, 231, 135, 0.44);
+  border-color: var(--control-hover-border);
 }
 
 .boot {
@@ -75,8 +88,8 @@ button:hover {
   justify-content: space-between;
   gap: 18px;
   border: 1px solid var(--line);
-  border-radius: 10px;
-  background: rgba(5, 13, 11, 0.72);
+  border-radius: var(--radius-lg);
+  background: var(--chrome-bg);
   box-shadow: var(--shadow);
   padding: 14px;
 }
@@ -102,9 +115,9 @@ button:hover {
   width: 46px;
   height: 46px;
   place-items: center;
-  border: 1px solid rgba(126, 231, 135, 0.42);
-  border-radius: 9px;
-  background: linear-gradient(145deg, rgba(126, 231, 135, 0.24), rgba(246, 198, 91, 0.1));
+  border: 1px solid var(--brand-border);
+  border-radius: var(--radius);
+  background: var(--brand-bg);
   color: var(--accent);
   font-weight: 800;
 }
@@ -147,6 +160,20 @@ button:hover {
   gap: 8px;
 }
 
+.theme-picker {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.theme-picker span {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .status-pill,
 .model-pill,
 .priority {
@@ -170,7 +197,7 @@ button:hover {
 
 .primary-action {
   background: var(--accent);
-  color: #08210d;
+  color: var(--primary-text);
   font-weight: 800;
 }
 
@@ -195,7 +222,7 @@ button:hover {
 .workspace,
 .approval-drawer {
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   background: var(--panel);
   box-shadow: var(--shadow);
 }
@@ -289,8 +316,8 @@ button:hover {
   gap: 6px 10px;
   margin-top: 12px;
   border: 1px solid rgba(177, 224, 194, 0.14);
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.16);
+  border-radius: var(--radius);
+  background: var(--inset-bg);
   padding: 10px;
 }
 
@@ -303,20 +330,20 @@ button:hover {
 
 .barge-indicator p {
   margin: 0;
-  color: #d9e9de;
+  color: var(--copy-strong);
 }
 
 .transcript {
   margin-top: 14px;
   border: 1px solid var(--line);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.035);
+  border-radius: var(--radius);
+  background: var(--raised-bg);
   padding: 12px;
 }
 
 .transcript p {
   margin-top: 8px;
-  color: #d9e9de;
+  color: var(--copy-strong);
   line-height: 1.45;
 }
 
@@ -335,8 +362,8 @@ button:hover {
   min-width: 0;
   flex: 1;
   border: 1px solid var(--line);
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.25);
+  border-radius: var(--radius);
+  background: var(--field-bg);
   color: var(--text);
   padding: 0.75rem;
 }

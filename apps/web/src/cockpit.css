@@ -35,8 +35,8 @@
 .schedule-panel,
 .plan-panel {
   border: 1px solid var(--line);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.045);
+  border-radius: var(--radius);
+  background: var(--raised-bg);
   padding: 13px;
 }
 
@@ -130,7 +130,7 @@ dd {
   display: grid;
   grid-template-columns: 52px 1fr;
   gap: 10px;
-  color: #dbece0;
+  color: var(--copy-strong);
 }
 
 .timeline-panel li span {
@@ -149,7 +149,7 @@ dd {
 
 .policy-panel li {
   border-left: 2px solid rgba(126, 231, 135, 0.5);
-  color: #dbece0;
+  color: var(--copy-strong);
   padding-left: 9px;
 }
 
@@ -216,8 +216,8 @@ dd {
 
 .event-card {
   border: 1px solid var(--line);
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.18);
+  border-radius: var(--radius);
+  background: var(--inset-bg);
   padding: 11px;
 }
 
@@ -245,9 +245,9 @@ dd {
   margin-top: 8px;
   overflow: auto;
   border: 1px solid rgba(177, 224, 194, 0.14);
-  border-radius: 7px;
-  background: rgba(5, 13, 11, 0.58);
-  color: #cfe3d6;
+  border-radius: var(--radius);
+  background: var(--field-bg);
+  color: var(--copy-strong);
   font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
   font-size: 0.72rem;
   line-height: 1.45;
@@ -296,7 +296,7 @@ dd {
 .approval-list article {
   min-width: min(460px, 80vw);
   border: 1px solid rgba(246, 198, 91, 0.35);
-  border-radius: 8px;
+  border-radius: var(--radius);
   background: rgba(246, 198, 91, 0.08);
   padding: 10px;
 }

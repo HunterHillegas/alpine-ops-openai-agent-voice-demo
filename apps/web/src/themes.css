@@ -1,0 +1,157 @@
+html[data-theme="nextstep"] {
+  color-scheme: dark;
+  --bg: #151719;
+  --bg-2: #202428;
+  --panel: rgba(45, 49, 52, 0.94);
+  --panel-strong: #363b40;
+  --line: rgba(255, 255, 255, 0.24);
+  --text: #f5f4ee;
+  --muted: #bec3c7;
+  --accent: #00a9c8;
+  --accent-2: #f0c66a;
+  --danger: #ff7a6e;
+  --cyan: #5cc7d8;
+  --shadow: 0 18px 46px rgba(0, 0, 0, 0.5);
+  --page-bg:
+    radial-gradient(circle at 20% 12%, rgba(255, 255, 255, 0.09), transparent 28%),
+    linear-gradient(135deg, #101214 0%, #2b3034 46%, #111315 100%);
+  --chrome-bg: linear-gradient(180deg, rgba(61, 66, 70, 0.96), rgba(33, 36, 39, 0.96));
+  --control-bg: linear-gradient(180deg, #4b5156, #24282b);
+  --control-hover-border: rgba(240, 198, 106, 0.72);
+  --primary-text: #091215;
+  --field-bg: #171a1d;
+  --raised-bg: rgba(255, 255, 255, 0.07);
+  --inset-bg: rgba(0, 0, 0, 0.28);
+  --copy-strong: #ecebe5;
+  --brand-bg: linear-gradient(145deg, #495057, #1f2427);
+  --brand-border: rgba(255, 255, 255, 0.32);
+  --radius: 4px;
+  --radius-lg: 5px;
+  font-family: "Avenir Next", "Helvetica Neue", Helvetica, sans-serif;
+}
+
+html[data-theme="platinum"] {
+  color-scheme: light;
+  --bg: #b9b9b9;
+  --bg-2: #d7d7d7;
+  --panel: #d6d6d6;
+  --panel-strong: #e5e5e5;
+  --line: #777;
+  --text: #121212;
+  --muted: #474747;
+  --accent: #1e4fbf;
+  --accent-2: #7a3b9a;
+  --danger: #b82018;
+  --cyan: #006c79;
+  --shadow: 0 2px 0 #777, 0 18px 32px rgba(0, 0, 0, 0.18);
+  --page-bg:
+    linear-gradient(45deg, rgba(255, 255, 255, 0.22) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255, 255, 255, 0.22) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(0, 0, 0, 0.08) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(0, 0, 0, 0.08) 75%),
+    #bfc1c2;
+  --chrome-bg: linear-gradient(180deg, #f1f1f1, #c9c9c9);
+  --control-bg: #dcdcdc;
+  --control-hover-border: #1e4fbf;
+  --primary-text: #fff;
+  --field-bg: #fff;
+  --raised-bg: #e2e2e2;
+  --inset-bg: #c9c9c9;
+  --copy-strong: #1d1d1d;
+  --brand-bg: linear-gradient(135deg, #f7f7f7, #b9b9b9);
+  --brand-border: #555;
+  --radius: 2px;
+  --radius-lg: 2px;
+  font-family: Charcoal, Chicago, Geneva, "Avenir Next", sans-serif;
+}
+
+html[data-theme="platinum"] body {
+  background-size: 18px 18px;
+}
+
+html[data-theme="nextstep"] .topbar,
+html[data-theme="nextstep"] .panel,
+html[data-theme="nextstep"] .workspace,
+html[data-theme="nextstep"] .approval-drawer,
+html[data-theme="nextstep"] .info-panel,
+html[data-theme="nextstep"] .chart-panel,
+html[data-theme="nextstep"] .timeline-panel,
+html[data-theme="nextstep"] .policy-panel,
+html[data-theme="nextstep"] .schedule-panel,
+html[data-theme="nextstep"] .plan-panel,
+html[data-theme="nextstep"] .event-card,
+html[data-theme="nextstep"] .transcript,
+html[data-theme="nextstep"] .barge-indicator {
+  box-shadow:
+    inset 1px 1px rgba(255, 255, 255, 0.18),
+    inset -1px -1px rgba(0, 0, 0, 0.54),
+    var(--shadow);
+}
+
+html[data-theme="nextstep"] button,
+html[data-theme="nextstep"] select {
+  box-shadow:
+    inset 1px 1px rgba(255, 255, 255, 0.24),
+    inset -1px -1px rgba(0, 0, 0, 0.62);
+}
+
+html[data-theme="nextstep"] .primary-action {
+  background: linear-gradient(180deg, #43d5eb, #0086a0);
+}
+
+html[data-theme="platinum"] .topbar,
+html[data-theme="platinum"] .panel,
+html[data-theme="platinum"] .workspace,
+html[data-theme="platinum"] .approval-drawer,
+html[data-theme="platinum"] .info-panel,
+html[data-theme="platinum"] .chart-panel,
+html[data-theme="platinum"] .timeline-panel,
+html[data-theme="platinum"] .policy-panel,
+html[data-theme="platinum"] .schedule-panel,
+html[data-theme="platinum"] .plan-panel,
+html[data-theme="platinum"] .event-card,
+html[data-theme="platinum"] .transcript,
+html[data-theme="platinum"] .barge-indicator {
+  box-shadow:
+    inset 1px 1px #fff,
+    inset -1px -1px #767676,
+    var(--shadow);
+}
+
+html[data-theme="platinum"] button,
+html[data-theme="platinum"] select,
+html[data-theme="platinum"] input {
+  box-shadow:
+    inset 1px 1px #fff,
+    inset -1px -1px #6d6d6d;
+}
+
+html[data-theme="platinum"] .primary-action {
+  background: #1e4fbf;
+}
+
+html[data-theme="platinum"] .voice-orb {
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.72), transparent 54%),
+    repeating-conic-gradient(from 0deg, #f0f0f0 0deg 12deg, #b7b7b7 12deg 24deg);
+  box-shadow:
+    inset 2px 2px #fff,
+    inset -2px -2px #747474,
+    0 0 0 2px #9a9a9a;
+}
+
+html[data-theme="platinum"] .bar {
+  background: linear-gradient(180deg, #7a3b9a, #1e4fbf);
+}
+
+html[data-theme="platinum"] .assistant {
+  border-color: #1e4fbf;
+}
+
+html[data-theme="platinum"] .policy-panel li {
+  border-left-color: #1e4fbf;
+}
+
+html[data-theme="platinum"] .approval-list article {
+  background: #efe3bc;
+}

@@ -1,16 +1,18 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { realtimeModel } from "@alpine/agents";
 import { scenarioTranscripts, type Approval, type CompanyState, type DemoScenario, type EventLogEntry, type TranscriptTurn } from "@alpine/mock-data";
+import { TopBar, type ThemeId } from "./components/TopBar";
 import { companyClient } from "./lib/companyClient";
 import type { AlpineRealtimeConsole, VoiceConnection } from "./lib/realtimeConsole";
 import "./styles.css";
 import "./cockpit.css";
+import "./themes.css";
 
 function App() {
   const [state, setState] = useState<CompanyState | null>(null);
   const [scenarios, setScenarios] = useState<DemoScenario[]>([]);
   const [scenarioId, setScenarioId] = useState("dead-charger-outage");
+  const [theme, setTheme] = useState<ThemeId>("nextstep");
   const [connection, setConnection] = useState<VoiceConnection>("disconnected");
   const [userText, setUserText] = useState("");
   const [assistantText, setAssistantText] = useState("Ready for a dispatch request. Load a scenario or connect voice.");
@@ -26,6 +28,13 @@ function App() {
   }, []);
 
   useEffect(() => () => realtimeRef.current?.disconnect(), []);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    return () => {
+      delete document.documentElement.dataset.theme;
+    };
+  }, [theme]);
 
   const selectedScenario = scenarios.find((scenario) => scenario.id === scenarioId);
   const customer = useMemo(() => {
@@ -72,9 +81,9 @@ function App() {
   async function resetDemo() {
     const next = await companyClient.reset(scenarioId);
     setState(next);
-      setTranscriptTurns([]);
-      setBargeInStatus("Idle");
-      setAssistantText("Demo data reset. Scenario seed restored.");
+    setTranscriptTurns([]);
+    setBargeInStatus("Idle");
+    setAssistantText("Demo data reset. Scenario seed restored.");
   }
 
   async function replay() {
@@ -149,16 +158,18 @@ function App() {
   }
 
   if (!state) {
-    return <main className="boot">Alpine FieldOps booting console...</main>;
+    return <main className="boot" data-theme={theme}>Alpine FieldOps booting console...</main>;
   }
 
   return (
-    <main className="app-shell">
+    <main className="app-shell" data-theme={theme}>
       <TopBar
         connection={connection}
         scenarioId={scenarioId}
         scenarios={scenarios}
         setScenarioId={setScenarioId}
+        theme={theme}
+        setTheme={setTheme}
         onConnect={connectVoice}
         onReset={resetDemo}
         onReplay={replay}
@@ -185,40 +196,6 @@ function App() {
 
       <ApprovalDrawer approvals={pendingApprovals} onApprove={approveAndRun} onReject={reject} />
     </main>
-  );
-}
-
-function TopBar(props: {
-  connection: string;
-  scenarioId: string;
-  scenarios: DemoScenario[];
-  setScenarioId: (id: string) => void;
-  onConnect: () => void;
-  onReset: () => void;
-  onReplay: () => void;
-}) {
-  return (
-    <header className="topbar">
-      <div className="brand">
-        <div className="brand-mark">AF</div>
-        <div>
-          <h1>Alpine FieldOps</h1>
-          <p>Voice Console</p>
-        </div>
-      </div>
-      <div className="topbar-controls">
-        <span className={`status-pill ${props.connection}`}>{props.connection}</span>
-        <span className="model-pill">{realtimeModel.model} · {realtimeModel.reasoning.effort}</span>
-        <select value={props.scenarioId} onChange={(event) => props.setScenarioId(event.target.value)} aria-label="Load scenario">
-          {props.scenarios.map((scenario) => (
-            <option key={scenario.id} value={scenario.id}>{scenario.name}</option>
-          ))}
-        </select>
-        <button onClick={props.onReplay}>Run replay</button>
-        <button onClick={props.onReset}>Reset data</button>
-        <button className="primary-action" onClick={props.onConnect}>{props.connection === "live" || props.connection === "mock" ? "Disconnect" : "Connect voice"}</button>
-      </div>
-    </header>
   );
 }
 

@@ -6,7 +6,7 @@ No real CRM, SMS, calendar, billing, inventory, refund, or dispatch systems are 
 
 ## What It Demonstrates
 
-- React/Vite operations cockpit with voice controls, live/replay transcript, customer/asset cards, telemetry, service timeline, work-order plan, approval drawer, and agent activity rail.
+- React/Vite operations cockpit with voice controls, switchable NeXTStep and MacOS 8 Platinum themes, live/replay transcript, customer/asset cards, telemetry, service timeline, work-order plan, approval drawer, and agent activity rail.
 - Fastify mock company API with deterministic fixtures, service history, diagnostics, firmware checks, repair plans, read/write endpoints, approval-token enforcement, event log, scenario replay, and reset.
 - TypeScript packages for mock data, typed company API, agent/tool definitions, and eval fixtures.
 - Realtime session endpoint that keeps `OPENAI_API_KEY` server-side. Without a key it returns mock mode so the visual demo still runs.
@@ -33,7 +33,7 @@ The browser does not receive the API key. `apps/api` mints a realtime client sec
 
 ### 0:00 Launch
 
-Open the dashboard. Point out Alpine FieldOps, connection state, model indicator, seeded scenario picker, reset button, and replay button.
+Open the dashboard. Point out Alpine FieldOps, connection state, model indicator, default NeXTStep theme, theme picker, seeded scenario picker, reset button, and replay button.
 
 ### 0:20 Start Voice Session
 
