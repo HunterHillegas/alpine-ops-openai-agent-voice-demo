@@ -51,11 +51,11 @@ Click **Run replay**. The transcript panel plays the seeded dispatcher/assistant
 
 ### 1:40 Approval
 
-Use the bottom approval drawer to approve the proposed work order. The mock API then creates the work order, reserves the listed part, updates the ticket, drafts the customer SMS, and queues a second approval to save the message.
+Use the bottom approval drawer to approve the proposed work order. The mock API then creates the work order, reserves the listed part, updates the ticket, drafts the customer SMS, and queues follow-up approvals to save and mock-send the message.
 
 ### 2:00 Customer Message
 
-Approve the customer-message card to save the grounded follow-up text. Message send remains mocked and approval-gated in the agent/tool contract.
+Approve the customer-message card to save the grounded follow-up text, then approve the mocked send card. No real SMS is sent.
 
 ### 2:25 Summary
 

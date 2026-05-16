@@ -56,6 +56,12 @@ test("replays main scenario and executes approved work order", async ({ page }) 
   await page.getByRole("button", { name: "Approve and run" }).click();
 
   await expect(page.getByRole("heading", { name: "Customer message saved" })).toBeVisible();
+  await expect(page.getByText("sendCustomerMessage", { exact: true })).toBeVisible();
+  await expect(page.getByText("1 pending")).toBeVisible();
+
+  await page.getByRole("button", { name: "Approve and run" }).click();
+
+  await expect(page.getByRole("heading", { name: "Customer message sent" })).toBeVisible();
   await expect(page.getByText("No pending side effects")).toBeVisible();
 });
 

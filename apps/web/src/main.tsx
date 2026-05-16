@@ -173,7 +173,12 @@ function App() {
       await companyClient.reservePart({ ...(approved.payload as object), approvalToken: approved.token });
     }
     if (approved.action === "saveCustomerMessage") {
-      await companyClient.saveCustomerMessage({ ...(approved.payload as object), approvalToken: approved.token });
+      const savedMessage = await companyClient.saveCustomerMessage({ ...(approved.payload as object), approvalToken: approved.token }) as { messageId: string };
+      await companyClient.requestHumanApproval({
+        action: "sendCustomerMessage",
+        summary: "Mock-send the saved customer SMS.",
+        payload: { messageId: savedMessage.messageId }
+      });
     }
     if (approved.action === "sendCustomerMessage") {
       await companyClient.sendCustomerMessage({ ...(approved.payload as object), approvalToken: approved.token });
