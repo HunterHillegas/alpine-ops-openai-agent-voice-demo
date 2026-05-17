@@ -39,10 +39,10 @@ npm run dev:web -- --host 0.0.0.0
 Set `OPENAI_API_KEY` for the API process:
 
 ~~~bash
-OPENAI_API_KEY=<real-key> npm run dev:api
+npm run dev:live
 ~~~
 
-The key stays server-side. The browser should only receive an ephemeral realtime credential.
+`npm run dev:live` loads `.env`, verifies `OPENAI_API_KEY` is present, then starts the normal API and web dev servers. The key stays server-side. The browser should only receive an ephemeral realtime credential.
 
 ## Connect Voice Loads Slowly The First Time
 

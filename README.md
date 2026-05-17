@@ -24,10 +24,10 @@ Open the web app at `http://localhost:5173`. The API runs at `http://localhost:8
 Optional live realtime credentials:
 
 ~~~bash
-OPENAI_API_KEY=<real-key> npm run dev:api
+npm run dev:live
 ~~~
 
-The browser does not receive the API key. `apps/api` mints a realtime client secret at `POST /realtime/session`. Scripts read process environment variables from the shell or deployment host.
+`npm run dev:live` loads `.env`, verifies `OPENAI_API_KEY` is present, then starts the normal API and web dev servers. The browser does not receive the API key. `apps/api` mints a realtime client secret at `POST /realtime/session`. Scripts read process environment variables from the shell or deployment host.
 
 ## Demo Script
 
