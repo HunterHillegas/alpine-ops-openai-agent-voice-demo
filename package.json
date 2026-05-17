@@ -10,7 +10,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev -w apps/api & npm run dev -w apps/web",
+    "dev": "node scripts/dev-runner.mjs",
     "dev:api": "npm run dev -w apps/api",
     "dev:web": "npm run dev -w apps/web",
     "build": "tsc --noEmit && npm run build -w apps/web",
