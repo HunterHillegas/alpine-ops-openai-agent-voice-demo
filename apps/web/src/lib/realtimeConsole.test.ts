@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { AlpineRealtimeConsole, approvalForModel, bindRealtimeSessionEvents, buildAlpineRealtimeAgent, extractClientSecret, type RealtimeConsoleCallbacks } from "./realtimeConsole";
+import { realtimeErrorMessage } from "./realtimeErrors";
 
 describe("realtime console integration", () => {
   it("builds the triage agent with specialist handoffs and core tools", () => {
@@ -104,6 +105,15 @@ describe("realtime console integration", () => {
     console.setMuted(false);
 
     expect(muted).toEqual([true, false]);
+  });
+
+  it("turns browser microphone permission failures into actionable UI copy", () => {
+    expect(realtimeErrorMessage(new DOMException("Permission denied", "NotAllowedError"))).toBe(
+      "Microphone permission denied. Allow microphone access for this browser, then click Connect voice again."
+    );
+    expect(realtimeErrorMessage(new DOMException("Requested device not found", "NotFoundError"))).toBe(
+      "No microphone was found. Connect or enable a microphone, then click Connect voice again."
+    );
   });
 
   it("refreshes state and surfaces approval, interruption, and error events", async () => {

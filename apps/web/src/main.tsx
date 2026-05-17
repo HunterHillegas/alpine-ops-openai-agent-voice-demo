@@ -8,6 +8,7 @@ import { TopBar, type ThemeId } from "./components/TopBar";
 import { companyClient } from "./lib/companyClient";
 import { dispatchSummaryText, ticketIdForCustomerMessage } from "./lib/dispatchSummary";
 import { scenarioForTextFallback } from "./lib/mockTextFallback";
+import { realtimeErrorMessage } from "./lib/realtimeErrors";
 import type { AlpineRealtimeConsole, VoiceConnection } from "./lib/realtimeConsole";
 import type {
   CancelAppointmentInput,
@@ -104,7 +105,7 @@ function App() {
       setBargeInStatus(micMode === "open-mic" ? "Open mic listening." : "Microphone muted. Switch to open mic before speaking.");
     } catch (err) {
       setConnection("disconnected");
-      setError(err instanceof Error ? err.message : "Unable to connect realtime session.");
+      setError(realtimeErrorMessage(err));
     }
   }
 
