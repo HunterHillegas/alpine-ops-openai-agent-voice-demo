@@ -24,6 +24,10 @@ For the MacOS 8 reference theme, open `http://localhost:5173/?theme=platinum` be
 
 Recommended filename: `docs/media/alpine-fieldops-console-platinum.png`.
 
+For the Beverly Hills 90210/SNES reference theme, open `http://localhost:5173/?theme=90210` before capture. The first viewport should keep the same operations cockpit with sun-striped gradients, teal/coral/yellow chrome, chunky shadows, and the `90210` theme selected.
+
+Recommended filename: `docs/media/alpine-fieldops-console-90210.png`.
+
 ## GIF Walkthrough
 
 Suggested sequence:
@@ -46,4 +50,4 @@ For automated UI proof, run:
 npm run test:ui
 ~~~
 
-The test suite covers initial render, replay transcript playback, approval execution, mock voice fallback, text fallback replay, unclear-ID guardrail, scenario-focused workspace, and Platinum theme desktop chrome from the `?theme=platinum` deep link.
+The test suite covers initial render, replay transcript playback, approval execution, mock voice fallback, text fallback replay, unclear-ID guardrail, scenario-focused workspace, Platinum theme desktop chrome from the `?theme=platinum` deep link, and the `90210` theme picker/deep-link path.

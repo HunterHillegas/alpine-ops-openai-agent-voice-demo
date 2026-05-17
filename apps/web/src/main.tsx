@@ -25,12 +25,13 @@ import "./cockpit.css";
 import "./themes.css";
 import "./platinum.css";
 import "./platinum-furniture.css";
+import "./theme-90210.css";
 
 function initialTheme(): ThemeId {
   if (typeof window === "undefined") return "nextstep";
 
   const theme = new URLSearchParams(window.location.search).get("theme");
-  return theme === "platinum" || theme === "nextstep" ? theme : "nextstep";
+  return theme === "platinum" || theme === "nextstep" || theme === "90210" ? theme : "nextstep";
 }
 
 function App() {

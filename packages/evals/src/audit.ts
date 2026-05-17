@@ -22,7 +22,7 @@ export function runCompletionAudit(env: NodeJS.ProcessEnv = process.env): Comple
   const checks: AuditCheck[] = [
     passed("typescript-monorepo", "Workspaces cover apps/web, apps/api, packages/agents, packages/company-api, packages/mock-data, and packages/evals."),
     passed("operations-cockpit", "Playwright smoke covers dashboard render, scenario focus, replay transcript, approval execution/rejection, theme switching, and mock voice fallback."),
-    passed("theme-support", "The web UI exposes NeXTStep as the default theme and MacOS 8 Platinum as a switchable top-bar theme."),
+    passed("theme-support", "The web UI exposes NeXTStep as the default theme, plus MacOS 8 Platinum and 90210 as switchable top-bar themes."),
     passed("platinum-desktop-fidelity", "Playwright verifies the Platinum deep link renders MacOS 8-style menu chrome, patterned wallpaper, desktop icons, background windows, and launcher strip."),
     passed("grouped-traces", "Activity rail groups visible tool, handoff, approval, and state-change events by agent."),
     passed("trace-redaction", "Trace formatter and activity rail tests redact phone numbers, emails, tokens, and client secrets while preserving operational IDs."),

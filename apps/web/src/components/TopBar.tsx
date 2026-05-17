@@ -1,11 +1,12 @@
 import { realtimeModel } from "@alpine/agents";
 import type { DemoScenario } from "@alpine/mock-data";
 
-export type ThemeId = "nextstep" | "platinum";
+export type ThemeId = "nextstep" | "platinum" | "90210";
 
 const themes: { id: ThemeId; name: string }[] = [
   { id: "nextstep", name: "NeXTSTEP" },
-  { id: "platinum", name: "MacOS 8 Platinum" }
+  { id: "platinum", name: "MacOS 8 Platinum" },
+  { id: "90210", name: "90210" }
 ];
 
 export function TopBar(props: {

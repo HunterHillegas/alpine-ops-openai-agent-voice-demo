@@ -1,0 +1,324 @@
+html[data-theme="90210"] {
+  color-scheme: light;
+  --bg: #ffb34f;
+  --bg-2: #23b7b0;
+  --panel: rgba(255, 248, 207, 0.9);
+  --panel-strong: #ffef82;
+  --line: rgba(72, 35, 69, 0.42);
+  --text: #2b1837;
+  --muted: #6b3f62;
+  --accent: #f03e83;
+  --accent-2: #087f7a;
+  --danger: #c7243f;
+  --cyan: #0b8bc0;
+  --shadow: 8px 8px 0 rgba(65, 24, 79, 0.18);
+  --page-bg:
+    linear-gradient(180deg, rgba(255, 244, 114, 0.86) 0 10%, rgba(255, 151, 83, 0.86) 10% 19%, rgba(239, 62, 131, 0.82) 19% 29%, transparent 29% 100%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0 2px, transparent 2px 18px),
+    linear-gradient(135deg, #ffdf5d 0%, #ff9354 32%, #ee3f82 56%, #24b9b0 100%);
+  --chrome-bg: rgba(255, 242, 145, 0.92);
+  --control-bg: #fff2a3;
+  --control-hover-border: #f03e83;
+  --primary-text: #fff9d8;
+  --field-bg: rgba(255, 255, 255, 0.62);
+  --raised-bg: rgba(255, 255, 255, 0.5);
+  --inset-bg: rgba(255, 140, 87, 0.18);
+  --copy-strong: #3a1c48;
+  --brand-bg:
+    linear-gradient(135deg, #f03e83 0 42%, #ffef5a 42% 64%, #14b4b0 64%);
+  --brand-border: #2b1837;
+  --radius: 6px;
+  --radius-lg: 8px;
+  font-family: "Trebuchet MS", "Avenir Next", Verdana, sans-serif;
+}
+
+html[data-theme="90210"] body {
+  background: var(--page-bg);
+  background-color: #ffb34f;
+  background-attachment: fixed;
+}
+
+html[data-theme="90210"] .app-shell {
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+}
+
+html[data-theme="90210"] .app-shell::before {
+  position: fixed;
+  right: -80px;
+  bottom: -92px;
+  z-index: 0;
+  width: 390px;
+  height: 390px;
+  border: 10px solid rgba(43, 24, 55, 0.18);
+  border-radius: 50%;
+  background:
+    repeating-linear-gradient(180deg, rgba(255, 245, 108, 0.96) 0 18px, rgba(255, 142, 80, 0.96) 18px 36px, rgba(239, 62, 131, 0.92) 36px 54px),
+    #ffef5a;
+  clip-path: inset(0 0 50% 0);
+  content: "";
+  pointer-events: none;
+}
+
+html[data-theme="90210"] .app-shell::after {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(90deg, transparent 0 48%, rgba(43, 24, 55, 0.16) 48% 52%, transparent 52%) 11% 84% / 36px 130px no-repeat,
+    linear-gradient(18deg, transparent 0 44%, rgba(43, 24, 55, 0.14) 44% 48%, transparent 48%) 7% 78% / 150px 90px no-repeat,
+    linear-gradient(-18deg, transparent 0 44%, rgba(43, 24, 55, 0.14) 44% 48%, transparent 48%) 7% 77% / 150px 90px no-repeat;
+  content: "";
+  pointer-events: none;
+}
+
+html[data-theme="90210"] .topbar,
+html[data-theme="90210"] .console-grid,
+html[data-theme="90210"] .approval-drawer,
+html[data-theme="90210"] .error-banner {
+  position: relative;
+  z-index: 1;
+}
+
+html[data-theme="90210"] .topbar,
+html[data-theme="90210"] .panel,
+html[data-theme="90210"] .workspace,
+html[data-theme="90210"] .approval-drawer {
+  border: 3px solid #2b1837;
+  background:
+    linear-gradient(180deg, rgba(255, 252, 214, 0.94), rgba(255, 229, 111, 0.92)),
+    var(--chrome-bg);
+  box-shadow:
+    inset 3px 3px 0 rgba(255, 255, 255, 0.72),
+    inset -3px -3px 0 rgba(208, 67, 117, 0.24),
+    var(--shadow);
+}
+
+html[data-theme="90210"] .topbar {
+  align-items: flex-start;
+}
+
+html[data-theme="90210"] .brand {
+  min-width: 230px;
+}
+
+html[data-theme="90210"] .brand-mark {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border: 3px solid #2b1837;
+  border-radius: 7px;
+  color: #fff9d8;
+  font-family: "Cooper Black", "Trebuchet MS", sans-serif;
+  font-size: 0;
+  box-shadow: 4px 4px 0 rgba(43, 24, 55, 0.22);
+  transform: rotate(-5deg);
+}
+
+html[data-theme="90210"] .brand-mark::after {
+  content: "90";
+  font-size: 1.16rem;
+  text-shadow: 2px 2px 0 #2b1837;
+}
+
+html[data-theme="90210"] .brand h1,
+html[data-theme="90210"] .workspace-header h2,
+html[data-theme="90210"] .info-panel h3,
+html[data-theme="90210"] .event-card h4 {
+  color: #2b1837;
+  font-family: "Cooper Black", "Trebuchet MS", sans-serif;
+  letter-spacing: 0;
+}
+
+html[data-theme="90210"] .brand h1 {
+  color: #f03e83;
+  font-size: 1.18rem;
+  text-shadow: 1px 1px 0 #fff9d8, 2px 2px 0 rgba(43, 24, 55, 0.2);
+}
+
+html[data-theme="90210"] .brand p,
+html[data-theme="90210"] .theme-picker span,
+html[data-theme="90210"] .panel-heading,
+html[data-theme="90210"] .info-panel span,
+html[data-theme="90210"] .transcript label,
+html[data-theme="90210"] .approval-drawer span {
+  color: #6b2b60;
+}
+
+html[data-theme="90210"] button,
+html[data-theme="90210"] select,
+html[data-theme="90210"] input {
+  border: 2px solid #2b1837;
+  border-radius: 6px;
+  background: var(--control-bg);
+  color: #2b1837;
+  box-shadow: 3px 3px 0 rgba(43, 24, 55, 0.18);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+html[data-theme="90210"] button:hover {
+  border-color: #f03e83;
+  transform: translateY(-2px);
+}
+
+html[data-theme="90210"] .primary-action {
+  background:
+    linear-gradient(180deg, #f03e83, #c52f8d);
+  color: #fff9d8;
+  text-shadow: 1px 1px 0 #2b1837;
+}
+
+html[data-theme="90210"] .status-pill,
+html[data-theme="90210"] .model-pill,
+html[data-theme="90210"] .priority {
+  border: 2px solid #2b1837;
+  border-radius: 6px;
+  background: #fff6b7;
+  color: #6b2b60;
+  box-shadow: 3px 3px 0 rgba(43, 24, 55, 0.16);
+}
+
+html[data-theme="90210"] .status-pill.live,
+html[data-theme="90210"] .status-pill.mock,
+html[data-theme="90210"] .priority {
+  color: #087f7a;
+}
+
+html[data-theme="90210"] .console-grid {
+  gap: 16px;
+  margin-top: 16px;
+}
+
+html[data-theme="90210"] .panel-heading,
+html[data-theme="90210"] .workspace-header,
+html[data-theme="90210"] .agent-group-heading {
+  border: 2px solid #2b1837;
+  border-radius: 5px;
+  background:
+    linear-gradient(90deg, #f03e83 0 14%, #ffef5a 14% 28%, #14b4b0 28% 42%, #fff7b5 42% 100%);
+  box-shadow: 3px 3px 0 rgba(43, 24, 55, 0.14);
+  color: #2b1837;
+  padding: 7px 9px;
+}
+
+html[data-theme="90210"] .panel-heading span,
+html[data-theme="90210"] .panel-heading strong,
+html[data-theme="90210"] .workspace-header h2,
+html[data-theme="90210"] .workspace-header p,
+html[data-theme="90210"] .agent-group-heading h3,
+html[data-theme="90210"] .agent-group-heading span {
+  color: #2b1837;
+}
+
+html[data-theme="90210"] .info-panel,
+html[data-theme="90210"] .chart-panel,
+html[data-theme="90210"] .timeline-panel,
+html[data-theme="90210"] .policy-panel,
+html[data-theme="90210"] .schedule-panel,
+html[data-theme="90210"] .plan-panel,
+html[data-theme="90210"] .event-card,
+html[data-theme="90210"] .transcript,
+html[data-theme="90210"] .barge-indicator,
+html[data-theme="90210"] .approval-list article {
+  border: 2px solid rgba(43, 24, 55, 0.42);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(255, 239, 126, 0.26)),
+    var(--raised-bg);
+  box-shadow: 4px 4px 0 rgba(43, 24, 55, 0.12);
+}
+
+html[data-theme="90210"] .info-panel h3,
+html[data-theme="90210"] .event-card small,
+html[data-theme="90210"] .follow-up span,
+html[data-theme="90210"] .message-ledger span,
+html[data-theme="90210"] .transcript-feed b,
+html[data-theme="90210"] .timeline-panel li span,
+html[data-theme="90210"] .schedule-panel b {
+  color: #f03e83;
+}
+
+html[data-theme="90210"] .timeline-panel li span,
+html[data-theme="90210"] .schedule-panel b,
+html[data-theme="90210"] .message-ledger span {
+  color: #087f7a;
+}
+
+html[data-theme="90210"] .voice-orb {
+  border: 4px solid #2b1837;
+  background:
+    repeating-linear-gradient(180deg, #fff15f 0 15px, #ff934f 15px 30px, #f03e83 30px 45px),
+    #fff15f;
+  box-shadow:
+    inset 0 0 0 10px rgba(255, 255, 255, 0.28),
+    8px 8px 0 rgba(43, 24, 55, 0.18);
+}
+
+html[data-theme="90210"] .voice-orb span {
+  border-color: rgba(43, 24, 55, 0.32);
+}
+
+html[data-theme="90210"] .voice-orb b {
+  color: #fff9d8;
+  font-family: "Cooper Black", "Trebuchet MS", sans-serif;
+  text-shadow: 3px 3px 0 #2b1837;
+}
+
+html[data-theme="90210"] .bar {
+  border-radius: 5px 5px 0 0;
+  background:
+    linear-gradient(180deg, #f03e83, #ffef5a 52%, #14b4b0);
+}
+
+html[data-theme="90210"] .event-args {
+  border: 2px solid rgba(43, 24, 55, 0.34);
+  background: #fffbd1;
+  color: #2b1837;
+}
+
+html[data-theme="90210"] .policy-panel li {
+  border-left-color: #f03e83;
+}
+
+html[data-theme="90210"] .follow-up {
+  border-left-color: #f03e83;
+}
+
+html[data-theme="90210"] .message-ledger {
+  border-left-color: #087f7a;
+}
+
+html[data-theme="90210"] .approval-drawer {
+  backdrop-filter: blur(8px);
+}
+
+html[data-theme="90210"] .approval-list article {
+  background:
+    linear-gradient(180deg, rgba(255, 239, 90, 0.42), rgba(240, 62, 131, 0.16)),
+    #fff8bd;
+}
+
+@media (max-width: 1180px) {
+  html[data-theme="90210"] .app-shell::before {
+    width: 280px;
+    height: 280px;
+  }
+}
+
+@media (max-width: 720px) {
+  html[data-theme="90210"] .app-shell {
+    padding: 10px;
+  }
+
+  html[data-theme="90210"] .topbar,
+  html[data-theme="90210"] .panel,
+  html[data-theme="90210"] .workspace,
+  html[data-theme="90210"] .approval-drawer {
+    border-width: 2px;
+  }
+
+  html[data-theme="90210"] .brand {
+    min-width: 0;
+  }
+}

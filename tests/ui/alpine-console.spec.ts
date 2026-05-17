@@ -22,6 +22,9 @@ test("renders seeded operations cockpit", async ({ page }) => {
   await page.getByLabel("Theme").selectOption("platinum");
   await expect(page.locator(".app-shell")).toHaveAttribute("data-theme", "platinum");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "platinum");
+  await page.getByLabel("Theme").selectOption("90210");
+  await expect(page.locator(".app-shell")).toHaveAttribute("data-theme", "90210");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "90210");
   await page.getByRole("button", { name: "Open mic" }).click();
   await expect(page.getByText("Open mic listening")).toBeVisible();
   await expect(page.getByText("No pending side effects")).toBeVisible();
@@ -45,6 +48,17 @@ test("loads Platinum desktop furniture from theme deep link", async ({ page }) =
   await expect(page.locator(".platinum-launch-strip")).toBeVisible();
   await expect(page.locator(".platinum-launch-strip span")).toHaveCount(6);
   await expect(page.locator(".topbar")).toHaveCSS("background-color", "rgb(216, 216, 216)");
+});
+
+test("loads 90210 theme from theme deep link", async ({ page }) => {
+  await page.goto("/?theme=90210");
+
+  await expect(page.getByLabel("Theme")).toHaveValue("90210");
+  await expect(page.locator(".app-shell")).toHaveAttribute("data-theme", "90210");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "90210");
+  await expect(page.locator("body")).toHaveCSS("background-color", "rgb(255, 179, 79)");
+  await expect(page.locator(".brand h1")).toHaveCSS("color", "rgb(240, 62, 131)");
+  await expect(page.locator(".primary-action")).toHaveCSS("color", "rgb(255, 249, 216)");
 });
 
 test("replays main scenario and executes approved work order", async ({ page }) => {
