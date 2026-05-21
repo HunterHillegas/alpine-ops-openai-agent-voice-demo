@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { scenarioTranscripts, type Approval, type CompanyState, type DemoScenario, type TranscriptTurn } from "@alpine/mock-data";
+import { ApprovalDrawer } from "./components/ApprovalDrawer";
 import { ActivityRail } from "./components/ActivityRail";
+import { DemoGuide } from "./components/DemoGuide";
 import { NextStepFurniture } from "./components/NextStepFurniture";
 import { PlatinumFurniture } from "./components/PlatinumFurniture";
 import { TopBar, type ThemeId } from "./components/TopBar";
@@ -27,7 +29,6 @@ import "./themes.css";
 import "./platinum.css";
 import "./platinum-furniture.css";
 import "./theme-90210.css";
-
 function initialTheme(): ThemeId {
   if (typeof window === "undefined") return "nextstep";
 
@@ -258,6 +259,14 @@ function App() {
 
       {error && <div className="error-banner">{error}</div>}
 
+      <DemoGuide
+        connection={connection}
+        pendingApprovals={pendingApprovals.length}
+        scenarioName={selectedScenario?.name}
+        onConnect={connectVoice}
+        onReplay={replay}
+      />
+
       <section className="console-grid">
         <VoicePanel
           connection={connection}
@@ -279,7 +288,6 @@ function App() {
     </main>
   );
 }
-
 function withApprovalToken<T extends { approvalToken: string }>(payload: unknown, approvalToken: string): T {
   return { ...(payload as Omit<T, "approvalToken">), approvalToken } as T;
 }
@@ -473,7 +481,6 @@ function CaseWorkspace({ customer, asset, ticket, telemetry, state, scenario }: 
     </section>
   );
 }
-
 function formatCents(amountCents: number) {
   return "$" + (amountCents / 100).toFixed(2);
 }
@@ -488,28 +495,5 @@ function InfoPanel({ title, value, meta, children }: { title: string; value: str
     </article>
   );
 }
-
-function ApprovalDrawer({ approvals, onApprove, onReject }: { approvals: Approval[]; onApprove: (approval: Approval) => void; onReject: (approval: Approval) => void }) {
-  return (
-    <section className="approval-drawer">
-      <div>
-        <span>Approval queue</span>
-        <strong>{approvals.length ? `${approvals.length} pending` : "No pending side effects"}</strong>
-      </div>
-      <div className="approval-list">
-        {approvals.length === 0 ? (
-          <p>Read-only lookups can run automatically. Ticket writes, internal notes, scheduling, cancellation, refund, part reservation, and message send wait here.</p>
-        ) : approvals.map((approval) => (
-          <article key={approval.approvalId}>
-            <b>{approval.action}</b>
-            <p>{approval.summary}</p>
-            <button onClick={() => onApprove(approval)}>Approve and run</button>
-            <button className="secondary" onClick={() => onReject(approval)}>Reject</button>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-createRoot(document.getElementById("root")!).render(<App />);
+const appRoot = ((window as Window & { alpineRoot?: ReturnType<typeof createRoot> }).alpineRoot ??= createRoot(document.getElementById("root")!));
+appRoot.render(<App />);

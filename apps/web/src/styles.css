@@ -210,6 +210,89 @@ button:hover {
   padding: 10px 12px;
 }
 
+.demo-guide {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.7fr) minmax(0, 2.3fr);
+  gap: 16px;
+  margin-top: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(135deg, rgba(246, 198, 91, 0.11), transparent 46%),
+    var(--chrome-bg);
+  box-shadow: var(--shadow);
+  padding: 14px;
+}
+
+.guide-intro span {
+  color: var(--accent-2);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.guide-intro h2 {
+  margin: 8px 0 0;
+  max-width: 330px;
+  color: var(--text);
+  font-size: 1.32rem;
+  line-height: 1.12;
+}
+
+.guide-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guide-steps li {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px;
+  min-height: 124px;
+  border: 1px solid rgba(177, 224, 194, 0.16);
+  border-radius: var(--radius);
+  background: var(--raised-bg);
+  padding: 12px;
+}
+
+.guide-steps li > b {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid rgba(246, 198, 91, 0.4);
+  border-radius: 50%;
+  background: rgba(246, 198, 91, 0.12);
+  color: var(--accent-2);
+}
+
+.guide-steps strong {
+  display: block;
+  color: var(--text);
+}
+
+.guide-steps p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  line-height: 1.38;
+}
+
+.guide-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.guide-actions button {
+  padding: 0.58rem 0.72rem;
+}
+
 .console-grid {
   display: grid;
   grid-template-columns: minmax(260px, 0.9fr) minmax(480px, 1.7fr) minmax(300px, 0.9fr);

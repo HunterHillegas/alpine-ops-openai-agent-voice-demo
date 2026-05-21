@@ -359,6 +359,7 @@ dd {
 
   .topbar,
   .approval-drawer,
+  .demo-guide,
   .lower-grid,
   .fallback-form {
     display: block;
@@ -371,6 +372,11 @@ dd {
 
   .workspace-grid {
     grid-template-columns: 1fr;
+  }
+
+  .guide-steps {
+    grid-template-columns: 1fr;
+    margin-top: 12px;
   }
 
   .approval-drawer {

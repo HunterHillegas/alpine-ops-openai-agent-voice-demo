@@ -9,6 +9,11 @@ test.beforeEach(async ({ page }) => {
 
 test("renders seeded operations cockpit", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Alpine FieldOps" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Run the field-service voice agent in three moves." })).toBeVisible();
+  await expect(page.getByText("Pick the dispatch case")).toBeVisible();
+  await expect(page.getByText("Send the agent work")).toBeVisible();
+  await expect(page.getByText("Approve writes")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Run selected replay" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Active case workspace" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Amelia Brooks" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "CHG-8821" })).toBeVisible();
@@ -58,11 +63,11 @@ test("loads 90210 theme from theme deep link", async ({ page }) => {
   await expect(page.locator("html")).toHaveAttribute("data-theme", "90210");
   await expect(page.locator("body")).toHaveCSS("background-color", "rgb(255, 179, 79)");
   await expect(page.locator(".brand h1")).toHaveCSS("color", "rgb(240, 62, 131)");
-  await expect(page.locator(".primary-action")).toHaveCSS("color", "rgb(255, 249, 216)");
+  await expect(page.locator(".topbar .primary-action")).toHaveCSS("color", "rgb(255, 249, 216)");
 });
 
 test("replays main scenario and executes approved work order", async ({ page }) => {
-  await page.getByRole("button", { name: "Run replay" }).click();
+  await page.getByRole("button", { name: "Run selected replay" }).click();
 
   await expect(page.getByRole("heading", { name: "Approval requested" })).toBeVisible();
   await expect(page.getByText("1 pending")).toBeVisible();
@@ -118,10 +123,10 @@ test("rejecting a proposed work order leaves write state unchanged", async ({ pa
 });
 
 test("mock voice connection and text fallback run seeded replay without an API key", async ({ page }) => {
-  await page.getByRole("button", { name: "Connect voice" }).click();
+  await page.locator(".topbar").getByRole("button", { name: "Connect voice" }).click();
 
   await expect(page.getByText("mock").first()).toBeVisible();
-  await expect(page.getByRole("button", { name: "Disconnect" })).toBeVisible();
+  await expect(page.locator(".topbar").getByRole("button", { name: "Disconnect" })).toBeVisible();
   await expect(page.getByText("Mock voice mode active. Set OPENAI_API_KEY on the API server for live WebRTC.")).toBeVisible();
 
   await page.getByPlaceholder("Text fallback for no-mic testing").fill("Check CHG-8821");
